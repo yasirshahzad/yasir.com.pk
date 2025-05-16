@@ -1,8 +1,8 @@
 /** @type {import("pliny/config").PlinyConfig } */
 const siteMetadata = {
-  title: 'HatfLabs',
-  author: 'Tails Azimuth',
-  headerTitle: 'HatfLabs - Where Ideas Meet Innovation',
+  title: 'HatfLabs - Where Ideas Meet Innovation',
+  author: 'Muhammad Yasir',
+  headerTitle: 'HatfLabs',
   description: 'A software design and development agency',
   language: 'en-us',
   theme: 'system', // system, dark or light
@@ -52,7 +52,7 @@ const siteMetadata = {
   newsletter: {
     // supports mailchimp, buttondown, convertkit, klaviyo, revue, emailoctopus, beehive
     // Please add your .env file and modify it according to your selection
-    provider: 'buttondown',
+    provider: 'emailoctopus',
   },
   comments: {
     // If you want to use an analytics provider you have to add it to the
