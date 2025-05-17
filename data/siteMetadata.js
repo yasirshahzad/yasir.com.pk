@@ -6,8 +6,8 @@ const siteMetadata = {
   description: 'A software design and development agency',
   language: 'en-us',
   theme: 'system', // system, dark or light
-  siteUrl: 'https://tailwind-nextjs-starter-blog.vercel.app',
-  siteRepo: 'https://github.com/timlrx/tailwind-nextjs-starter-blog',
+  siteUrl: 'https://yasir.com.pk',
+  siteRepo: 'https://github.com/yasirshahzad/yasir.com.pk',
   siteLogo: `${process.env.BASE_PATH || ''}/static/images/logo.png`,
   socialBanner: `${process.env.BASE_PATH || ''}/static/images/twitter-card.webp`,
   mastodon: 'https://mastodon.social/@mastodonuser',
