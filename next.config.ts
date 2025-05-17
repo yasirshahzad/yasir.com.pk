@@ -1,5 +1,7 @@
 import { withContentlayer } from 'next-contentlayer2'
 import something from '@next/bundle-analyzer'
+import type { NextConfig } from 'next'
+
 
 const withBundleAnalyzer = something({
   enabled: process.env.ANALYZE === 'true',
@@ -59,12 +61,10 @@ const output = process.env.EXPORT ? 'export' : undefined
 const basePath = process.env.BASE_PATH || undefined
 const unoptimized = process.env.UNOPTIMIZED ? true : undefined
 
-/**
- * @type {import('next/dist/next-server/server/config').NextConfig}
- **/
+/** @type {import('next').NextConfig} */
 module.exports = () => {
   const plugins = [withContentlayer, withBundleAnalyzer]
-  return plugins.reduce((acc, next) => next(acc), {
+  return plugins.reduce((acc, next) => next(acc as NextConfig), {
     output,
     basePath,
     reactStrictMode: true,
