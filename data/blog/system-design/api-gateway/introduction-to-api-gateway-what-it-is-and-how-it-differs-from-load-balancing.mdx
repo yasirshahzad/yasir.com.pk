@@ -1,0 +1,109 @@
+---
+title: Introduction to API Gateway - What It Is and How It Differs from Load Balancing
+date: '2025-05-19'
+tags: ['system-design', 'api-gateway']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/api-gateway-vs-load-balancer.png']
+summary: In modern software architecture—especially with the rise of microservices—efficient request routing and system scalability are critical. Two key components that help manage this are the API Gateway and the Load Balancer.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={2} />
+
+In modern software architecture—especially with the rise of **microservices**—efficient request routing and system scalability are critical. Two key components that help manage this are the **API Gateway** and the **Load Balancer**.
+
+While they may seem similar, they serve **distinct purposes**. This post explores the **role of an API Gateway**, how it fits into a system’s architecture, and how it differs from a load balancer.
+
+## 🔍 What Is an API Gateway?
+
+An **API Gateway** is a **server-side component** that acts as a single **entry point** for clients—such as web browsers, mobile apps, or third-party services—to access the **backend microservices or APIs** of an application.
+
+Think of it as the **traffic controller** of your backend ecosystem.
+
+### 🎯 Key Responsibilities of an API Gateway:
+
+- **Request Routing**: Forwards client requests to the correct microservice based on the URL or route.
+- **Authentication and Authorization**: Verifies identity and controls access to specific endpoints.
+- **Rate Limiting**: Prevents abuse by throttling requests per client or user.
+- **API Aggregation**: Combines responses from multiple services into one.
+- **Caching**: Stores frequent responses to improve performance.
+- **Logging and Monitoring**: Tracks API usage and performance metrics.
+
+### 🛠 Example Use Case:
+
+In a microservices-based e-commerce application, an API Gateway could:
+
+- Route `/user/orders` to the **Order Service**
+- Route `/user/profile` to the **User Service**
+- Validate JWT tokens for secure access
+- Apply throttling for public APIs
+
+## 📊 API Gateway vs. Load Balancer: Key Differences
+
+| Feature                  | API Gateway                                           | Load Balancer                                 |
+| ------------------------ | ----------------------------------------------------- | --------------------------------------------- |
+| **Purpose**              | Manages, routes, and secures API requests             | Distributes traffic across backend servers    |
+| **Focus**                | API management & microservice routing                 | High availability & even traffic distribution |
+| **Request Type**         | API-level (e.g. REST, GraphQL)                        | Network-level (HTTP, TCP, etc.)               |
+| **Granularity**          | Handles specific API endpoints and services           | Routes to server instances only               |
+| **Functionality**        | Auth, rate limiting, caching, aggregation             | Load distribution, health checks              |
+| **Response Aggregation** | ✅ Supports combining multiple service responses      | ❌ Not supported                              |
+| **Common Tools**         | Kong, AWS API Gateway, Apigee, NGINX (as API gateway) | HAProxy, NGINX, AWS ELB, Traefik              |
+
+![API Gateway vs. Load Balancer: Key Differences](/static/images/system-design/api-gateway-vs-load-balancer.png)
+
+
+## 🧠 Deeper Explanation
+
+### 📌 How API Gateways Handle Requests:
+
+- Clients send requests to a central API gateway endpoint.
+- The gateway interprets the request path (e.g., `/users/123/orders`).
+- It routes the request to the right microservice.
+- The gateway may **enforce security** and **rate limits**, then return the response to the client.
+
+### 📌 How Load Balancers Handle Requests:
+
+- Load balancers distribute incoming requests among multiple servers running the **same service**.
+- They help **scale horizontally** by balancing traffic based on:
+
+  - Round-robin algorithms
+  - Least-connections
+  - Health checks
+  - Server response times
+
+## 🧩 When to Use What?
+
+| Scenario                                             | Use This          |
+| ---------------------------------------------------- | ----------------- |
+| Microservices architecture with many APIs            | **API Gateway**   |
+| Need for authentication, rate limiting, logging      | **API Gateway**   |
+| Distributing identical workloads (e.g., web servers) | **Load Balancer** |
+| Scaling a monolithic or legacy backend               | **Load Balancer** |
+| Combining multiple service calls into one response   | **API Gateway**   |
+
+---
+
+## 🔄 Can You Use Both?
+
+Absolutely! In fact, in many production-grade cloud architectures, **both components are used together**:
+
+1. **Clients** → Request to a **Load Balancer**
+2. Load Balancer → Routes to an **API Gateway** instance
+3. API Gateway → Routes request to the appropriate **microservice**
+
+This approach provides both **scalability** and **feature-rich request management**.
+
+## 📷 Visual Comparison (Optional Diagrams)
+
+Want visual diagrams of how traffic flows between clients, load balancers, API gateways, and microservices? Let me know and I can generate simple architecture diagrams for both approaches.
+
+## 🏁 Conclusion
+
+While both API Gateways and Load Balancers manage traffic, their **core responsibilities** differ:
+
+- Use an **API Gateway** when working with APIs and microservices that require **fine-grained routing**, **security**, and **rate limiting**.
+- Use a **Load Balancer** when you need to distribute load across multiple instances of the **same service**.
+
+Understanding these roles is essential for building **scalable, maintainable, and secure systems** in modern cloud-native applications.
+
