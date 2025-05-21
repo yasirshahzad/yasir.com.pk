@@ -1,0 +1,49 @@
+---
+title: Scalability in Distributed Systems - Horizontal vs. Vertical Scaling Explained
+date: '2025-05-21'
+tags: ['system-design', 'scalability']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.webp']
+summary: Learn the key differences between horizontal and vertical scaling in distributed systems. Discover how each approach impacts system performance, cost, and growth capacity.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## What Is Scalability in Distributed Systems?
+
+**Scalability** is a system's ability to handle increased workload by either adding more resources (horizontal scaling) or upgrading existing ones (vertical scaling). In **distributed systems**, scalability ensures smooth performance as user demands grow.
+
+Let's break down the two main types of scaling:
+
+## A. Horizontal Scaling (Scaling Out)
+
+**Horizontal scaling** means adding more machines or nodes to distribute the load. It's a cost-effective and flexible way to handle traffic spikes and ensure **high availability**.
+
+- **Benefits:** Easily add or remove servers as needed
+- **Use Cases:** Ideal for cloud-based and distributed systems
+- **Examples:** **MongoDB**, **Cassandra**
+
+## B. Vertical Scaling (Scaling Up)
+
+**Vertical scaling** involves upgrading a single server—adding more CPU, memory, or storage. It boosts performance but has physical limits and may require downtime.
+
+- **Benefits:** Simple to implement on smaller systems
+- **Limitations:** Downtime, hardware limits, potential single point of failure
+- **Examples:** **MySQL** (scale up by switching to a larger instance)
+
+## Horizontal vs. Vertical Scaling: A Quick Comparison
+
+| Feature           | Horizontal Scaling         | Vertical Scaling                |
+| ----------------- | -------------------------- | ------------------------------- |
+| Resource Type     | More machines              | Bigger machines                 |
+| Downtime          | Minimal or none            | May involve downtime            |
+| Cost Efficiency   | Scales with demand         | Can become expensive            |
+| Fault Tolerance   | Higher (distributed nodes) | Lower (single point of failure) |
+| Scalability Limit | Virtually limitless        | Limited by hardware             |
+
+## Conclusion
+
+Choosing between **horizontal and vertical scaling** depends on your system's architecture, budget, and performance goals. Distributed systems often favor horizontal scaling for its flexibility and resilience, while smaller applications may benefit from vertical scaling for simplicity.
+
+For best results, modern architectures often combine both methods for a balanced and scalable infrastructure.
