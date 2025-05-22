@@ -3,7 +3,7 @@ import { allBlogs } from 'contentlayer/generated'
 import Main from './Main'
 
 export default async function Page() {
-  const sortedPosts = sortPosts(allBlogs, "date")
+  const sortedPosts = sortPosts(allBlogs, 'date')
   const posts = allCoreContent(sortedPosts)
   return <Main posts={posts} />
 }
