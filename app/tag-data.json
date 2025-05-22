@@ -1,6 +1,8 @@
 {
-  "system-design": 12,
-  "api-gateway": 1,
+  "system-design": 16,
+  "key-concepts": 1,
+  "api-gateway": 3,
+  "scalability": 1,
   "load-balacing": 8,
   "load-balacing-algorithms": 1,
   "load-balacing-uses": 1
