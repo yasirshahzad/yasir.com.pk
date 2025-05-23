@@ -44,19 +44,21 @@ Coordination services abstract complexity and help in:
 
 Popular tools include **Apache ZooKeeper**, **etcd**, and **Consul**.
 
-
 ### D. Consistency Models in Distributed Systems
 
 Consistency models define how data changes are seen across distributed components:
 
-1. **Strong Consistency:** Updates are immediately visible everywhere.
-2. **Eventual Consistency:** Data syncs over time.
-3. **Causal Consistency:** Related updates maintain order.
+1. **Strong Consistency:** Updates are immediately visible everywhere. For example - RDBMS uses strong consistency.
+2. **Eventual Consistency:** Data syncs over time. For example, AWS DynamoDB uses eventual consistency.
+3. **Causal Consistency:** Causal consistency is a data consistency model used in distributed systems. It ensures that related events (causal events) happen in the correct order for everyone who sees them. It's ideal for:
+   - Social media apps
+   - Collaborative tools
+   - Messaging systems
 4. **Read-Your-Writes:** Users always see their latest updates.
 5. **Session Consistency:** Ensures a consistent view during a session.
 6. **Sequential Consistency:** Operations appear in the same global order.
-7. **Monotonic Reads:** No backward steps in data versioning.
-8. **Linearizability:** Strongest form; every operation appears instantaneous.
+7. **Monotonic Reads:** No backward steps in data versioning. For Example - A user checking a flight status on an airline app will not see a departure time that goes back in time; it will only move forward.
+8. **Linearizability:** Strongest form; every operation appears instantaneous. For example - In a distributed key-value store, once a new value is written to a key, any read operation on any node immediately reflects this change.
 
 ### Concurrency Control vs. Synchronization
 

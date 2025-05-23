@@ -1,0 +1,116 @@
+---
+title: Monitoring vs. Observability in Distributed Systems - Explained Simply with Examples
+date: '2025-05-23'
+tags: ['system-design', 'observability', 'monitoring']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.webp']
+summary: Learn the difference between monitoring and observability in distributed systems. Understand metrics, logging, tracing, dashboards, and alerts with real-world examples and top tools like Prometheus, Grafana, and Jaeger.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## 🛠 What Is Monitoring and Observability?
+
+In distributed systems, things often run across many servers and services. To keep everything healthy and performant, you need to:
+
+- **Track system activity (Monitoring)**
+- **Understand why things happen (Observability)**
+
+Let's break it down into five key parts with real-life examples.
+
+### 📊 A. Metrics Collection
+
+**What Are Metrics?**
+Metrics are numbers that tell you how your system is doing.
+
+#### 🔍 Example:
+
+In a ride-sharing app like Uber:
+
+- **Latency** = how long it takes to match a rider with a driver.
+- **Error rate** = % of failed bookings.
+- **Throughput** = number of successful bookings per second.
+
+**Tools to use:**
+🛠 Prometheus, InfluxDB, Graphite
+
+### 🕵️‍♂️ B. Distributed Tracing
+
+**What Is It?**
+It’s like putting GPS trackers on requests to follow their full journey across your system.
+
+#### 🔍 Example:
+
+You want to trace why booking a ride is slow. With distributed tracing, you can see:
+
+- How long it took to check payment
+- How fast the driver-matching service responded
+
+**Tools to use:**
+🛠 Jaeger, Zipkin, OpenTelemetry
+
+### 🧾 C. Logging
+
+**What Are Logs?**
+Logs are text records of what happens inside your system.
+
+#### 🔍 Example:
+
+A failed payment might log:
+
+```
+[ERROR] PaymentService: Card declined – UserID 1234
+```
+
+Centralized logging lets developers search through all system logs in one place.
+
+**Tools to use:**
+🛠 ELK Stack (Elasticsearch, Logstash, Kibana), Graylog
+
+### 🚨 D. Alerting and Anomaly Detection
+
+**What It Means:**
+Get notified **before** users complain.
+
+#### 🔍 Example:
+
+If ride-booking errors spike or payment latency exceeds 2 seconds, your system can:
+
+- Send alerts to Slack or PagerDuty
+- Automatically flag the issue for review
+
+**Tools to use:**
+🛠 Grafana, PagerDuty, Sensu
+
+### 📈 E. Visualization and Dashboards
+
+**Why It Matters:**
+Numbers and logs are hard to read. Dashboards turn them into visuals you can **understand in seconds**.
+
+#### 🔍 Example:
+
+A dashboard might show:
+
+- Map of server response times
+- Daily trend of booking failures
+- Pie chart of payment errors by type
+
+**Tools to use:**
+🛠 Grafana, Kibana, Datadog
+
+## ✅ Summary
+
+| Component  | What It Does                        | Real-Life Benefit                            | Tool Examples             |
+| ---------- | ----------------------------------- | -------------------------------------------- | ------------------------- |
+| Metrics    | Tracks numbers like latency, errors | Spot trends and performance issues           | Prometheus, InfluxDB      |
+| Tracing    | Follows requests through services   | Finds the exact point of delay or failure    | Jaeger, Zipkin            |
+| Logging    | Records system events and messages  | Debug specific issues with detail            | ELK Stack, Graylog        |
+| Alerting   | Sends notifications on anomalies    | Proactively fix problems before users notice | Grafana, PagerDuty, Sensu |
+| Dashboards | Visualizes all data in one place    | Quick and clear decision-making              | Grafana, Kibana, Datadog  |
+
+### 📌 Final Thoughts
+
+Monitoring tells you **what** is wrong. Observability helps you understand **why** it's happening.
+
+Together, they form the **backbone of reliability** in any modern distributed system.
