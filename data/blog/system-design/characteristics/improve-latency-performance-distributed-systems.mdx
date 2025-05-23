@@ -1,0 +1,65 @@
+---
+title: How to Improve Latency and Performance in Distributed Systems
+date: '2025-05-23'
+tags: ['system-design', 'scalability']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.webp']
+summary: Learn how to reduce latency and boost performance in distributed systems using data locality, load balancing, and caching strategies. These simple techniques can significantly enhance speed, scalability, and user experience.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+In distributed systems, **latency** and **performance** directly impact how fast and efficiently users can access your services. If your system is slow, users will leave. If it can’t handle traffic, it’ll crash. Let’s explore simple ways to fix that.
+
+## Why Latency and Performance Matter
+
+- **Latency** is the time it takes to send and receive data.
+- **Performance** is how quickly your system responds and handles tasks.
+
+In distributed systems, data is spread out over many nodes or servers. Making them work smoothly together is key to keeping things fast and responsive.
+
+## 3 Key Techniques to Improve Latency and Performance
+
+### A. Data Locality
+
+**Data locality** means keeping data close to where it’s used. This reduces how far data needs to travel between servers.
+
+**How to improve data locality:**
+
+- **Sharding**: Split data into chunks and store each chunk where it's most needed.
+- **Replication**: Keep copies of important data on multiple servers.
+- **Partitioning**: Organize data logically so related data is stored together.
+
+> **Example:** An e-commerce site can store product data closer to the region where most customers are from, speeding up search and browsing.
+
+### B. Load Balancing
+
+**Load balancing** spreads work evenly across servers. This prevents any one server from being overloaded and ensures better use of resources.
+
+**Common load balancing methods:**
+
+- **Round-robin**: Sends requests to each server in turn.
+- **Least connections**: Sends traffic to the server with the fewest active connections.
+- **Consistent hashing**: Keeps traffic routed to the same server when possible, useful for caching.
+
+> **Example:** A video streaming service can balance user traffic across servers to avoid buffering and downtime.
+
+### C. Caching Strategies
+
+**Caching** saves frequently used data temporarily, so it can be served faster the next time it’s needed.
+
+**Types of caching:**
+
+- **In-memory caching** (e.g., Redis, Memcached): Stores data in RAM for fast access.
+- **Distributed caching**: Shares cache across multiple nodes for scalability.
+- **Content Delivery Networks (CDNs)**: Store static files like images and videos closer to users.
+
+> **Example:** Social media platforms cache profile pictures and feed data to avoid repeated fetching from the database.
+
+## Final Thoughts
+
+By improving **data locality**, using smart **load balancing**, and implementing effective **caching**, you can reduce latency and boost performance in your distributed systems.
+
+These optimizations make your app or service faster, more reliable, and ready to handle growth. Even small tweaks can lead to big wins in speed and user satisfaction.
