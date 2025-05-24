@@ -1,0 +1,65 @@
+---
+title: Fault Tolerance vs. High Availability - Key Differences Explained
+date: '2025-05-24'
+tags: ['system-design', 'high-availability', 'recovery']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/improve-latency-performance-distributed-systems#why-latency-and-performance-matter.png']
+summary: Understand the key differences between fault tolerance and high availability in system design. Learn how they impact reliability, downtime, cost, and when to use each based on your system's needs.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+When designing reliable systems—especially distributed systems or cloud-based infrastructure—two concepts often come up: **Fault Tolerance** and **High Availability**. While they both aim to keep systems running, they do so in distinct ways.
+
+Let's break them down.
+
+## What Is Fault Tolerance?
+
+**Definition:**
+Fault tolerance is the system's ability to keep functioning **without interruption** even when components fail.
+
+### Key Characteristics:
+
+- **Redundancy:** Duplicate components (servers, databases, networks) ensure no single point of failure.
+- **Automatic Failover:** The system instantly switches to backups if something fails.
+- **No Data Loss:** Data integrity is maintained during failures.
+- **Higher Cost:** Requires more hardware and complex configurations.
+
+### Best For:
+
+- Critical sectors like **finance**, **healthcare**, or **aviation** where even a second of downtime can be disastrous.
+
+### What Is High Availability?
+
+**Definition:**
+High availability ensures that the system remains **accessible and operational** most of the time, even if short outages occur.
+
+### Key Characteristics:
+
+- **Uptime Focused:** Often measured in uptime percentages like **99.99%** or **99.999%**.
+- **Load Balancing:** Uses redundancy, clustering, and balancing to spread traffic and handle failures.
+- **Rapid Recovery:** Quick to bounce back after failures, even if there's a small blip.
+- **Cost-Effective:** Prioritizes uptime while managing budget concerns.
+
+### Best For:
+
+- **E-commerce sites**, **enterprise platforms**, and **online services** where high availability is critical but brief interruptions are tolerable.
+
+## Fault Tolerance vs. High Availability: A Quick Comparison
+
+| Feature              | Fault Tolerance                     | High Availability                       |
+| -------------------- | ----------------------------------- | --------------------------------------- |
+| **Goal**             | Zero disruption during failure      | Minimize downtime                       |
+| **Failure Handling** | Immediate, seamless failover        | Rapid recovery with slight interruption |
+| **Downtime**         | None                                | Minimal and acceptable                  |
+| **Cost**             | Higher, due to duplication          | Lower, more budget-friendly             |
+| **Data Integrity**   | Maintained during failure           | May risk minimal data loss              |
+| **Use Cases**        | Life-critical and real-time systems | Customer-facing, business-critical apps |
+
+## Conclusion
+
+**Fault tolerance** is about **continuous operation**—your system never skips a beat, even if something breaks.
+**High availability** is about being **up most of the time**—a small hiccup is okay as long as service is quickly restored.
+
+Choosing between the two depends on your application's **criticality**, **user expectations**, and **budget**. For life-saving tech? Go fault-tolerant. For online stores? High availability might be enough.

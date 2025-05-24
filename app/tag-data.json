@@ -1,9 +1,12 @@
 {
-  "system-design": 17,
+  "system-design": 20,
+  "concurrency": 1,
+  "scalability": 2,
+  "observability": 1,
+  "monitoring": 1,
+  "availability": 1,
   "key-concepts": 1,
   "api-gateway": 3,
-  "availability": 1,
-  "scalability": 1,
   "load-balacing": 8,
   "load-balacing-algorithms": 1,
   "load-balacing-uses": 1
