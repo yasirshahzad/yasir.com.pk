@@ -1,0 +1,91 @@
+---
+title: TCP vs. UDP - What's the Difference and When to Use Each
+date: '2025-05-17'
+tags: ['system-design', 'networking']
+draft: false
+layout: PostSimple
+images: []
+summary: Understand the differences between TCP and UDP—two key internet protocols. Learn their features, performance, reliability, and ideal use cases for better network application design.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={2} />
+
+## TCP vs. UDP: What's the Difference and When to Use Each
+
+When building networked applications or understanding how data travels over the internet, it's important to know the roles of **TCP** and **UDP**. These are the two primary transport layer protocols in the **TCP/IP model**, each with distinct advantages.
+
+Let's compare them in terms of **reliability**, **speed**, **use cases**, and **protocol behavior**.
+
+## 📦 What is TCP (Transmission Control Protocol)?
+
+**TCP** is a **connection-oriented** protocol designed to provide **reliable**, **ordered**, and **error-checked** data delivery between computers.
+
+### 🔑 Key Features of TCP:
+
+- **Reliable Transmission:** Ensures all data reaches the destination in the correct order.
+- **Connection-Oriented:** Establishes a connection (via a handshake) before transferring data.
+- **Flow Control:** Regulates data flow to avoid overwhelming the receiver.
+- **Congestion Control:** Adjusts sending rate based on network load.
+- **Acknowledgments:** Confirms successful receipt; retransmits lost packets.
+
+### ✅ Best Use Cases:
+
+- **Web Browsing** (HTTP, HTTPS)
+- **Email Services** (SMTP, POP3, IMAP)
+- **File Transfers** (FTP, SFTP)
+
+### 📘 Example:
+
+When you load a webpage, TCP ensures all text, images, and stylesheets are delivered **accurately and in sequence**.
+
+## ✉️ What is UDP (User Datagram Protocol)?
+
+**UDP** is a **connectionless** protocol focused on **speed** and **efficiency**, transmitting data without guaranteeing delivery or order.
+
+### 🔑 Key Features of UDP:
+
+- **No Handshake:** Sends data without setting up a connection.
+- **Unreliable Delivery:** Packets may be lost or arrive out of order.
+- **Low Overhead:** Minimal protocol overhead, ideal for real-time scenarios.
+- **No Congestion Control:** Maintains a constant sending rate regardless of network conditions.
+
+### ✅ Best Use Cases:
+
+- **Live Video/Audio Streaming**
+- **Online Multiplayer Games**
+- **Voice over IP (VoIP)**
+- **DNS Lookups**
+
+### 📘 Example:
+
+When streaming a live football match, UDP allows data to flow **quickly** to minimize buffering—even if a few video frames are lost.
+
+## 🆚 Key Differences Between TCP and UDP
+
+| Feature                | **TCP**                                   | **UDP**                          |
+| ---------------------- | ----------------------------------------- | -------------------------------- |
+| **Reliability**        | High – guarantees delivery and order      | Low – delivery is not guaranteed |
+| **Connection Type**    | Connection-oriented                       | Connectionless                   |
+| **Speed**              | Slower due to overhead                    | Faster due to low overhead       |
+| **Error Checking**     | Yes (acknowledgments and retransmissions) | Basic checksum only              |
+| **Congestion Control** | Yes                                       | No                               |
+| **Packet Ordering**    | Maintains order                           | No ordering mechanism            |
+| **Overhead**           | High                                      | Low                              |
+| **Best For**           | Web, file transfers, emails               | Streaming, gaming, voice calls   |
+
+## 🚀 Choosing Between TCP and UDP
+
+| Scenario                      | Recommended Protocol | Why?                                    |
+| ----------------------------- | -------------------- | --------------------------------------- |
+| File Uploads/Downloads        | TCP                  | Reliability is crucial                  |
+| Watching Live Streams         | UDP                  | Speed is more important than accuracy   |
+| Sending Emails                | TCP                  | Needs complete and accurate delivery    |
+| Playing Online Games          | UDP                  | Fast, real-time communication preferred |
+| Secure Website Access (HTTPS) | TCP                  | Security and reliability are required   |
+
+## 🧠 Conclusion
+
+- Use **TCP** when **data integrity and reliability** are more important than speed.
+- Use **UDP** when **low latency and real-time performance** matter more than occasional data loss.
+
+Understanding the difference between TCP and UDP helps you design **faster, more reliable, and application-specific** network solutions.

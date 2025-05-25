@@ -1,0 +1,75 @@
+---
+title: HTTP vs. HTTPS - What's the Difference and Why It Matters
+date: '2025-05-17'
+tags: ['system-design', 'networking']
+draft: false
+layout: PostSimple
+images: []
+summary: Learn the key differences between HTTP and HTTPS, and why HTTPS is essential for secure, trustworthy websites. Understand their roles in performance, SEO, and online safety.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={2} />
+
+## HTTP vs. HTTPS: What's the Difference and Why It Matters
+
+In the world of web development and internet communication, understanding **HTTP** and **HTTPS** is crucial. Both are used to transfer data between your browser and a website, but they differ dramatically in **security**, **performance**, and **trust**.
+
+Let's dive into the core differences.
+
+## What is HTTP?
+
+**HTTP** (HyperText Transfer Protocol) is the basic protocol used to load web pages. It's responsible for delivering HTML, images, videos, and other resources from the server to your browser.
+
+### 🔑 Key Features of HTTP:
+
+- **Stateless:** Each request is independent; no session memory between them.
+- **Plain Text Transmission:** Data is not encrypted, making it vulnerable to interception.
+- **Default Port:** Operates over port **80**.
+
+### ✅ Use Case Example:
+
+Visiting a **public blog** or an **informational site** with no form submissions or sensitive data.
+
+## What is HTTPS?
+
+**HTTPS** (HyperText Transfer Protocol Secure) is the secure version of HTTP. It uses **SSL/TLS encryption** to protect data from hackers and ensure privacy.
+
+### 🔒 Key Features of HTTPS:
+
+- **Encryption:** Prevents third parties from reading transmitted data.
+- **Authentication:** Ensures users are communicating with the intended website (prevents spoofing).
+- **Data Integrity:** Ensures data isn't altered during transfer.
+- **Default Port:** Operates over port **443**.
+
+### ✅ Use Case Example:
+
+Online shopping, **bank logins**, or **form submissions**—any scenario involving **sensitive user data**.
+
+## 🆚 HTTP vs. HTTPS: Head-to-Head Comparison
+
+| Feature         | **HTTP**                               | **HTTPS**                                    |
+| --------------- | -------------------------------------- | -------------------------------------------- |
+| **Security**    | No encryption, data exposed            | Encrypted via SSL/TLS                        |
+| **Port**        | 80                                     | 443                                          |
+| **Performance** | Slightly faster (no encryption)        | Slightly slower (due to encryption overhead) |
+| **SEO Ranking** | Lower                                  | Higher (Google favors HTTPS sites)           |
+| **Trust Level** | No browser padlock, "Not secure" label | Secure padlock icon, builds trust            |
+| **Use Cases**   | Public/informational websites          | Banking, e-commerce, login pages             |
+
+## 🔍 Why HTTPS Matters
+
+- **✅ Security:** Protects users from eavesdropping and man-in-the-middle attacks.
+- **✅ Trust & Credibility:** Browsers display padlocks and warn users about non-secure sites.
+- **✅ SEO Boost:** Google gives ranking preference to HTTPS-enabled sites.
+- **✅ Compliance:** HTTPS is often required for GDPR, PCI-DSS, and other privacy standards.
+
+## 📝 Quick Reference
+
+| Protocol | Full Form                          | Port | Security Level | Best For                           |
+| -------- | ---------------------------------- | ---- | -------------- | ---------------------------------- |
+| HTTP     | HyperText Transfer Protocol        | 80   | None           | Blogs, public info sites           |
+| HTTPS    | HyperText Transfer Protocol Secure | 443  | Encrypted      | Secure logins, payments, user data |
+
+## 🚀 Conclusion
+
+**HTTP** may still work for non-sensitive tasks, but **HTTPS** has become the **standard** for modern websites. From improving **user trust** to enhancing **security** and **SEO**, the benefits are undeniable. If you're building or managing a website today, enabling HTTPS isn't just smart—it's **essential**.
