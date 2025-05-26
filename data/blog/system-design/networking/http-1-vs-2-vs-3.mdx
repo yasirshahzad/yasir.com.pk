@@ -1,0 +1,79 @@
+---
+title: HTTP 1.0 vs 1.1 vs 2.0 vs 3.0 - A Complete Guide for Developers
+date: '2025-05-25'
+tags: ['system-design', 'networking']
+draft: false
+author: default
+layout: PostSimple
+images: ["/static/images/system-design/http-versions.webp"]
+summary: Learn the key differences between HTTP versions 1.0, 1.1, 2.0, and 3.0. Discover how each version improves web performance, security, and speed—plus which one suits your project best.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={2} />
+
+HTTP (HyperText Transfer Protocol) is the foundation of web communication. Over time, it has gone through several upgrades—each making websites faster, more secure, and more efficient. In this guide, we’ll break down the differences between HTTP/1.0, HTTP/1.1, HTTP/2, and HTTP/3 in a simple way.
+
+### 📘 Quick Overview
+
+| Feature           | HTTP/1.0        | HTTP/1.1      | HTTP/2      | HTTP/3           |
+| ----------------- | --------------- | ------------- | ----------- | ---------------- |
+| **Released**      | 1996            | 1997          | 2015        | 2020             |
+| **Connection**    | One per request | Persistent    | Multiplexed | QUIC (UDP)       |
+| **Protocol Type** | Text            | Text          | Binary      | Binary           |
+| **Speed**         | Slow            | Faster        | Fast        | Fastest          |
+| **Security**      | None            | Optional      | Optional    | Built-in TLS 1.3 |
+| **Best For**      | Simple sites    | Dynamic pages | Large apps  | Real-time apps   |
+
+### 🌐 HTTP/1.0 – The Starting Point (1996)
+
+- **How it works:** One request = one connection. After the server responds, the connection closes.
+- **Use Case:** Best for simple, static sites.
+- **Drawback:** Every new file (image, CSS, etc.) requires a new connection.
+
+### 🚀 HTTP/1.1 – Better Performance (1997)
+
+- **Improvements:**
+
+  - Keeps connections open (persistent).
+  - Supports chunked transfers (send as it loads).
+  - Supports multiple websites on one server (via Host headers).
+
+- **Use Case:** Ideal for dynamic websites and e-commerce platforms.
+- **Advantage:** Faster than 1.0 due to fewer connections and better caching.
+
+### ⚡ HTTP/2 – Built for Speed (2015)
+
+- **Key Features:**
+
+  - Binary protocol = faster and more efficient.
+  - Multiplexing = multiple requests in one connection.
+  - Header compression = smaller, quicker requests.
+  - Server Push = preloads resources before they’re requested.
+
+- **Use Case:** Great for large, complex web apps and high-traffic websites.
+- **Advantage:** Major boost in performance and load time.
+
+### ⚡⚡ HTTP/3 – Real-Time Ready (2020)
+
+- **What’s New:**
+
+  - Uses **QUIC**, a protocol built on UDP instead of TCP.
+  - Faster setup with 0-RTT (zero round-trip time).
+  - Handles network issues better (great for mobile).
+  - Encryption (TLS 1.3) is built-in from the start.
+
+- **Use Case:** Ideal for live video, gaming, conferencing, and other real-time apps.
+- **Advantage:** Extremely fast, secure, and reliable.
+
+### 🔄 Why Upgrade to HTTP/2 or HTTP/3?
+
+- **Speed:** Each version improves how quickly pages load.
+- **Security:** Better encryption and protection of data.
+- **Efficiency:** Handles many requests at once with fewer connections.
+- **Future-Proof:** Supports modern features like streaming, push notifications, and more.
+
+### 🧠 Final Thoughts
+
+The journey from HTTP/1.0 to HTTP/3 is all about **faster speeds**, **better security**, and **improved user experience**. If you're building modern apps or handling lots of data, upgrading your HTTP version is a smart move.
+
+Whether you're running a simple blog or a real-time multiplayer game, understanding HTTP versions can help you optimize your web app's performance.
