@@ -35,6 +35,7 @@
     "postcss": "^8.4.24",
     "react": "19.0.0",
     "react-dom": "19.0.0",
+    "react-live": "^4.1.8",
     "reading-time": "1.5.0",
     "rehype-autolink-headings": "^7.1.0",
     "rehype-citation": "^2.3.0",

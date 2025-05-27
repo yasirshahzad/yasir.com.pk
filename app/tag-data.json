@@ -1,5 +1,13 @@
 {
-  "system-design": 20,
+  "data-structures": 2,
+  "interview-prep": 2,
+  "system-design": 29,
+  "networking": 7,
+  "dns": 3,
+  "load-balacing": 9,
+  "high-availability": 1,
+  "recovery": 2,
+  "error-handling": 1,
   "concurrency": 1,
   "scalability": 2,
   "observability": 1,
@@ -7,7 +15,6 @@
   "availability": 1,
   "key-concepts": 1,
   "api-gateway": 3,
-  "load-balacing": 8,
   "load-balacing-algorithms": 1,
   "load-balacing-uses": 1
 }
