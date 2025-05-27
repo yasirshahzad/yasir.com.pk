@@ -1,0 +1,70 @@
+---
+title: What is DNS? A Simple Guide to How the Domain Name System Works
+date: '2025-05-27'
+tags: ['system-design', 'networking']
+draft: false
+author: default
+layout: PostSimple
+images: []
+summary: Discover what DNS (Domain Name System) is and why it's essential for the internet. Learn how DNS translates website names into IP addresses, the key components involved, and how DNS keeps the internet running smoothly.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={2} />
+
+
+Have you ever wondered how you can type a website name like **[www.example.com](http://www.example.com)** and instantly reach the site? That's all thanks to **DNS**, the Domain Name System. Think of DNS as the internet's phonebook — it converts easy-to-remember website names into the numerical IP addresses that computers use to communicate.
+
+## Why is DNS Important?
+
+Without DNS, you'd have to memorize complex IP addresses like `192.168.1.1` to visit websites — which would be impossible for most people. DNS makes the internet:
+
+* **User-friendly:** Easy domain names instead of confusing numbers.
+* **Flexible:** Websites can change IP addresses without disrupting your access.
+* **Fast & Reliable:** Uses caching and load balancing to speed up browsing.
+* **Scalable:** Can handle billions of domain names and devices.
+
+## Key Parts of DNS
+
+1. **Domain Names, TLDs, and Subdomains**
+
+   * **Domain Names:** The web address you type (e.g., example.com).
+   * **Top-Level Domains (TLDs):** The ending like `.com`, `.org`, or country codes like `.uk`.
+   * **Subdomains:** Sections within a domain, like `blog.example.com`.
+
+2. **DNS Servers**
+
+   * **Root Servers:** The top level, directing queries to the correct TLD servers.
+   * **TLD Servers:** Manage domains within their TLD, like `.com` or `.net`.
+   * **Authoritative Name Servers:** Hold the final information about a domain, including the IP address.
+
+3. **DNS Resolvers**
+   These translate domain names to IP addresses for your device. Types include:
+
+   * **Stub Resolver:** The client on your device that starts the DNS request.
+   * **Recursive Resolver:** Finds the IP by querying multiple DNS servers.
+   * **Caching Resolver:** Saves previous results to speed up future requests.
+   * **Forwarder:** Sends queries to another DNS server for resolution.
+   * **Iterative Resolver:** Provides partial answers or referrals to other DNS servers.
+
+## How DNS Works — The Lookup Process
+
+When you type a website address:
+
+1. Your device's **stub resolver** asks a **recursive resolver** (usually your ISP or a public DNS like Google DNS) for the IP.
+2. The recursive resolver checks its cache. If the IP isn't cached, it queries:
+
+   * **Root servers** →
+   * **TLD servers** →
+   * **Authoritative servers**
+3. Once found, the IP address is sent back to your device.
+4. Your browser connects to the website using the IP address.
+
+## Real-Life Example
+
+Suppose your laptop uses Google's DNS (8.8.8.8). When you enter `www.example.com`, your stub resolver sends the request to Google's recursive resolver. If Google has the IP cached, it returns it immediately. If not, it performs the full lookup process, caches the result, and sends it back to your laptop, letting you load the website quickly.
+
+
+## Final Thoughts
+
+DNS is a vital part of the internet's infrastructure, quietly working behind the scenes to connect you to websites. Understanding how DNS works helps appreciate the complex system that makes browsing easy and fast.
+
