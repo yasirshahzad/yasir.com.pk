@@ -1,0 +1,71 @@
+---
+title: Introduction to Caching - What It Is and Why It Matters in Web Performance
+date: '2025-05-28'
+tags: ['system-design', 'caching']
+draft: false
+author: default
+layout: PostSimple
+images: []
+summary: Caching is a powerful technique used to speed up applications, reduce server load, and improve user experience. This post introduces the fundamentals of caching, including how it works, types of caching, key concepts, and why it’s crucial in modern web development.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={2} />
+
+Caching plays a vital role in improving the performance and scalability of modern web applications. Whether you're building a website, API, or mobile app, understanding caching can help you reduce latency, optimize server load, and enhance user experience.
+
+## 💡 What is Caching?
+
+**Caching** is the process of storing frequently accessed data in a high-speed storage layer so it can be retrieved quickly when needed. Instead of fetching data from its original, often slower, source every time, a cache allows applications to get the data faster.
+
+### 🔁 How Caching Works:
+
+1. The application requests data.
+2. The cache is checked first.
+3. If found (**cache hit**), the data is returned immediately.
+4. If not found (**cache miss**), the data is fetched from the source, stored in the cache, and returned.
+
+## ⚙️ Types of Caching
+
+1. **In-Memory Caching**
+
+   - **Example**: Redis, Memcached
+   - **Speed**: Very fast (stored in RAM)
+   - **Use Case**: Real-time data like sessions, user preferences
+
+2. **Disk Caching**
+
+   - **Speed**: Slower than memory, faster than remote access
+   - **Use Case**: Local file system, static assets
+
+3. **Database Caching**
+
+   - **Use Case**: Query result caching to reduce database load
+   - **Tools**: Query result caching mechanisms in MySQL, PostgreSQL, etc.
+
+4. **CDN Caching (Content Delivery Network)**
+
+   - **Speed**: High, due to global distribution
+   - **Use Case**: Caching images, videos, and static assets near the user’s location
+
+## 🧰 Key Caching Concepts
+
+| Term                | Description                                      |
+| ------------------- | ------------------------------------------------ |
+| **Cache**           | Temporary storage for quick access to data       |
+| **Cache Hit**       | Requested data is found in the cache             |
+| **Cache Miss**      | Data not found in the cache; fetched from source |
+| **Cache Eviction**  | Removing old data to make room for new data      |
+| **Cache Staleness** | Cached data is outdated compared to the source   |
+
+## 📈 Why Caching Matters
+
+- **Faster Response Times**: Users get data quicker, improving UX.
+- **Reduced Server Load**: Backend systems handle fewer requests.
+- **Improved Scalability**: Systems can handle more users efficiently.
+- **Lower Latency**: Especially with CDN caching across global servers.
+
+## 🚀 Bonus: DNS Load Balancing & High Availability (Preview)
+
+In distributed systems and large-scale applications, caching often works hand-in-hand with **DNS load balancing** and **high availability architectures**. These systems ensure that user traffic is distributed across multiple servers and that caching nodes stay up and consistent — even during failures.
+
+Stay tuned for the next post in this series where we’ll cover DNS load balancing and how it contributes to fault tolerance and performance.
