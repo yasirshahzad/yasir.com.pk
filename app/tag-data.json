@@ -1,7 +1,8 @@
 {
+  "system-design": 30,
+  "caching": 1,
   "data-structures": 2,
   "interview-prep": 2,
-  "system-design": 29,
   "networking": 7,
   "dns": 3,
   "load-balacing": 9,

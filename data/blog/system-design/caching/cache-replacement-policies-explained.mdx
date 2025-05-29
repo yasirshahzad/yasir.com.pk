@@ -1,0 +1,50 @@
+---
+title: Understanding Cache Replacement Policies - LRU, LFU, FIFO, and More
+date: '2025-05-29'
+tags: ['system-design', 'caching']
+draft: false
+author: default
+layout: PostSimple
+images: []
+summary: Learn the most common cache replacement policies—LRU, LFU, FIFO, and Random. Discover how they work, when to use them, and how to choose the right one for your caching strategy based on performance and complexity.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+Efficient caching is essential for optimizing performance in systems and applications. But when a cache fills up, how do you decide which data to remove? This is where **cache replacement policies** come in. These policies help manage memory by determining which items to discard when space runs out. Here’s a breakdown of the most widely used cache replacement policies:
+
+## 1. Least Recently Used (LRU)
+
+**LRU** removes the item that hasn't been accessed for the longest time. It assumes that **recently used items will likely be needed again**, making it a smart choice for applications with temporal locality. However, it requires tracking item access times, which can add overhead.
+
+## 2. Least Frequently Used (LFU)
+
+**LFU** removes items that are accessed the least often. The logic is simple: **frequently accessed items are more valuable** and should be kept in cache. This policy is great for applications with stable access patterns but can be complex to implement due to the need to track usage counts.
+
+## 3. First In, First Out (FIFO)
+
+**FIFO** removes the oldest item in the cache, regardless of how often or recently it was used. It operates like a queue—**first added, first removed**. FIFO is **easy to implement** but might evict useful data if it happens to be old but still relevant.
+
+## 4. Random Replacement
+
+In **random replacement**, the cache removes an item chosen at random. While this method ignores usage patterns, it’s **simple and fast**, and surprisingly effective when access patterns are highly unpredictable.
+
+### Comparing Cache Replacement Policies
+
+Each policy comes with trade-offs:
+
+- **LRU and LFU** offer **better performance** by considering access patterns but are **more complex** and require extra memory or computation.
+- **FIFO and Random** are **easier to implement** but may lead to less optimal caching performance.
+
+### Choosing the Right Policy
+
+The best cache replacement policy depends on your specific use case:
+
+- Use **LRU** when recent usage is a good predictor of future access.
+- Use **LFU** for long-term usage trends.
+- Use **FIFO** for simple scenarios where age matters.
+- Use **Random** when access patterns are unpredictable or when simplicity is critical.
+
+**Conclusion**
+
+Choosing the right cache replacement policy is crucial for balancing **performance, memory usage, and implementation complexity**. Understand your application’s access patterns before selecting the strategy that fits best.
