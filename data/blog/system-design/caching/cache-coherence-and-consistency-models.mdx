@@ -1,0 +1,78 @@
+---
+title: Cache Coherence and Consistency Models - A Guide for Distributed Systems
+date: '2025-05-30'
+tags: ['system-design', 'caching']
+draft: false
+author: default
+layout: PostSimple
+images: []
+summary: In distributed systems or multi-core processors, cache coherence and consistency models play a critical role in maintaining a unified and reliable view of data. Learn the difference between coherence and consistency, their implementation strategies, and how to pick the right model for your system.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## 🔄 Cache Coherence vs. Cache Consistency
+
+When designing a caching strategy for distributed systems or multi-core processors, it's essential to understand **cache coherence** and **consistency models**. These concepts ensure that data remains accurate and up-to-date—even when multiple caches are involved.
+
+## 🧠 What is Cache Coherence?
+
+**Cache coherence** ensures that **all nodes or processors see a consistent view of shared data**. In systems with multiple caches, each may hold a copy of a data item. If one copy is updated, all others must reflect that change.
+
+### ✅ Common Cache Coherence Techniques:
+
+1. **Write-invalidate**
+
+   - When a cache writes to its local copy, it **invalidates** all other copies in other caches.
+   - Other caches must fetch fresh data when needed.
+   - ✅ Lower network usage;
+     ❌ Possible performance hit on frequent invalidation.
+
+2. **Write-update (write-broadcast)**
+
+   - When a cache writes, it **broadcasts the updated value** to all other caches.
+   - All caches **update** their copies instantly.
+   - ✅ Real-time data propagation;
+     ❌ Higher network traffic.
+
+## 📜 Cache Consistency Models
+
+While coherence ensures all copies eventually agree, **consistency models** define **how and when** updates become visible across the system.
+
+### 🔐 1. Strict Consistency
+
+- **Definition**: Every read returns the **most recent write**, instantly visible across all nodes.
+- **Pros**: Perfect accuracy.
+- **Cons**: Impractical in real-world distributed systems due to high latency and synchronization overhead.
+
+### 📚 2. Sequential Consistency
+
+- **Definition**: All operations appear to execute in the **same sequential order** for all nodes.
+- **Pros**: Easier to implement than strict consistency.
+- **Cons**: Still requires coordination and can impact scalability.
+
+### 🔁 3. Causal Consistency
+
+- **Definition**: **Causally related operations** must appear in order; unrelated ones can appear in any order.
+- **Pros**: Offers a good balance between **accuracy** and **performance**.
+- **Use Case**: Collaborative tools, social feeds.
+
+### 🕒 4. Eventual Consistency
+
+- **Definition**: All caches **eventually** receive the latest updates—but the timing and order are not guaranteed.
+- **Pros**: Maximizes performance and availability.
+- **Cons**: Temporary inconsistencies allowed.
+- **Use Case**: DNS systems, NoSQL databases, microservices.
+
+## 🧩 Choosing the Right Model
+
+| Model      | Consistency | Performance | Best For                              |
+| ---------- | ----------- | ----------- | ------------------------------------- |
+| Strict     | ⭐⭐⭐⭐⭐  | ⭐          | Financial or mission-critical systems |
+| Sequential | ⭐⭐⭐⭐    | ⭐⭐        | Coordinated multi-user apps           |
+| Causal     | ⭐⭐⭐      | ⭐⭐⭐      | Real-time collaborative apps          |
+| Eventual   | ⭐          | ⭐⭐⭐⭐⭐  | Scalable, resilient web services      |
+
+## 🔍 Final Thoughts
+
+Understanding cache coherence and consistency models is key to building **robust, scalable systems**. Whether you're optimizing for **accuracy** or **performance**, choosing the right model can make or break your application's reliability and speed.

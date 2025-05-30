@@ -1,0 +1,98 @@
+---
+title: Caching Challenges - Common Problems and How to Solve Them
+date: '2025-05-30'
+tags: ['system-design', 'caching']
+draft: false
+author: default
+layout: PostSimple
+images: []
+summary: Caching improves performance—but it's not without challenges. From thundering herds to hot keys and cache drift, this post covers common cache-related problems and effective strategies to prevent them from degrading your application.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+Implementing caching is powerful—but not foolproof. Improper configuration, access patterns, or unexpected traffic can lead to significant issues. Let’s explore the most common **caching challenges** and how to address them effectively.
+
+## 1. 🐘 **Thundering Herd Problem**
+
+**What Happens?**
+When a **popular cache entry expires**, multiple clients may request the same missing data simultaneously. This floods the origin server.
+
+**Solutions**:
+
+- Use **staggered expiration** to avoid simultaneous expiry.
+- Implement a **cache lock or mutex** to let one client refresh the cache.
+- Use **background refresh/update** before data expires.
+
+## 2. 🚫 **Cache Penetration**
+
+**What Happens?**
+Requests for **non-existent or uncached data** directly hit the origin, reducing cache effectiveness.
+
+**Solutions**:
+
+- Apply **negative caching** (cache 404s or nulls temporarily).
+- Use a **Bloom Filter** to avoid querying non-existent keys.
+
+## 3. 🪵 **Big Key Problem**
+
+**What Happens?**
+Large data objects (big keys) consume significant memory, forcing evictions of useful smaller items.
+
+**Solutions**:
+
+- **Compress** large data before caching.
+- **Chunk** the data into smaller pieces.
+- Use a **separate cache tier** for large objects.
+
+## 4. 🔥 **Hot Key Problem**
+
+**What Happens?**
+Some data is accessed far more frequently, creating performance bottlenecks and uneven load distribution.
+
+**Solutions**:
+
+- Use **consistent hashing** for load balancing.
+- **Replicate** hot keys across multiple nodes.
+- Implement a **load-balancing proxy** to distribute hot key requests.
+
+## 5. 🐶 **Cache Stampede (Dogpile Effect)**
+
+**What Happens?**
+When data is missing, **many simultaneous requests** try to refresh it, hammering both cache and origin.
+
+**Solutions**:
+
+- Use **request coalescing** to combine concurrent requests.
+- Implement a **read-through cache**, where cache automatically fetches on miss.
+- Introduce **lock-based caching**, allowing only one request to refresh.
+
+## 6. 🧹 **Cache Pollution**
+
+**What Happens?**
+Infrequently used data pushes out frequently used data, hurting performance.
+
+**Solutions**:
+
+- Use smarter eviction policies like **LRU (Least Recently Used)** or **LFU (Least Frequently Used)**.
+- Set **priority levels** or **frequency-based weights** on cache entries.
+
+## 7. 🧬 **Cache Drift**
+
+**What Happens?**
+Cached data becomes **outdated or inconsistent** with the source due to updates that don’t invalidate the cache.
+
+**Solutions**:
+
+- Implement **cache invalidation** on write/update.
+- Use **time-to-live (TTL)** wisely for auto-refresh.
+- Consider **event-driven cache updates** using message queues or pub/sub systems.
+
+![Cache Issues][def]
+
+### 🧠 Final Thoughts
+
+Caching is not a plug-and-play solution. It needs **careful design and maintenance** to truly optimize performance. By proactively addressing these common pitfalls, you can ensure your cache boosts responsiveness, scalability, and reliability—without becoming a liability.
+
+
+[def]: https://storage.googleapis.com/download/storage/v1/b/designgurus-prod.appspot.com/o/docImages%2F6423ee77b391f95ff67e064a%2Fimg:4051356-f10b-73ef-f03f-b58566018525.svg?generation=1680077280280579&alt=media
