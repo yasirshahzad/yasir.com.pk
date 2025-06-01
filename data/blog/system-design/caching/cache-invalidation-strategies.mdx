@@ -5,13 +5,14 @@ tags: ['system-design', 'caching']
 draft: false
 author: default
 layout: PostSimple
+lastmod: '2025-06-01'
 images: []
 summary: Learn the essential cache invalidation strategies to keep your application data fresh, reduce latency, and prevent stale or inconsistent results. Understand write-through, write-back, TTL, purge, ban, and more.
 ---
 
 <TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
 
-Caching boosts performance by storing data closer to the user—butCache Read Strategies it introduces the risk of serving outdated (stale) data. Cache invalidation ensures that your application always presents the most accurate and up-to-date information.
+Caching boosts performance by storing data closer to the user—but Cache Read Strategies it introduces the risk of serving outdated (stale) data. Cache invalidation ensures that your application always presents the most accurate and up-to-date information.
 
 ## Why Cache Invalidation Matters
 
@@ -31,64 +32,58 @@ Invalidation strategies help keep caches fast while ensuring users get the lates
 
 Failing to invalidate can lead to wrong information being shown—such as out-of-stock items being listed as available.
 
----
-
 ## Main Cache Invalidation Strategies
 
-## 1. **Write-Through Cache**
+### 1. **Write-Through Cache**
 
 - **How it works**: Data is written to the cache and the database at the same time.
 - **Pros**: Ensures consistency and protects against data loss.
 - **Cons**: Slightly slower writes due to dual operations.
 
-## 2. **Write-Around Cache**
+### 2. **Write-Around Cache**
 
 - **How it works**: Data is written directly to the database, skipping the cache.
 - **Pros**: Avoids polluting cache with infrequently read data.
 - **Cons**: Recently written data may cause a cache miss.
 
-## 3. **Write-Back Cache**
+### 3. **Write-Back Cache**
 
 - **How it works**: Data is written to the cache first, then written to the database later.
 - **Pros**: Very fast for write-heavy operations.
 - **Cons**: Risk of data loss during crashes, since data may not yet be saved.
 
-## 4. **Write-Behind Cache**
+### 4. **Write-Behind Cache**
 
 - **How it works**: Similar to write-back, but writes to the database on a schedule or trigger.
 - **Pros**: Good performance, scheduled consistency.
 - **Cons**: Still a risk of losing data if failure occurs before sync.
 
----
-
 ## Cache Invalidation Methods
 
-## 1. **Purge**
+### 1. **Purge**
 
 Immediately removes specific cache content (like a URL). Ensures the next request fetches fresh data from the origin server.
 
-## 2. **Refresh**
+### 2. **Refresh**
 
 Forces a fresh version of content from the origin while updating the cached version. Useful for on-demand updates without clearing cache.
 
-## 3. **Ban**
+### 3. **Ban**
 
 Flags a group of cached items (based on URL pattern or headers) as invalid. They’re replaced on next access, allowing soft invalidation.
 
-### 🆚 Purge vs. Ban
+#### 🆚 Purge vs. Ban
 
 - **Purge**: Hard delete, immediate effect, specific to one cache key.
 - **Ban**: Marks multiple items invalid by pattern; replaced over time.
 
-## 4. **Time-To-Live (TTL)**
+### 4. **Time-To-Live (TTL)**
 
 Sets an expiration timer on cached data. Once TTL expires, the cache must re-fetch and store fresh content.
 
-## 5. **Stale-While-Revalidate**
+### 5. **Stale-While-Revalidate**
 
 Serves stale data immediately while asynchronously updating the cache in the background. Ensures low-latency responses with eventual consistency.
-
----
 
 ## Conclusion
 

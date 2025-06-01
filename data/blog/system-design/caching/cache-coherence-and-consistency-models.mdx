@@ -1,6 +1,7 @@
 ---
 title: Cache Coherence and Consistency Models - A Guide for Distributed Systems
 date: '2025-05-30'
+lastmod: '2025-06-01'
 tags: ['system-design', 'caching']
 draft: false
 author: default
@@ -10,8 +11,6 @@ summary: In distributed systems or multi-core processors, cache coherence and co
 ---
 
 <TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
-
-## 🔄 Cache Coherence vs. Cache Consistency
 
 When designing a caching strategy for distributed systems or multi-core processors, it's essential to understand **cache coherence** and **consistency models**. These concepts ensure that data remains accurate and up-to-date—even when multiple caches are involved.
 
@@ -38,40 +37,144 @@ When designing a caching strategy for distributed systems or multi-core processo
 ## 📜 Cache Consistency Models
 
 While coherence ensures all copies eventually agree, **consistency models** define **how and when** updates become visible across the system.
+Let’s break down the **four consistency models** — with **scenarios, diagrams in words**, and **when to use which model** in real systems.
 
 ### 🔐 1. Strict Consistency
 
-- **Definition**: Every read returns the **most recent write**, instantly visible across all nodes.
-- **Pros**: Perfect accuracy.
-- **Cons**: Impractical in real-world distributed systems due to high latency and synchronization overhead.
+#### ✅ Definition:
+
+Every read must reflect the **latest write**, immediately and globally.
+
+#### 📈 Example Scenario:
+
+Imagine a **stock trading platform**. When Alice buys 100 shares, Bob (on another server) should **instantly** see that change, or else trades could happen with stale data.
+
+#### 🔧 Diagram (conceptual):
+
+```
+Write(W1) → [Node A] Read(W1)
+          → [Node B] Read(W1)
+```
+
+Every node instantly reflects the latest value.
+
+#### 🟢 Use When:
+
+- **Absolute accuracy is critical**
+- Ex: Banking, real-time trading
+
+#### 🔴 Avoid When:
+
+- You have high network latency or distributed nodes across the globe
+- It’s nearly **impossible** to implement practically
 
 ### 📚 2. Sequential Consistency
 
-- **Definition**: All operations appear to execute in the **same sequential order** for all nodes.
-- **Pros**: Easier to implement than strict consistency.
-- **Cons**: Still requires coordination and can impact scalability.
+#### ✅ Definition:
+
+All operations appear in **the same sequence for all nodes**, but the system doesn't guarantee immediate visibility.
+
+#### 📈 Example Scenario:
+
+In a **shared document editor**, two users type sequentially. Everyone should see edits in the **same order**, even if there's a slight delay.
+
+#### 🔧 Diagram:
+
+```
+Client A: Write(W1) → Read(W1)
+Client B: Write(W2) → Read(W1 → W2)
+```
+
+All clients see the same order: W1 → W2
+
+#### 🟢 Use When:
+
+- Order matters, but instant sync isn't required
+- Ex: Collaborative editing, logging systems
+
+#### 🔴 Avoid When:
+
+- You need higher performance and can tolerate slight disorder
 
 ### 🔁 3. Causal Consistency
 
-- **Definition**: **Causally related operations** must appear in order; unrelated ones can appear in any order.
-- **Pros**: Offers a good balance between **accuracy** and **performance**.
-- **Use Case**: Collaborative tools, social feeds.
+#### ✅ Definition:
+
+Only **causally related** operations must appear in order. Unrelated ops can appear in any order.
+
+#### 📈 Example Scenario:
+
+In a **social media feed**:
+
+- Alice posts “I got the job!”
+- Then replies to her own post “So excited!”
+  Anyone seeing the reply should have already seen the original post.
+
+But:
+
+- Bob posts a cat meme — not related to Alice’s post — and can appear in any order.
+
+#### 🔧 Diagram:
+
+```
+Alice: Post P1 → Comment C1
+      Everyone must see: P1 before C1
+
+Bob: Post B1 (unrelated) → can appear anytime
+```
+
+#### 🟢 Use When:
+
+- You have user interactions with logical cause-effect
+- Ex: Social networks, collaborative apps
+
+#### 🔴 Avoid When:
+
+- You need strict order for **every** operation
 
 ### 🕒 4. Eventual Consistency
 
-- **Definition**: All caches **eventually** receive the latest updates—but the timing and order are not guaranteed.
-- **Pros**: Maximizes performance and availability.
-- **Cons**: Temporary inconsistencies allowed.
-- **Use Case**: DNS systems, NoSQL databases, microservices.
+#### ✅ Definition:
 
-## 🧩 Choosing the Right Model
+Every node will **eventually** reflect the latest value, but **no guarantees** on when or in what order.
 
-| Model      | Consistency | Performance | Best For                              |
-| ---------- | ----------- | ----------- | ------------------------------------- |
-| Strict     | ⭐⭐⭐⭐⭐  | ⭐          | Financial or mission-critical systems |
-| Sequential | ⭐⭐⭐⭐    | ⭐⭐        | Coordinated multi-user apps           |
-| Causal     | ⭐⭐⭐      | ⭐⭐⭐      | Real-time collaborative apps          |
-| Eventual   | ⭐          | ⭐⭐⭐⭐⭐  | Scalable, resilient web services      |
+#### 📈 Example Scenario:
+
+You change your **Twitter bio** — it might show the old bio for a few seconds on some devices, but it updates eventually.
+
+#### 🔧 Diagram:
+
+```
+Write(W1) → Node A (immediate)
+          → Node B (after delay)
+          → Node C (after longer delay)
+```
+
+#### 🟢 Use When:
+
+- You care about **availability and performance**
+- Ex: DNS, NoSQL DBs, shopping cart systems
+
+#### 🔴 Avoid When:
+
+- Consistency is critical (e.g., banking, seat booking)
+
+### 📊 Summary Table
+
+| Model                  | Guarantees Order? | Instant Updates? | Use Case Example             | Real-world Use                      |
+| ---------------------- | ----------------- | ---------------- | ---------------------------- | ----------------------------------- |
+| Strict Consistency     | ✅ Yes            | ✅ Yes           | Stock Trading                | Rare (theoretical)                  |
+| Sequential Consistency | ✅ Yes            | ❌ Not always    | Collaborative editing        | Distributed logs, Paxos             |
+| Causal Consistency     | ✅ Related only   | ❌ Delayed       | Social media, chat apps      | Facebook Feed, DynamoDB             |
+| Eventual Consistency   | ❌ No             | ❌ No            | DNS, product views, comments | Amazon DynamoDB, CouchDB, Cassandra |
+
+### ⚖️ How to Choose?
+
+| You prioritize...           | Choose this model    |
+| --------------------------- | -------------------- |
+| 💰 Accuracy over everything | Strict / Sequential  |
+| 🧠 Logical order matters    | Causal Consistency   |
+| 🚀 Speed and uptime         | Eventual Consistency |
 
 ## 🔍 Final Thoughts
 
