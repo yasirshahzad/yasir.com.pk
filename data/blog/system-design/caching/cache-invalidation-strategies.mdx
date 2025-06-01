@@ -85,7 +85,6 @@ Sets an expiration timer on cached data. Once TTL expires, the cache must re-fet
 
 Serves stale data immediately while asynchronously updating the cache in the background. Ensures low-latency responses with eventual consistency.
 
-
 ## Comparison
 
 Here’s a comprehensive **comparison table** of different **cache invalidation methods** with **definitions**, **examples**, **use cases**, and **scenarios** to clarify when and how each should be used:
@@ -98,8 +97,6 @@ Here’s a comprehensive **comparison table** of different **cache invalidation 
 | **4. TTL (Time-To-Live)**     | Automatically expires cache content after a fixed duration.   | Cache-Control: max-age=3600 (1 hour TTL)                            | Useful for non-critical data that can tolerate slight staleness.                           | Weather data cached for 15 minutes; after TTL, new API call is made.                               |
 | **5. Stale-While-Revalidate** | Serves old content while updating cache in the background.    | Cache-Control: stale-while-revalidate=30                            | Improves performance by serving instantly, yet keeps content up to date behind the scenes. | A news homepage is loaded quickly while updated headlines are fetched in background for next view. |
 
-
-
 ### 🔄 **Purge vs. Ban Summary**
 
 | Attribute | **Purge**                             | **Ban**                                         |
@@ -109,8 +106,6 @@ Here’s a comprehensive **comparison table** of different **cache invalidation 
 | Execution | Immediate                             | Lazy — updated when content is next requested   |
 | Overhead  | Higher if many keys                   | More efficient for bulk or grouped invalidation |
 | Best for  | Precision cache management            | Pattern-based or category-wide cache flushing   |
-
-
 
 ## Conclusion
 
