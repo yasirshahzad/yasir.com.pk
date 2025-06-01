@@ -1,0 +1,56 @@
+---
+title: What is a CDN? A Beginner-Friendly Guide to Content Delivery Networks
+date: '2025-06-01'
+lastmod: '2025-06-01'
+tags: ['system-design', 'cdn']
+draft: false
+author: default
+layout: PostSimple
+images: []
+summary: A CDN (Content Delivery Network) is a global network of servers that speeds up content delivery by serving it from the location closest to the user. Learn how CDNs work and why they're essential for fast, secure websites.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+A **Content Delivery Network (CDN)** is a network of servers distributed across different parts of the world. These servers store copies of your website’s content—like images, videos, and scripts—and deliver them to users from the nearest location. The main goal of a CDN is to make websites load faster, reduce delays, and improve performance.
+
+## How Does a CDN Work?
+
+When someone visits your website, their request is automatically routed to the **nearest CDN server**, also known as an **edge server**. If that server already has the content cached (stored temporarily), it delivers it right away. If not, it fetches the data from the original server (called the **origin server**), saves a copy, and sends it to the user.
+
+Next time someone else nearby makes the same request, the edge server can deliver it instantly—saving time and reducing the load on the main server.
+
+## Key Terms You Should Know
+
+Here are some basic CDN terms made simple:
+
+- **Point of Presence (PoP)**: A physical location with CDN servers. More PoPs mean faster delivery worldwide.
+- **Edge Server**: The local server that caches and delivers content to users.
+- **Origin Server**: The main server where your website's original content is stored.
+- **Cache Warming**: Preloading content into the edge server’s cache before it's requested.
+- **Time to Live (TTL)**: The amount of time cached content stays before being updated.
+- **Anycast**: A routing method that directs requests to the nearest available server.
+- **Content Invalidation**: Updating or removing outdated cached content to keep things fresh.
+- **Cache Purging**: Forcing removal of cached content manually or automatically.
+
+## Top Benefits of Using a CDN
+
+1. **Faster Load Times**
+   CDNs reduce the distance between users and your content, so your website loads faster.
+
+2. **Better Performance**
+   By handling static content like images and videos, CDNs free up your main server to focus on dynamic content.
+
+3. **Higher Reliability**
+   If one server goes down, another nearby can take over, keeping your site online.
+
+4. **Easier Scalability**
+   CDNs handle traffic spikes and growing user demand without crashing your site.
+
+5. **Stronger Security**
+   Many CDNs offer protection from DDoS attacks, Web Application Firewalls (WAF), and secure HTTPS connections.
+
+**Final Thoughts**
+Using a CDN is one of the easiest ways to boost your website’s speed, reliability, and security. Whether you run a blog or an e-commerce store, a CDN helps your site perform better for users all over the world.
+
+Let me know if you want this blog post exported to Markdown, HTML, or a CMS format like WordPress.
