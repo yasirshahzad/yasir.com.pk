@@ -12,7 +12,6 @@ summary: Quorum ensures consistency in distributed systems by requiring a majori
 
 <TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
 
-
 ## Introduction
 
 In distributed systems, data is copied across several servers to ensure high availability and fault tolerance. But with multiple copies comes the challenge of maintaining **consistency**—making sure every server reflects the same, most recent data.
@@ -23,28 +22,28 @@ In distributed systems, data is copied across several servers to ensure high ava
 
 For example, in a 5-node database cluster:
 
-* A **quorum** would be 3 nodes.
-* If 3 nodes agree to commit a transaction, the operation proceeds.
-* This majority rule ensures **strong consistency** even if some nodes are down.
+- A **quorum** would be 3 nodes.
+- If 3 nodes agree to commit a transaction, the operation proceeds.
+- This majority rule ensures **strong consistency** even if some nodes are down.
 
 ## Why Do We Need Quorum?
 
 Imagine three replicas—R1, R2, and R3. If a write goes to R1 but a read hits R2 before it catches up, the data will be inconsistent. Quorum prevents this by ensuring that:
 
-* A **write quorum** (W) reaches enough nodes.
-* A **read quorum** (R) fetches from enough nodes.
-* When **W + R > N** (total nodes), at least one node overlaps in both read and write, guaranteeing latest data is read.
+- A **write quorum** (W) reaches enough nodes.
+- A **read quorum** (R) fetches from enough nodes.
+- When **W + R > N** (total nodes), at least one node overlaps in both read and write, guaranteeing latest data is read.
 
 ## Choosing the Right Quorum
 
 A general rule:
 
-* **Quorum = majority = ⌈N/2⌉ + 1**
+- **Quorum = majority = ⌈N/2⌉ + 1**
 
 Some examples:
 
-* N=5: Quorum is 3 (can tolerate 2 failures)
-* N=4: Quorum is also 3 (only 1 failure tolerated)
+- N=5: Quorum is 3 (can tolerate 2 failures)
+- N=4: Quorum is also 3 (only 1 failure tolerated)
 
 Hence, it's **recommended to use an odd number of nodes** for better fault tolerance.
 
@@ -60,28 +59,27 @@ Tip: **Reads are often more frequent**, so systems may prioritize faster reads.
 
 ## Types of Quorum
 
-* **Majority-Based Quorum**: Requires over half the nodes to agree.
-* **Read/Write Quorum**: Custom numbers for read and write operations, e.g., W=3, R=2 in a 5-node system.
+- **Majority-Based Quorum**: Requires over half the nodes to agree.
+- **Read/Write Quorum**: Custom numbers for read and write operations, e.g., W=3, R=2 in a 5-node system.
 
 ## Where Quorum is Used
 
-* **Distributed Databases**: Keeps replicas in sync.
-* **Cluster Management**: Decides active nodes to prevent split-brain issues.
-* **Consensus Algorithms**: Like Paxos and Raft, which need quorum for state agreement.
+- **Distributed Databases**: Keeps replicas in sync.
+- **Cluster Management**: Decides active nodes to prevent split-brain issues.
+- **Consensus Algorithms**: Like Paxos and Raft, which need quorum for state agreement.
 
 ## Benefits of Quorum
 
-* ✅ **Fault Tolerance**: System keeps working even if some nodes fail.
-* ✅ **Consistency**: Ensures latest data is accessed.
-* ✅ **High Availability**: Operations continue as long as quorum is met.
+- ✅ **Fault Tolerance**: System keeps working even if some nodes fail.
+- ✅ **Consistency**: Ensures latest data is accessed.
+- ✅ **High Availability**: Operations continue as long as quorum is met.
 
 ## Challenges of Using Quorum
 
-* ⚠️ **Network Partitions**: Can prevent quorum formation.
-* ⚠️ **Performance Overhead**: More nodes = more latency.
-* ⚠️ **Operational Complexity**: Managing quorum logic can be tough.
+- ⚠️ **Network Partitions**: Can prevent quorum formation.
+- ⚠️ **Performance Overhead**: More nodes = more latency.
+- ⚠️ **Operational Complexity**: Managing quorum logic can be tough.
 
 ## Final Thoughts
 
 Quorum is essential for ensuring **reliable, consistent, and available** operations in distributed systems. Though it adds complexity, when implemented properly, it forms the backbone of resilient and trustworthy systems.
-
