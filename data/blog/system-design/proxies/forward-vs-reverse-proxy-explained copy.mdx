@@ -1,0 +1,68 @@
+---
+title: Forward vs Reverse Proxy - What's the Difference and Why It Matters
+date: '2025-06-03'
+lastmod: '2025-06-.'
+tags: ['system-design', 'proxy']
+draft: false
+author: default
+layout: PostSimple
+images: []
+summary: Discover what a proxy server is, the difference between forward and reverse proxies, and how each protects clients or servers. Learn how proxies help with caching, security, and load balancing in simple terms.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## **Forward vs Reverse Proxy: What's the Difference and Why It Matters**
+
+When browsing the internet or building web apps, you might come across terms like _forward proxy_ and _reverse proxy_. These are tools used to route, filter, or optimize traffic between clients and servers. But what do they really do? Let's break it down.
+
+## **What Is a Proxy Server?**
+
+A **proxy server** acts as a middleman between your device (the client) and the internet (the server). Instead of connecting directly to a website, your request goes through this proxy first. It can help hide your identity, filter content, and even improve speed.
+
+![Proxy server](https://storage.googleapis.com/download/storage/v1/b/designgurus-prod.appspot.com/o/docImages%2F6422b9db56b5587b0fd4a911%2Fimg:38c44e-131d-268-a53-f5b5ce13710.svg?generation=1679998774996714&alt=media)
+
+## **What Is a Forward Proxy?**
+
+A **forward proxy**, often just called a “proxy,” sits in front of client devices. It receives internet requests from those clients and sends them out on their behalf.
+
+**Key features:**
+
+- Hides client identity from websites.
+- Can cache data for faster loading.
+- Filters or modifies requests (e.g., add headers, encrypt, compress).
+- Can merge identical requests into one (collapsed forwarding), reducing load.
+
+**Use case:**
+Protecting internal users or restricting access within an organization.
+
+## **What Is a Reverse Proxy?**
+
+A **reverse proxy** stands in front of servers instead of clients. When a user requests something from a website, the reverse proxy handles that request and fetches the response from one of the backend servers.
+
+**Key features:**
+
+- Hides server identity from clients.
+- Balances load across multiple servers.
+- Can cache responses to improve performance.
+- Routes requests to the right server.
+
+![Reverse Proxy](https://storage.googleapis.com/download/storage/v1/b/designgurus-prod.appspot.com/o/docImages%2F6422b9db56b5587b0fd4a911%2Fimg:d05e1f5-7b14-b82c-d65-d473331b1400.svg?generation=1679998731857860&alt=media)
+
+**Use case:**
+Protecting and managing access to backend web servers (like with large websites such as Facebook).
+
+## **Forward Proxy vs Reverse Proxy**
+
+| Feature      | Forward Proxy                     | Reverse Proxy                    |
+| ------------ | --------------------------------- | -------------------------------- |
+| Position     | In front of clients               | In front of servers              |
+| Hides        | Client identity                   | Server identity                  |
+| Common uses  | Security, access control, caching | Load balancing, caching, routing |
+| Who uses it? | Users, organizations              | Web services, websites           |
+
+![Forward Vs. Reverse](https://storage.googleapis.com/download/storage/v1/b/designgurus-prod.appspot.com/o/docImages%2F6422b9db56b5587b0fd4a911%2Fimg:f66ba26-1ba-eace-3120-a3abd1478f45.svg?generation=1679999814236213&alt=media)
+
+## **Final Thoughts**
+
+A **forward proxy** protects your internal users, while a **reverse proxy** protects your backend servers. Both improve performance and security—but for different sides of the network. Knowing which one to use helps you build faster, safer web systems.
