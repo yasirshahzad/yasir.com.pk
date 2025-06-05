@@ -12,7 +12,7 @@ summary: Learn the most common cache replacement policies—LRU, LFU, FIFO, and 
 
 <TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
 
-Efficient caching is essential for optimizing performance in systems and applications. But when a cache fills up, how do you decide which data to remove? This is where **cache replacement policies** come in. These policies help manage memory by determining which items to discard when space runs out. Here’s a breakdown of the most widely used cache replacement policies:
+Efficient caching is essential for optimizing performance in systems and applications. But when a cache fills up, how do you decide which data to remove? This is where **cache replacement policies** come in. These policies help manage memory by determining which items to discard when space runs out. Here's a breakdown of the most widely used cache replacement policies:
 
 ## 1. Least Recently Used (LRU)
 
@@ -40,7 +40,7 @@ Use **LRU** when **temporal locality** is expected — i.e., **recently accessed
 
 ### ❌ **Cons**:
 
-- Can evict frequently used items if they weren’t used recently
+- Can evict frequently used items if they weren't used recently
 
 ## 2. Least Frequently Used (LFU)
 
@@ -77,7 +77,7 @@ Use **LFU** when **some items are accessed repeatedly and others only occasional
 
 ## 4. Random Replacement
 
-In **random replacement**, the cache removes an item chosen at random. While this method ignores usage patterns, it’s **simple and fast**, and surprisingly effective when access patterns are highly unpredictable.
+In **random replacement**, the cache removes an item chosen at random. While this method ignores usage patterns, it's **simple and fast**, and surprisingly effective when access patterns are highly unpredictable.
 
 ### Comparing Cache Replacement Policies
 

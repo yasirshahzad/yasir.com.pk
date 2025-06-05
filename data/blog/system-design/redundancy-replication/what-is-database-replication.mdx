@@ -14,7 +14,7 @@ summary: Database replication means copying data to multiple databases to improv
 
 ## What Is Database Replication? Strategies, Benefits, and Differences from Redundancy
 
-**Database replication** is the process of copying and keeping data in sync across multiple databases. It’s commonly used in **distributed systems** to ensure high **availability**, **fault tolerance**, and **scalability**. When one database goes down or gets too busy, replicas help maintain smooth performance and access.
+**Database replication** is the process of copying and keeping data in sync across multiple databases. It's commonly used in **distributed systems** to ensure high **availability**, **fault tolerance**, and **scalability**. When one database goes down or gets too busy, replicas help maintain smooth performance and access.
 
 ## How Replication Works
 
@@ -35,7 +35,7 @@ In most setups, there's a **primary-replica** model. The primary database handle
 
 ### 1. Synchronous Replication
 
-In this method, **every data change must be copied to all replicas before it’s confirmed**. This guarantees **real-time consistency**, but can be slower due to waiting on all replicas.
+In this method, **every data change must be copied to all replicas before it's confirmed**. This guarantees **real-time consistency**, but can be slower due to waiting on all replicas.
 
 **Best for:** Critical systems that need strong data accuracy.
 
@@ -51,7 +51,7 @@ A middle ground between the two: changes must reach **at least one replica** bef
 
 **Best for:** Systems that want a balance of performance and consistency.
 
-!(Replication)[https://storage.googleapis.com/download/storage/v1/b/designgurus-prod.appspot.com/o/fd6347dd6bfec703e6bdcd900?generation=1708999274439621&alt=media]
+![Replication](https://storage.googleapis.com/download/storage/v1/b/designgurus-prod.appspot.com/o/fd6347dd6bfec703e6bdcd900?generation=1708999274439621&alt=media)
 
 ## Conclusion
 

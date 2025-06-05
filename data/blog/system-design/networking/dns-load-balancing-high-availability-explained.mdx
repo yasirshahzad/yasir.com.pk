@@ -11,13 +11,13 @@ summary: Learn how DNS load balancing and high availability techniques like roun
 
 <TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
 
-The Domain Name System (DNS) is essential for translating website names into IP addresses so computers can communicate. As the internet grows, it’s important to keep DNS fast, reliable, and always available. This is where DNS **load balancing** and **high availability** come in — smart techniques that spread traffic across multiple servers to prevent slowdowns and outages.
+The Domain Name System (DNS) is essential for translating website names into IP addresses so computers can communicate. As the internet grows, it's important to keep DNS fast, reliable, and always available. This is where DNS **load balancing** and **high availability** come in — smart techniques that spread traffic across multiple servers to prevent slowdowns and outages.
 
 ## 1. Round-Robin DNS: Simple Load Sharing
 
 Round-robin DNS links a domain name to several IP addresses. Each time someone visits, the DNS server cycles through these IPs in turn, sharing the traffic evenly among multiple servers. This helps improve website speed and uptime.
 
-**Limitations:** Round-robin doesn’t consider server load or user location, which can sometimes cause uneven traffic or slower responses.
+**Limitations:** Round-robin doesn't consider server load or user location, which can sometimes cause uneven traffic or slower responses.
 
 ## 2. Geographically Distributed DNS Servers
 

@@ -3,12 +3,12 @@
   "interview-prep": 2,
   "system-design": 48,
   "key-concepts": 1,
-  "api-gateway": 3,
   "caching": 7,
+  "api-gateway": 3,
   "cdn": 4,
   "concurrency": 1,
   "high-availability": 1,
-  "recovery": 2,
+  "recovery": 3,
   "availability": 1,
   "scalability": 2,
   "observability": 1,
@@ -21,6 +21,6 @@
   "dns": 3,
   "quorum": 1,
   "replication": 3,
-  "redundancy": 1,
+  "redundancy": 2,
   "proxy": 3
 }

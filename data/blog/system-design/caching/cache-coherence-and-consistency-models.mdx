@@ -37,7 +37,7 @@ When designing a caching strategy for distributed systems or multi-core processo
 ## 📜 Cache Consistency Models
 
 While coherence ensures all copies eventually agree, **consistency models** define **how and when** updates become visible across the system.
-Let’s break down the **four consistency models** — with **scenarios, diagrams in words**, and **when to use which model** in real systems.
+Let's break down the **four consistency models** — with **scenarios, diagrams in words**, and **when to use which model** in real systems.
 
 ### 🔐 1. Strict Consistency
 
@@ -66,7 +66,7 @@ Every node instantly reflects the latest value.
 #### 🔴 Avoid When:
 
 - You have high network latency or distributed nodes across the globe
-- It’s nearly **impossible** to implement practically
+- It's nearly **impossible** to implement practically
 
 ### 📚 2. Sequential Consistency
 
@@ -112,7 +112,7 @@ In a **social media feed**:
 
 But:
 
-- Bob posts a cat meme — not related to Alice’s post — and can appear in any order.
+- Bob posts a cat meme — not related to Alice's post — and can appear in any order.
 
 #### 🔧 Diagram:
 
