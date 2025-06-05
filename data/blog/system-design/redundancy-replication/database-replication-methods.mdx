@@ -1,0 +1,127 @@
+---
+title: 6 Common Database Replication Methods - Explained with Pros and Cons
+date: '2025-06-05'
+lastmod: '2025-06-05'
+tags: ['system-design', 'replication']
+draft: false
+author: default
+layout: PostSimple
+images: []
+summary: Learn about primary-replica, primary-primary, multi-master, read-replica, snapshot, and hybrid database replication methods. Compare benefits and challenges to pick the right strategy.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+**Database replication** is a powerful strategy to ensure data **availability**, **redundancy**, and **scalability**. Depending on your system's architecture and requirements, different replication methods offer unique advantages and trade-offs.
+
+## 1. Primary-Replica (Master-Slave) Replication
+
+**How it works:**
+One **primary** (master) database handles all write operations, while one or more **replicas** (slaves) handle reads. Changes from the primary are **asynchronously** pushed to the replicas.
+
+**Example:**
+A high-traffic website uses the primary database to insert and update records, while multiple replicas handle read-only queries for users.
+
+**✅ Pros:**
+
+- Enhances **data availability**
+- Allows **load balancing** for reads
+- Easier to manage than more complex setups
+
+**❌ Cons:**
+
+- **Write bottleneck** at the primary
+- Possible **replication lag**, causing temporary inconsistency
+
+## 2. Primary-Primary (Master-Master) Replication
+
+**How it works:**
+Two or more databases act as **primary nodes**, each capable of handling both reads and writes. Changes are **synchronized** between all nodes.
+
+**Example:**
+A distributed e-commerce system across two regions, both able to process purchases and update inventory.
+
+**✅ Pros:**
+
+- Higher **write availability**
+- Improved **load distribution**
+- No **single point of failure**
+
+**❌ Cons:**
+
+- Requires **conflict resolution** logic
+- Increased **operational complexity**
+- Overhead in **data synchronization**
+
+## 3. Multi-Master Replication
+
+**How it works:**
+An extension of primary-primary replication with **multiple write-capable nodes**, often across several geographic regions.
+
+**✅ Pros:**
+
+- Greater **resilience** and **write availability**
+- Ideal for **globally distributed systems**
+
+**❌ Cons:**
+
+- Very high **complexity**
+- **Conflict handling** becomes critical
+- Sync overhead affects **performance**
+
+## 4. Read-Replica Replication
+
+**How it works:**
+Similar to primary-replica, but **read-only replicas** are used strictly to **scale reads**, not for redundancy or writes.
+
+**Example:**
+A cloud-hosted database adds 3 read-replicas to handle traffic spikes during peak hours.
+
+**✅ Pros:**
+
+- Simple to implement
+- Scales **read-heavy workloads** effectively
+
+**❌ Cons:**
+
+- No improvement in **write throughput**
+- Possible **stale data** on replicas due to lag
+
+## 5. Snapshot Replication
+
+**How it works:**
+Captures a **point-in-time snapshot** of data and copies it to another system. Used mainly for analytics or reporting purposes.
+
+**✅ Pros:**
+
+- Easy to understand
+- Good for **reporting and analytics**
+
+**❌ Cons:**
+
+- Not suitable for **real-time systems**
+- Large snapshots may cause **resource strain**
+
+## 6. Hybrid Replication
+
+**How it works:**
+Combines multiple methods to create a **tailored replication setup**. For instance, use multi-master between data centers and read-replicas within each.
+
+**✅ Pros:**
+
+- **Flexible** and customizable
+- Optimizes both **performance** and **consistency**
+
+**❌ Cons:**
+
+- Higher **setup and maintenance complexity**
+- Must carefully coordinate **replication logic**
+
+## Conclusion
+
+Choosing the right replication method depends on your application's **read/write balance**, **availability needs**, and **geographic distribution**.
+
+- Use **Primary-Replica** for read-heavy apps with centralized writes.
+- Choose **Primary-Primary** or **Multi-Master** for distributed write-heavy systems.
+- Add **Read-Replicas** or **Snapshots** for performance and analytics.
+- Go **Hybrid** when one strategy alone doesn’t fit.

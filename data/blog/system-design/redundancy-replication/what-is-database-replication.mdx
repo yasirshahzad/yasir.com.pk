@@ -1,0 +1,58 @@
+---
+title: What Is Database Replication? Strategies, Benefits, and Differences from Redundancy
+date: '2025-06-05'
+lastmod: '2025-06-05'
+tags: ['system-design', 'replication']
+draft: false
+author: default
+layout: PostSimple
+images: []
+summary: Database replication means copying data to multiple databases to improve availability, performance, and fault tolerance. Learn its types and how it differs from redundancy.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## What Is Database Replication? Strategies, Benefits, and Differences from Redundancy
+
+**Database replication** is the process of copying and keeping data in sync across multiple databases. It’s commonly used in **distributed systems** to ensure high **availability**, **fault tolerance**, and **scalability**. When one database goes down or gets too busy, replicas help maintain smooth performance and access.
+
+## How Replication Works
+
+In most setups, there's a **primary-replica** model. The primary database handles all updates. Those changes are then sent to the replicas. Each replica confirms it got the update, and only then does the system move on to the next update.
+
+## Redundancy vs. Replication: What's the Difference?
+
+| Feature        | Redundancy         | Replication                     |
+| -------------- | ------------------ | ------------------------------- |
+| Usage          | Passive backup     | Active data use                 |
+| Focus          | System reliability | Data consistency & availability |
+| Implementation | Backup components  | Synced data across systems      |
+
+- **Redundancy** is about having backup systems ready to take over in case of failure.
+- **Replication** is about having live, up-to-date copies of data in multiple places.
+
+## Top 3 Database Replication Strategies
+
+### 1. Synchronous Replication
+
+In this method, **every data change must be copied to all replicas before it’s confirmed**. This guarantees **real-time consistency**, but can be slower due to waiting on all replicas.
+
+**Best for:** Critical systems that need strong data accuracy.
+
+### 2. Asynchronous Replication
+
+Here, data changes are copied to replicas **after** the primary confirms the write. This improves speed but can cause **temporary data mismatches** between the primary and replicas.
+
+**Best for:** High-performance systems where slight delays in sync are acceptable.
+
+### 3. Semi-Synchronous Replication
+
+A middle ground between the two: changes must reach **at least one replica** before being confirmed, while others can catch up later.
+
+**Best for:** Systems that want a balance of performance and consistency.
+
+!(Replication)[https://storage.googleapis.com/download/storage/v1/b/designgurus-prod.appspot.com/o/fd6347dd6bfec703e6bdcd900?generation=1708999274439621&alt=media]
+
+## Conclusion
+
+Database replication is key to building **resilient, scalable, and fast systems**. It helps avoid bottlenecks, ensures data availability, and reduces the risk of downtime. When combined with **redundancy**, it creates a robust infrastructure ideal for modern applications.

@@ -1,10 +1,11 @@
 {
   "data-structures": 2,
   "interview-prep": 2,
-  "system-design": 36,
+  "system-design": 48,
   "key-concepts": 1,
   "api-gateway": 3,
   "caching": 7,
+  "cdn": 4,
   "concurrency": 1,
   "high-availability": 1,
   "recovery": 2,
@@ -17,5 +18,9 @@
   "load-balacing-algorithms": 1,
   "load-balacing-uses": 1,
   "networking": 7,
-  "dns": 3
+  "dns": 3,
+  "quorum": 1,
+  "replication": 3,
+  "redundancy": 1,
+  "proxy": 3
 }
