@@ -1,0 +1,60 @@
+---
+title: What is a Unique Index? Ensuring Data Integrity with Fast Lookups
+date: '2025-06-09'
+tags: ['system-design', 'indexes']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.png']
+summary: A Unique Index enforces distinct values in a column, preventing duplicates while speeding up queries. It's ideal for fields like email or username, ensuring data accuracy with minimal impact on read performance.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## What is a Unique Index?
+
+A **Unique Index** guarantees that all values in the indexed column or columns are unique—no duplicates allowed. It enforces a **uniqueness constraint** to keep data accurate and consistent.
+
+Databases automatically create unique indexes for **primary keys** and **UNIQUE constraints**, but you can also add extra unique indexes on columns like emails or usernames.
+
+## Why Use a Unique Index?
+
+Unique indexes help:
+
+- Prevent duplicate data (e.g., no two users with the same email)
+- Speed up queries on unique columns
+- Allow the database to optimize queries since it expects only one matching row
+
+## Performance Considerations
+
+Unique indexes make **SELECT** queries fast and efficient. However, inserts or updates on these columns carry a small overhead because the database must check for duplicates before allowing changes. This extra step ensures data integrity but slightly slows down writes.
+
+Storage and maintenance costs are similar to regular indexes, making unique indexes a good trade-off for data correctness.
+
+## Use Cases
+
+Use unique indexes for any column that must have distinct values, such as:
+
+- Usernames
+- Email addresses
+- Social Security numbers
+- Candidate keys apart from the primary key
+
+Unlike the primary index, you can have multiple unique indexes per table.
+
+## Example
+
+Here’s how to create a unique index on an email column in a `Users` table:
+
+```sql
+CREATE UNIQUE INDEX idx_users_email ON Users(Email);
+```
+
+This ensures emails are unique, speeding up queries like:
+
+```sql
+SELECT * FROM Users WHERE Email = 'alice@example.com';
+```
+
+and preventing duplicate emails during inserts or updates.
+
+A unique index is key for keeping your data clean and queries fast on columns that require unique values.

@@ -1,0 +1,75 @@
+---
+title: What is a Non-Clustered Index? How It Speeds Up Database Queries
+date: '2025-06-09'
+tags: ['system-design', 'indexes']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.png']
+summary: A Non-Clustered Index is a separate data structure that stores column values and pointers to table rows, speeding up lookups without altering the table’s physical order. Multiple non-clustered indexes can exist per table to optimize diverse queries.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+## What is a Non-Clustered Index?
+
+A **Non-Clustered Index** (also called a secondary index) is a separate structure that stores indexed column values alongside pointers to the actual data rows in the table. Unlike a clustered index, it does **not** change the physical order of the table data — the table remains in its original order on disk.
+
+Think of it like the index at the back of a book: the book’s pages are in order, but the index lists keywords and points you to pages where those keywords appear.
+
+A table can have **many non-clustered indexes** on different columns, since they don’t dictate the table’s physical layout.
+
+## Why Use a Non-Clustered Index?
+
+Non-clustered indexes greatly speed up queries filtering or joining on the indexed column by allowing the database to quickly jump to matching records rather than scanning the whole table.
+
+For example, an index on `LastName` in an `Employees` table enables fast lookups like:
+
+```sql
+SELECT * FROM Employees WHERE LastName = 'Smith';
+```
+
+## Performance Considerations
+
+- Non-clustered indexes speed up **selective queries** (those returning few rows).
+- Queries use the index to find matching keys, then follow pointers to retrieve full rows.
+- If the index **covers** the query (includes all requested columns), the database can serve the query from the index alone, avoiding extra lookups.
+- Adding many indexes increases **storage** and slows down **writes** because inserts/updates/deletes must update all relevant indexes.
+- Non-clustered indexes don’t guarantee physical data locality, so range scans may cause scattered reads.
+- For queries returning a large fraction of rows, a full table scan may be more efficient than index lookups.
+
+## When to Use?
+
+Ideal for columns often used in:
+
+- `WHERE` clauses filtering
+- Join conditions (`ON` clauses)
+- Sorting (`ORDER BY`)
+
+For example:
+
+- Creating an index on `CustomerID` in an `Orders` table if the clustered index is on another column.
+- Indexing `LastName` in an `Employees` table for fast last name searches.
+- Indexing `ProductCategory` in a `Products` table to speed up filtering by category.
+
+Since you can have many non-clustered indexes per table, tailor them to your query patterns, but avoid excessive indexing.
+
+## Example
+
+Creating a non-clustered index on the `LastName` column of the `Employees` table:
+
+```sql
+CREATE INDEX idx_emp_lastname ON Employees(LastName);
+```
+
+This lets queries like:
+
+```sql
+SELECT * FROM Employees WHERE LastName = 'Doe';
+```
+
+quickly find all matching employees. The actual employee rows remain stored in their original order, but this index serves as a fast lookup for `LastName`.
+
+---
+
+Non-clustered indexes are essential tools to speed up selective lookups without rearranging your table data, providing flexible indexing options across many columns!

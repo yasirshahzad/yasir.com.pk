@@ -1,0 +1,53 @@
+---
+title: What is a Clustered Index? Boosting Database Query Performance
+date: '2025-06-09'
+tags: ['system-design', 'indexes']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.png']
+summary: A Clustered Index controls the physical order of data in a table, making range queries and sorting extremely fast. It organizes rows on disk by the index key and is usually the primary key, with only one clustered index allowed per table.
+---
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## What is a Clustered Index?
+
+A **Clustered Index** determines how data is physically stored on disk. The table’s rows are arranged in the same order as the clustered index key, so the index’s leaf nodes **contain the actual data**. Because of this, a table can have **only one clustered index**.
+
+By default, many databases use the **primary key** as the clustered index (e.g., SQL Server, InnoDB). But you can choose another column if it better fits your query patterns.
+
+## Why Use a Clustered Index?
+
+Clustered indexes make:
+
+* **Range queries and sorting** lightning fast, since data is stored sequentially on disk
+* Queries like fetching all records between two dates very efficient
+* Grouping and ordered retrieval faster without extra sorting
+* Better disk read performance due to data locality (adjacent rows stored close)
+
+## Performance Trade-offs
+
+* Inserting rows can be slower if new data needs to fit in the middle of existing sorted data (causing page splits)
+* Updating clustered keys is costly because rows might move to keep order
+* Only one clustered index allowed per table, so choose carefully based on common queries
+* Non-clustered indexes reference data through the clustered key, adding some overhead
+
+## When to Use?
+
+Ideal for columns frequently used in range queries or sorting, such as:
+
+* Date or timestamp columns (e.g., logs, history tables)
+* Customer last names if often queried in sorted order
+* Auto-incrementing primary keys to optimize insert speed
+
+For small tables, clustered indexing matters less, but for large tables, it significantly improves performance on ordered queries.
+
+## Example
+
+In SQL Server, create a clustered index like this:
+
+```sql
+CREATE CLUSTERED INDEX idx_cust_name ON Customers(LastName ASC, FirstName ASC);
+```
+
+This stores the `Customers` table physically sorted by `LastName` and `FirstName`. Queries ordering by these columns or searching ranges like `LastName BETWEEN 'A' and 'C'` run very efficiently.
+

@@ -1,0 +1,73 @@
+---
+title: Understanding Database Indexes - Boosting Query Performance the Smart Way
+date: '2025-06-09'
+tags: ['system-design', 'indexes']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.png']
+summary: Learn what database indexes are, how they boost query performance, and why they can slow down write operations. Discover how to use indexes wisely to balance speed and efficiency in data retrieval and storage.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+## What Are Database Indexes and Why Do They Matter?
+
+Database performance is a key concern for developers and DBAs alike. As datasets grow, queries can become slower and more resource-intensive. One of the most effective ways to tackle this issue is by using **database indexes**.
+
+Indexes act like a roadmap for your data, making it faster to find the information you need. Think of them as the table of contents in a book—helping you skip directly to the page you want, without flipping through every single page.
+
+## Real-Life Analogy: A Library Catalog
+
+Consider a traditional library catalog. It usually has two main listings—one by book title and one by author name. If you're looking for a book by a particular author, you don’t have to search every title. You simply use the author-sorted catalog.
+
+This is exactly how indexes work in databases. Instead of scanning every row in a table, the database uses an index to jump straight to the relevant data.
+
+## How Do Database Indexes Work?
+
+An index is a **data structure** that stores the values of one or more columns from a table along with pointers to the rows where those values are stored. For example, if you create an index on the "Title" column in a books table, the database builds a sorted list of titles with references to the full rows.
+
+This drastically improves search performance, especially for large datasets that span multiple devices or contain millions of records.
+
+## Key Benefits of Indexes
+
+**1. Faster Data Retrieval**
+Indexes significantly speed up query execution by minimizing the amount of data that must be scanned.
+
+**2. Better Sorting and Ordering**
+Queries that require ordered results (e.g., `ORDER BY`) benefit from indexes, as the data is already sorted.
+
+**3. Reduced Table Scans**
+Instead of scanning the entire table, the database uses the index to directly locate the desired rows.
+
+**4. Efficient Data Access**
+Indexes optimize the way databases access rows, especially when the search condition matches indexed columns.
+
+**5. High Index Selectivity**
+Indexes are most effective when they are **selective**, meaning they filter out many rows and return only a few.
+
+## The Trade-Off: How Indexes Impact Write Performance
+
+While indexes speed up reads, they can slow down **write operations**—such as `INSERT`, `UPDATE`, and `DELETE`.
+
+Why? Because every time data is modified, the associated indexes must also be updated. This introduces extra processing overhead and storage requirements.
+
+For instance, updating a row in a table with multiple indexes means the database has to:
+
+- Modify the table data
+- Update all affected indexes
+
+This is why **unnecessary indexes** should be avoided, and **unused indexes** should be regularly reviewed and removed.
+
+## Best Practices for Using Indexes
+
+- **Analyze Query Patterns**: Add indexes only on columns used frequently in `WHERE`, `JOIN`, or `ORDER BY` clauses.
+- **Monitor Performance**: Use database monitoring tools to see which indexes are being used.
+- **Avoid Over-Indexing**: Too many indexes can slow down writes and consume more storage.
+- **Review Regularly**: Remove indexes that no longer provide performance benefits.
+
+## Final Thoughts
+
+Indexes are a powerful tool for improving database query performance, but they are not without cost. In **read-heavy systems**, indexes are essential. In **write-heavy systems**, use them sparingly and only when necessary.
+
+By understanding when and how to use indexes, you can ensure that your database remains fast, efficient, and scalable.
