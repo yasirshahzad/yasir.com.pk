@@ -1,0 +1,114 @@
+---
+title: Architecture of a Distributed File System (DFS) Explained  
+date: '2025-06-09'
+tags: ['system-design', "misc", distributed-file-system]
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.webp']
+summary: Understand the internal architecture of a distributed file system (DFS), including key components like metadata servers, data nodes, replication mechanisms, and a real-world example using Hadoop HDFS.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+## 🧱 What is the Architecture of a Distributed File System?
+
+A **Distributed File System (DFS)** allows data to be stored across multiple machines while making it appear like a single unified system to users. Its architecture is designed for **efficiency**, **scalability**, and **fault tolerance** in large-scale networked environments.
+
+
+## 🔧 **Key Components of a Distributed File System**
+
+### 1. 📁 **Client Interface**
+- **Function**: Lets users/applications read/write files just like a local file system.
+- **Implementation**: Exposed via APIs, SDKs, or command-line tools.
+
+### 2. 🧭 **Metadata Server (Control Plane)**
+- **Function**: Stores metadata like:
+  - File paths & hierarchy
+  - Access permissions
+  - File-to-node mapping
+- **Note**: A single point of failure unless **replicated**.
+
+### 3. 💾 **Data Nodes / Storage Nodes**
+- **Function**: Store actual file content.
+- **Structure**:
+  - Files are split into **chunks/blocks**
+  - Stored on **multiple nodes** for durability
+  - Perform read/write as instructed by metadata servers
+
+### 4. 🔁 **Replication & Redundancy**
+- **Function**: Ensures fault tolerance.
+- **Behavior**: Automatically replicates file blocks across multiple nodes.
+- **Benefit**: Survives node or disk failures.
+
+### 5. ⚖️ **Load Balancer or Scheduler**
+- **Function**: Spreads data and processing evenly.
+- **Benefit**: Prevents overloading a single node and improves performance.
+
+### 6. 🌐 **Network Infrastructure**
+- **Function**: Enables communication among all DFS components.
+- **Importance**: Low-latency, high-bandwidth networks = better DFS performance.
+
+### 7. 🔄 **Consistency and Synchronization**
+- **Function**: Keeps data copies in sync across nodes.
+- **Types**:
+  - **Strong Consistency**: All users see the latest data
+  - **Eventual Consistency**: Updates propagate over time
+
+### 8. 🛠 **Fault Tolerance & Recovery**
+- **Function**: Detects and handles node failures.
+- **Includes**:
+  - Heartbeat checks
+  - Auto re-replication
+  - Data re-routing
+
+### 9. 🔐 **Security Features**
+- **Function**: Protects data in transit and at rest.
+- **Tools Used**:
+  - Authentication (e.g., Kerberos)
+  - Access Control Lists (ACLs)
+  - Encryption
+
+
+## 📘 **Example: HDFS (Hadoop Distributed File System)**
+
+| Component     | Role in HDFS                                              |
+|---------------|-----------------------------------------------------------|
+| **Client Interface** | CLI, Java API to interact with HDFS                 |
+| **NameNode**  | Stores all file metadata                                  |
+| **DataNodes** | Store data blocks across the Hadoop cluster               |
+| **Replication**| Each block is replicated to multiple DataNodes           |
+| **YARN**      | Handles resource management and job scheduling            |
+
+### 🔍 HDFS High-Level Architecture:
+
+```plaintext
+[ Client ]
+    ↓
+[ NameNode (Metadata) ]
+    ↓        ↓        ↓
+[DataNode] [DataNode] [DataNode]
+```
+
+![Architecture](https://storage.googleapis.com/download/storage/v1/b/designgurus-prod.appspot.com/o/1bfe9d32e09678603296b4d00?generation=1702832647989004&alt=media)
+
+
+## ✅ **Why this Architecture Matters**
+
+| Strength                         | Result                                 |
+|----------------------------------|----------------------------------------|
+| Modular component design         | Easier to manage & scale               |
+| Data + Metadata separation       | Optimized performance                  |
+| Redundancy via replication       | Higher availability & reliability      |
+| Scheduler/load balancer          | Efficient resource utilization         |
+
+
+## 🏁 Conclusion
+
+The architecture of a Distributed File System is what enables it to:
+- Scale to **petabytes of data**
+- Handle **failures gracefully**
+- Support **millions of users or jobs**
+
+Whether you're working with **big data**, **cloud platforms**, or **high-performance computing**, understanding DFS architecture helps in designing **robust and scalable systems**.
+

@@ -1,0 +1,87 @@
+---
+title: What is a Distributed File System? Explained with Examples
+date: '2025-06-09'
+tags: ['system-design', "misc", distributed-file-system]
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.webp']
+summary: Learn what a Distributed File System is, how it works, its key features, examples like HDFS and GFS, and common use cases such as cloud storage and big data processing.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## **What is a Distributed File System (DFS)?**
+
+A **Distributed File System** stores files across **multiple servers** (possibly in different locations) but looks like a single storage system to users.
+
+👉 Users can access files **as if they are stored locally**, even though they are spread across many machines.
+
+
+## ✅ **Key Features of DFS**
+
+| Feature                  | Description                                                            |
+| ------------------------ | ---------------------------------------------------------------------- |
+| 📦 **Data Distribution** | Files are split or copied across multiple servers.                     |
+| 🔍 **Transparency**      | Users don't need to know where data is stored.                         |
+| 📈 **Scalability**       | Add more servers to handle more users/data.                            |
+| 🛡 **Fault Tolerance**   | Uses replication—if one server fails, data is still available.         |
+| 🔄 **Consistency**       | Updates are synced across all copies (either instantly or eventually). |
+
+
+## 💡 **Real-World Use Cases**
+
+1. **🌩 Cloud Storage**:
+   Services like **Google Drive** and **Dropbox** use DFS to store your files across multiple servers.
+
+2. **📊 Big Data Processing**:
+   **Hadoop HDFS** is used in data analytics for storing and processing large datasets.
+
+3. **🌍 Content Delivery Networks (CDNs)**:
+   Distribute files worldwide to make websites load faster.
+
+4. **🚀 High-Performance Computing**:
+   Scientific simulations use DFS to share massive datasets across servers.
+
+
+## 🧠 **Popular Examples of DFS**
+
+| System            | What It's Known For                                     |
+| ----------------- | ------------------------------------------------------- |
+| **HDFS**          | Big data processing with Hadoop.                        |
+| **GFS**           | Google's internal DFS for massive data handling.        |
+| **Microsoft DFS** | Windows-based file sharing across servers.              |
+| **Amazon EFS**    | Scalable cloud file storage with EC2.                   |
+| **CephFS**        | Open-source, POSIX-compliant, cloud-native file system. |
+
+
+## ⚠️ **Common Challenges**
+
+* 🔄 **Data Sync Issues**: Hard to keep updates in sync across all servers.
+* 🔐 **Security Risks**: More nodes = more places to secure.
+* 🐢 **Performance**: Slower than local systems due to network delays.
+
+
+## 🧾 **Quick Example: Dropbox**
+
+When you upload a file to Dropbox:
+
+* It gets split into chunks.
+* Chunks are saved on different servers in different data centers.
+* If one server crashes, another copy exists.
+* You don't notice any of this—just see your file.
+
+
+## ✅ **Summary**
+
+| Pros                       | Cons                  |
+| -------------------------- | --------------------- |
+| High availability          | Complexity            |
+| Scalable across locations  | Potential sync delays |
+| Appears like local storage | Security challenges   |
+
+
+## 🏁 Conclusion
+
+Distributed File Systems are **essential** in today's internet-scale applications—from cloud storage to data analytics. They're powerful but must be carefully managed for **sync**, **security**, and **performance**.
+
+

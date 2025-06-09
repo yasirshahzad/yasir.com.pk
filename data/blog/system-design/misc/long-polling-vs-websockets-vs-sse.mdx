@@ -1,0 +1,130 @@
+---
+title: Long-Polling vs WebSockets vs Server-Sent Events - Key Differences
+date: '2025-06-09'
+tags: ['system-design', 'misc']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.webp']
+summary: Understand the difference between Long-Polling, WebSockets, and Server-Sent Events (SSE) for real-time client-server communication. Learn with simple points, examples, and use cases.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## **1. Basic HTTP Request (How It Normally Works)**
+
+- Client sends a request to the server.
+- Server responds with data.
+- Connection closes.
+
+👉 **Limitation**: Not suitable for real-time apps (like chat or live updates).
+
+![HTTP Protocol](https://www.designgurus.io/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fdownload%2Fstorage%2Fv1%2Fb%2Fdesigngurus-prod.appspot.com%2Fo%2FdocImages%252F6426df6a209d28c9a2d0d330%252Fimg%3Aa6e074-e8e3-86c-2fad-4ebbfefe6754.png%3Fgeneration%3D1680269332988288%26alt%3Dmedia&w=3840&q=75&dpl=dpl_C6iFfK2QyaSuvXUqDyDbaXxbKWB7)
+
+## **2. AJAX Polling (Old-School Way)**
+
+**How it works**:
+
+- Client repeatedly sends requests (e.g., every 1 sec).
+- Server responds with data (or empty if nothing new).
+
+**Example**:
+
+```js
+setInterval(() => {
+  fetch('/updates').then((res) => res.json())
+}, 1000)
+```
+
+✅ **Simple**
+❌ **Heavy server load**, many useless requests
+
+![Ajax Polling](https://www.designgurus.io/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fdownload%2Fstorage%2Fv1%2Fb%2Fdesigngurus-prod.appspot.com%2Fo%2FdocImages%252F6426df6a209d28c9a2d0d330%252Fimg%3A84e53c1-ca5-ad32-fb73-245d3c47bbc2.png%3Fgeneration%3D1680269445164908%26alt%3Dmedia&w=3840&q=75&dpl=dpl_C6iFfK2QyaSuvXUqDyDbaXxbKWB7)
+
+## **3. Long-Polling (Improved Polling)**
+
+**How it works**:
+
+- Client sends a request.
+- Server holds the request **until new data is available**.
+- Once data is sent, client reconnects.
+
+**Example**:
+
+```js
+function poll() {
+  fetch('/updates')
+    .then((res) => res.json())
+    .then(poll)
+}
+poll()
+```
+
+✅ **Better than polling**
+❌ Still HTTP overhead, reconnects often
+
+![Long Pulling](https://www.designgurus.io/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fdownload%2Fstorage%2Fv1%2Fb%2Fdesigngurus-prod.appspot.com%2Fo%2FdocImages%252F6426df6a209d28c9a2d0d330%252Fimg%3A84e53c1-ca5-ad32-fb73-245d3c47bbc2.png%3Fgeneration%3D1680269445164908%26alt%3Dmedia&w=3840&q=75&dpl=dpl_C6iFfK2QyaSuvXUqDyDbaXxbKWB7)
+
+## **4. WebSockets (Real-Time, Two-Way)**
+
+**How it works**:
+
+- One persistent connection via WebSocket.
+- Both client & server can send data **anytime**.
+
+**Example**:
+
+```js
+const socket = new WebSocket('ws://example.com/socket')
+socket.onmessage = (event) => console.log(event.data)
+```
+
+✅ **Best for real-time**, like **chat apps, games**
+❌ More setup, not supported on all firewalls/proxies
+
+![WebSockets](https://www.designgurus.io/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fdownload%2Fstorage%2Fv1%2Fb%2Fdesigngurus-prod.appspot.com%2Fo%2FdocImages%252F6426df6a209d28c9a2d0d330%252Fimg%3A5cd02-6fb7-db0c-7211-d065050f0d3.png%3Fgeneration%3D1680269650635727%26alt%3Dmedia&w=3840&q=75&dpl=dpl_C6iFfK2QyaSuvXUqDyDbaXxbKWB7)
+
+## **5. Server-Sent Events (SSE)**
+
+**How it works**:
+
+- One-way connection (server ➝ client)
+- Server pushes updates when available
+
+**Example**:
+
+```js
+const eventSource = new EventSource('/events')
+eventSource.onmessage = (e) => console.log(e.data)
+```
+
+✅ **Lightweight**, great for **news, stock updates**
+❌ **Client can't send data back**, only receives
+
+![Server side events](https://www.designgurus.io/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fdownload%2Fstorage%2Fv1%2Fb%2Fdesigngurus-prod.appspot.com%2Fo%2FdocImages%252F6426df6a209d28c9a2d0d330%252Fimg%3A16245-3173-5d8c-2a14-d5f765f7fcaa.png%3Fgeneration%3D1680269794609812%26alt%3Dmedia&w=3840&q=75&dpl=dpl_C6iFfK2QyaSuvXUqDyDbaXxbKWB7)
+
+## **Comparison Table**
+
+| Feature               | Polling       | Long-Polling  | WebSockets  | SSE              |
+| --------------------- | ------------- | ------------- | ----------- | ---------------- |
+| Real-time             | ❌            | ✅            | ✅          | ✅               |
+| Duplex (2-way)        | ✅            | ✅            | ✅          | ❌ (1-way only)  |
+| Persistent Connection | ❌            | ❌            | ✅          | ✅               |
+| Server Push           | ❌            | ✅            | ✅          | ✅               |
+| Use Case              | Basic updates | Notifications | Chat, games | News feeds, logs |
+
+## **When to Use What?**
+
+- 🔁 **Polling**: Rarely; legacy support only.
+- ⏳ **Long-Polling**: Basic push notifications.
+- ⚡ **WebSockets**: Real-time 2-way apps (chat, games).
+- 📰 **SSE**: Real-time 1-way feeds (logs, dashboards).
+
+## Final Thoughts
+
+If you need:
+
+- **Real-time bi-directional**: use **WebSockets**
+- **Real-time server-only updates**: use **SSE**
+- **Fallback or older browser support**: use **Long-Polling**
+
+Want a graphic for this? I can generate a comparison diagram too.
