@@ -8,7 +8,6 @@ images: ['/static/images/system-design/01-mastering-system-design.png']
 summary: The Leader and Follower pattern improves consistency and availability in distributed systems by electing a single leader to handle all write operations and coordinate replication, while followers act as backups or serve read requests.
 ---
 
-
 In distributed systems, data is often replicated across multiple servers for **fault tolerance** and **high availability**. However, ensuring consistency across replicas can be tricky—especially if using **quorum-based** approaches, which require a majority of servers to be available. Quorum ensures some consistency but may reduce availability and still allow rare inconsistencies.
 
 **The Leader and Follower Pattern: A Better Approach**
