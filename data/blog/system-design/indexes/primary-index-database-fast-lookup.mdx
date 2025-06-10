@@ -5,7 +5,7 @@ tags: ['system-design', 'indexes', 'database']
 draft: false
 layout: PostSimple
 images: ['/static/images/system-design/01-mastering-system-design.png']
-summary: A Primary Index is an automatic, unique index created on a table’s primary key for fast data retrieval. It ensures quick lookups, enforces uniqueness, and boosts performance in relational databases.
+summary: A Primary Index is an automatic, unique index created on a table's primary key for fast data retrieval. It ensures quick lookups, enforces uniqueness, and boosts performance in relational databases.
 ---
 
 <TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
@@ -13,7 +13,7 @@ summary: A Primary Index is an automatic, unique index created on a table’s pr
 
 ## What is a Primary Index?
 
-A **Primary Index** is an index automatically created on a table’s **primary key**—the column or set of columns that uniquely identify each row. Since every table has only one primary key, it can have only one primary index.
+A **Primary Index** is an index automatically created on a table's **primary key**—the column or set of columns that uniquely identify each row. Since every table has only one primary key, it can have only one primary index.
 
 ## Why is it Important?
 
@@ -31,7 +31,7 @@ Since primary keys rarely change, the index requires minimal updates, keeping da
 
 ## Example
 
-Here’s a simple SQL example where a primary index is created automatically:
+Here's a simple SQL example where a primary index is created automatically:
 
 ```sql
 CREATE TABLE Customers (
@@ -45,5 +45,5 @@ The database creates a primary index on `CustomerID`, so searching for a specifi
 
 ## When to Use?
 
-Always use a primary index on the main identifier of your table—typically the primary key. It’s fundamental for efficient, reliable database design.
+Always use a primary index on the main identifier of your table—typically the primary key. It's fundamental for efficient, reliable database design.
 

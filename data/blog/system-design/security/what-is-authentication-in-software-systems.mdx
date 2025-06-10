@@ -1,0 +1,73 @@
+---
+title: What Is Authentication in Software Systems?
+date: '2025-06-10'
+tags: ['system-design', security]
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.webp']
+summary: Learn what authentication is, why it's important, and the different types and methods used to verify user identities in software systems.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+**Authentication** is the process of verifying a user's identity—just like showing an ID to enter a secure area. In the digital world, it's the **first line of defense** to ensure that only legitimate users gain access to systems, applications, or data.
+
+## 🧭 The Basics
+
+Imagine a bouncer at a club checking IDs. In software, **authentication works the same way**—verifying that you are who you claim to be.
+
+Authentication is based on one or more of the following:
+
+- **Something you know** – e.g., a password or PIN
+- **Something you have** – e.g., a mobile device, hardware token
+- **Something you are** – e.g., fingerprint, face scan
+
+## 🔑 Types of Authentication
+
+### 1. **Single-Factor Authentication (SFA)**
+
+- **What**: Just one form of verification, usually a password.
+- **Example**: Logging in with only a username and password.
+- **Pros**: Simple to implement.
+- **Cons**: Weak security if users choose poor passwords.
+
+### 2. **Two-Factor Authentication (2FA)**
+
+- **What**: Requires two forms of authentication—typically a password and a code sent to your phone.
+- **Example**: Online banking login with a password + OTP.
+- **Pros**: Stronger security than SFA.
+- **Cons**: Adds a small usability burden.
+
+### 3. **Multi-Factor Authentication (MFA)**
+
+- **What**: Uses two or more verification methods from different categories.
+- **Example**: A password, a fingerprint scan, and a smart card.
+- **Pros**: Highly secure.
+- **Cons**: May require additional hardware or infrastructure.
+
+## 🔒 Why Authentication Matters
+
+### ✅ **Security**
+
+It ensures that only authorized users can access your system, protecting against unauthorized access and breaches.
+
+### ✅ **Data Protection**
+
+Authentication guards sensitive data—financial, personal, or corporate—from being accessed or modified by malicious actors.
+
+### ✅ **User Trust**
+
+Users are more confident in systems that use strong, transparent authentication methods.
+
+## 🔧 Common Authentication Methods
+
+| Method                    | Description                                           | Strength       |
+| ------------------------- | ----------------------------------------------------- | -------------- |
+| **Passwords & PINs**      | Most basic; depends on user memory                    | Low to Medium  |
+| **Biometrics**            | Uses unique physical traits (e.g., fingerprint, face) | High           |
+| **Tokens & Cards**        | One-time code generators (hardware/software)          | Medium to High |
+| **Behavioral Biometrics** | Monitors user behavior like keystroke patterns        | Medium         |
+
+## 🎯 Final Thoughts
+
+Authentication is the **foundation of security** in any software system. Whether you're building a mobile app, a web platform, or an enterprise system, getting authentication right ensures your users—and their data—are protected.

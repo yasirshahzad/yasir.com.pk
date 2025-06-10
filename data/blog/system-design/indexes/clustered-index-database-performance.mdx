@@ -11,7 +11,7 @@ summary: A Clustered Index controls the physical order of data in a table, makin
 
 ## What is a Clustered Index?
 
-A **Clustered Index** determines how data is physically stored on disk. The table’s rows are arranged in the same order as the clustered index key, so the index’s leaf nodes **contain the actual data**. Because of this, a table can have **only one clustered index**.
+A **Clustered Index** determines how data is physically stored on disk. The table's rows are arranged in the same order as the clustered index key, so the index's leaf nodes **contain the actual data**. Because of this, a table can have **only one clustered index**.
 
 By default, many databases use the **primary key** as the clustered index (e.g., SQL Server, InnoDB). But you can choose another column if it better fits your query patterns.
 

@@ -5,7 +5,7 @@ tags: ['system-design', 'indexes', 'database']
 draft: false
 layout: PostSimple
 images: ['/static/images/system-design/01-mastering-system-design.png']
-summary: A Non-Clustered Index is a separate data structure that stores column values and pointers to table rows, speeding up lookups without altering the table’s physical order. Multiple non-clustered indexes can exist per table to optimize diverse queries.
+summary: A Non-Clustered Index is a separate data structure that stores column values and pointers to table rows, speeding up lookups without altering the table's physical order. Multiple non-clustered indexes can exist per table to optimize diverse queries.
 ---
 
 <TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
@@ -15,9 +15,9 @@ summary: A Non-Clustered Index is a separate data structure that stores column v
 
 A **Non-Clustered Index** (also called a secondary index) is a separate structure that stores indexed column values alongside pointers to the actual data rows in the table. Unlike a clustered index, it does **not** change the physical order of the table data — the table remains in its original order on disk.
 
-Think of it like the index at the back of a book: the book’s pages are in order, but the index lists keywords and points you to pages where those keywords appear.
+Think of it like the index at the back of a book: the book's pages are in order, but the index lists keywords and points you to pages where those keywords appear.
 
-A table can have **many non-clustered indexes** on different columns, since they don’t dictate the table’s physical layout.
+A table can have **many non-clustered indexes** on different columns, since they don't dictate the table's physical layout.
 
 ## Why Use a Non-Clustered Index?
 
@@ -35,7 +35,7 @@ SELECT * FROM Employees WHERE LastName = 'Smith';
 - Queries use the index to find matching keys, then follow pointers to retrieve full rows.
 - If the index **covers** the query (includes all requested columns), the database can serve the query from the index alone, avoiding extra lookups.
 - Adding many indexes increases **storage** and slows down **writes** because inserts/updates/deletes must update all relevant indexes.
-- Non-clustered indexes don’t guarantee physical data locality, so range scans may cause scattered reads.
+- Non-clustered indexes don't guarantee physical data locality, so range scans may cause scattered reads.
 - For queries returning a large fraction of rows, a full table scan may be more efficient than index lookups.
 
 ## When to Use?

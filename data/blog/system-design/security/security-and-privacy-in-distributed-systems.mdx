@@ -1,0 +1,96 @@
+---
+title: What Is Security and Privacy in Distributed Systems?
+date: '2025-06-10'
+tags: ['system-design', security]
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.webp']
+summary: Discover the key aspects of security and privacy in distributed systems, including authentication, encryption, secure communication, and intrusion prevention.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## 🔐 What Is Security and Privacy in Distributed Systems?
+
+In distributed systems, **security and privacy** are essential to protect sensitive data, user information, and the overall integrity of the system. Because these systems consist of multiple interconnected components often spread across different networks or geographic locations, they are especially vulnerable to threats like unauthorized access, data interception, or service disruption.
+
+This article outlines the **key pillars of security and privacy in distributed systems**, helping you understand how to protect your infrastructure effectively.
+
+## A. ✅ Authentication and Authorization
+
+### 📌 **Authentication** is the process of verifying the identity of a user, service, or node before granting access.
+
+### 📌 **Authorization** defines what authenticated entities are allowed to do—what data they can access, modify, or control.
+
+### 🔐 Tools & Techniques:
+
+- **OAuth 2.0**: Widely used for delegated access control.
+- **JWT (JSON Web Tokens)**: Lightweight tokens for stateless authentication.
+- **Kerberos**: Secure ticket-based authentication protocol used in enterprise environments.
+
+### 🎯 Goal:
+
+Prevent **unauthorized access** and **privilege escalation** in a distributed environment.
+
+## B. 🔒 Data Encryption
+
+### 📌 Encryption ensures that even if data is intercepted, it cannot be read without the appropriate decryption key.
+
+There are two critical areas to protect:
+
+- **Data at Rest**: Stored data on disks or databases.
+- **Data in Transit**: Data moving between nodes, services, or users.
+
+### 🔐 Techniques:
+
+- **Symmetric Encryption** (e.g., AES): Uses one key for both encryption and decryption.
+- **Asymmetric Encryption** (e.g., RSA): Uses public and private key pairs.
+- **Protocols**: TLS/SSL for securing communications over networks.
+
+### 🎯 Goal:
+
+Ensure **data confidentiality** and **privacy**, even if communication channels are compromised.
+
+## C. 📡 Secure Communication
+
+In distributed systems, nodes regularly exchange data. Ensuring these communication channels are secure is critical to **prevent interception, spoofing, or tampering**.
+
+### 🔐 Methods:
+
+- **TLS/SSL**: Encrypts network traffic between nodes.
+- **IPSec**: Encrypts and authenticates IP packets.
+- **End-to-End Encryption**: Used in messaging and communication apps to ensure only endpoints can decrypt the content.
+
+### 🎯 Goal:
+
+Protect the **integrity and confidentiality** of all inter-node communication.
+
+## D. 🛡️ Intrusion Detection and Prevention
+
+Intrusion Detection and Prevention Systems (IDPS) are essential for monitoring and defending against real-time threats within a distributed environment.
+
+### 🔍 Capabilities:
+
+- Monitor network traffic and system behavior.
+- Detect suspicious or malicious activities.
+- Automatically block or report threats.
+
+### 🔧 Examples:
+
+- **Snort**, **Suricata** (Open-source IDS tools)
+- **AWS GuardDuty**, **Azure Security Center** (Cloud-based solutions)
+
+### 🎯 Goal:
+
+Detect and respond to threats proactively, reducing the risk of **data breaches**, **malware spread**, or **system compromise**.
+
+## 🧠 Conclusion
+
+Security and privacy in distributed systems require a **layered and proactive approach**. Each layer—from authentication to encryption to real-time threat detection—works together to reduce the attack surface and ensure your systems are resilient against modern threats.
+
+### ✅ Key Takeaways:
+
+- **Always authenticate and authorize access** to every component in the system.
+- **Encrypt all sensitive data**, both at rest and in transit.
+- **Use secure communication protocols** to guard against network-based attacks.
+- **Deploy intrusion detection and prevention tools** to monitor and defend your system.

@@ -34,9 +34,9 @@ Because the hash function directly maps keys to buckets, a hash index can perfor
 ## Limitations of Hash Indexes
 
 - **No support for range queries:** Queries with `<`, `>`, `BETWEEN`, or range scans cannot use hash indexes.
-- **No ordering:** Since hash indexes don’t store keys in sorted order, they cannot optimize `ORDER BY` operations.
+- **No ordering:** Since hash indexes don't store keys in sorted order, they cannot optimize `ORDER BY` operations.
 - **No prefix or partial matching:** Queries like `LIKE 'John%'` cannot leverage hash indexes effectively.
-- **Database support varies:** Not all RDBMS support user-created hash indexes, or they have limitations (e.g., PostgreSQL only recently made hash indexes crash-safe; MySQL InnoDB doesn’t allow explicit hash indexes).
+- **Database support varies:** Not all RDBMS support user-created hash indexes, or they have limitations (e.g., PostgreSQL only recently made hash indexes crash-safe; MySQL InnoDB doesn't allow explicit hash indexes).
 - **Potential resizing cost:** If the hash table fills up, it may need to be resized and rehashed, which can be expensive but infrequent.
 
 ## Use Cases for Hash Indexes
