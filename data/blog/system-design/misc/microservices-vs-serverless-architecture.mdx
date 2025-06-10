@@ -1,0 +1,96 @@
+---
+title: Microservices vs Serverless - What's the Best Fit for Your App?
+date: '2025-06-10'
+tags: ['system-design', 'misc']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.webp']
+summary: Explore the key differences between Microservices and Serverless architecture. Learn which approach is best for your app based on scalability, cost, complexity, and use cases.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+When building modern applications, choosing the right architecture is key. **Microservices** and **Serverless** are two popular approaches for creating scalable, flexible, and efficient systems. While they share some goals, they work very differently under the hood.
+
+Let's break down what they are, how they work, and when to use each.
+
+## 🔧 What is Microservices Architecture?
+
+**Microservices** is an architecture where an application is split into small, independent services. Each service does one thing well and can be developed, deployed, and scaled on its own.
+
+### ✅ Key Features:
+
+- **Modular Structure**: Services are broken down by function (e.g., auth, payments, inventory).
+- **Independent Deployment**: Each service can be updated without affecting the rest.
+- **Tech Flexibility**: Teams can use different languages or tools for different services.
+- **CI/CD Friendly**: Easier to automate testing and deployment.
+
+### 📦 Example:
+
+An online store might have separate microservices for:
+
+- User login
+- Product catalog
+- Payment processing
+- Order history
+
+### 🔄 Use Cases:
+
+- Large, complex applications.
+- Teams working on different parts of a product.
+- Systems requiring fine-tuned scalability.
+
+## ☁️ What is Serverless Architecture?
+
+**Serverless** means your code runs on servers—but **you don't manage them**. The cloud provider handles all the server maintenance, scaling, and provisioning. You just write the function logic.
+
+### ✅ Key Features:
+
+- **No Server Management**: Focus only on code, not infrastructure.
+- **Auto-Scaling**: Adjusts automatically to traffic levels.
+- **Pay-as-You-Go**: You're billed only for the actual compute time used.
+- **Event-Driven**: Runs in response to events, such as HTTP requests or file uploads.
+
+### 📦 Example:
+
+A function that resizes images each time a new file is uploaded to cloud storage.
+
+### 🔄 Use Cases:
+
+- Lightweight APIs.
+- Automated workflows.
+- Applications with spiky or unpredictable traffic.
+
+## ⚖️ Microservices vs Serverless: Key Differences
+
+| Feature                   | Microservices                                      | Serverless                                 |
+| ------------------------- | -------------------------------------------------- | ------------------------------------------ |
+| **Infrastructure**        | Requires management (e.g., with Docker/Kubernetes) | No infrastructure management required      |
+| **Scalability**           | Manual or semi-automated                           | Fully automatic based on demand            |
+| **Cost Model**            | Pay for provisioned infrastructure                 | Pay-per-use (based on usage and time)      |
+| **Complexity**            | More operational complexity                        | Simpler to operate, but with some limits   |
+| **Use Case Fit**          | Best for large, modular apps                       | Best for small tasks and event-driven apps |
+| **Execution Time Limits** | No hard limits                                     | Limited (varies by cloud provider)         |
+
+## 🧠 When to Use What?
+
+### Use **Microservices** if:
+
+- You're building a **large application** with complex logic.
+- You want **full control** over services and infrastructure.
+- You need **long-running processes** or custom environments.
+
+### Use **Serverless** if:
+
+- Your app has **event-based** workflows.
+- You need to **scale quickly** without managing servers.
+- You want a **cost-effective solution** for low to moderate traffic.
+
+## 📝 Final Thoughts
+
+Both Microservices and Serverless offer paths to scalability and modern development. The best choice depends on your project's size, complexity, and team expertise.
+
+- **Choose Microservices** for long-term flexibility and control.
+- **Choose Serverless** for simplicity, speed, and cost-efficiency—especially for short-lived, event-triggered tasks.
+
+Want to combine both? Many teams **use Microservices architecture with Serverless functions** for specific tasks like image processing or notifications. There's no one-size-fits-all—pick what serves your goals best.

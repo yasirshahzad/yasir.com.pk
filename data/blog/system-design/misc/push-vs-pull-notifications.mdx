@@ -1,0 +1,95 @@
+---
+title: Push vs Pull Notifications - What's the Difference and When to Use Each
+date: '2025-06-10'
+tags: ['system-design', 'misc']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.webp']
+summary: Discover the key differences between push and pull notification systems. Learn how they work, their pros and cons, and which is best for real-time or user-controlled updates.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+In the digital world, keeping users informed is essential. Whether it's a breaking news alert or a new message, notifications play a vital role in user experience. There are two primary types: **push** and **pull** notifications. Each serves a different purpose, and knowing when to use them can help you create better, more responsive applications.
+
+## What is a Push Notification?
+
+A **push notification** is a message sent from a server directly to the user's device or browser without any user request. It's **proactive**, meaning the user doesn't have to do anything to receive it.
+
+### ✅ Characteristics:
+
+- **Real-Time Updates**: Great for urgent alerts.
+- **User Engagement**: Helps keep users active, if not overused.
+- **Permission-Based**: Requires users to allow notifications.
+
+### 📱 Common Use Cases:
+
+- New message or email alerts.
+- Social media activity.
+- App alerts like food delivery or ride status.
+
+### 🌦 Example:
+
+A weather app sends a sudden storm alert to your phone.
+
+### 👍 Pros:
+
+- Instant delivery.
+- No user action needed.
+
+### 👎 Cons:
+
+- Can feel intrusive.
+- Needs permission to work.
+
+## What is a Pull Notification?
+
+A **pull notification** means the user (or client) must **request** updates. It's **reactive**, depending on user action to fetch the latest information.
+
+### ✅ Characteristics:
+
+- **User-Controlled**: Updates are fetched manually.
+- **Less Intrusive**: Ideal for non-urgent updates.
+- **Flexible Timing**: Works whenever the user chooses to check.
+
+### 📱 Common Use Cases:
+
+- Refreshing your email app to check for new messages.
+- Updating a news app manually.
+- Polling a server in a dashboard or project management tool.
+
+### 📲 Example:
+
+You open Instagram to check for new likes or DMs.
+
+### 👍 Pros:
+
+- Less interruptive.
+- Users choose when to get updates.
+
+### 👎 Cons:
+
+- Not ideal for time-sensitive info.
+- Requires user action.
+
+## Push vs Pull Notifications: Key Differences
+
+| Feature            | Push Notifications                   | Pull Notifications                 |
+| ------------------ | ------------------------------------ | ---------------------------------- |
+| **Initiated by**   | Server                               | User/Client                        |
+| **Timeliness**     | Instant                              | On-demand                          |
+| **User Control**   | Low                                  | High                               |
+| **Intrusiveness**  | Can be intrusive                     | Less intrusive                     |
+| **Internet Need**  | Always-on connection needed          | Updates when online                |
+| **Implementation** | More complex (real-time tech needed) | Easier (standard request/response) |
+
+## Which Should You Use?
+
+- Use **push notifications** when you need to alert users instantly—like for security alerts, messages, or breaking news.
+- Use **pull notifications** when updates aren't urgent—like checking for new blog posts or status updates.
+
+## Final Thoughts
+
+Push and pull notifications each have their strengths. The right choice depends on your app's goals and your users' needs. Push is perfect for real-time engagement, while pull offers more control and simplicity.
+
+Want to build smarter notifications? Start by asking: **Does the user need this info now or can it wait?**

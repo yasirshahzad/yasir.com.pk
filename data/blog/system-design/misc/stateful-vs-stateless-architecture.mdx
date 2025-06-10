@@ -1,0 +1,96 @@
+---
+title: Stateful vs Stateless Architecture - Key Differences Explained
+date: '2025-06-10'
+tags: ['system-design', 'misc']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.webp']
+summary: Discover the core differences between stateful and stateless architectures in web development. Learn which is best for scalability, session management, and performance.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+In modern web and software design, understanding how an application manages **user session data** is crucial. Two fundamental architectural styles—**Stateful** and **Stateless**—define how servers handle user interactions.
+
+Each has its pros and cons, and choosing the right one can significantly affect performance, scalability, and user experience.
+
+
+## 🔄 What is Stateful Architecture?
+
+### 📘 Definition:
+
+**Stateful architecture** means the **server retains memory** of past user interactions. Each session is tracked, and the state is preserved between requests.
+
+### ✅ Characteristics:
+
+* **Session Memory**: Server remembers previous user interactions.
+* **Resource Intensive**: Requires more memory and processing to manage sessions.
+* **Personalized UX**: Allows tailored experiences, like remembering user preferences or activity.
+
+### 💡 Use Cases:
+
+* **E-commerce**: Shopping cart and user login session management.
+* **Online Banking**: Persistent sessions for security and transaction history.
+* **Gaming Apps**: Multiplayer state synchronization and continuity.
+
+### 📦 Example:
+
+On an online shopping site, your cart retains items as you browse between pages, and your login state persists across different areas of the app.
+
+
+## 🚫 What is Stateless Architecture?
+
+### 📘 Definition:
+
+**Stateless architecture** means the **server does not retain any session data**. Every request is **independent** and must contain all the necessary information for processing.
+
+### ✅ Characteristics:
+
+* **No Memory of Past Requests**: Every interaction is standalone.
+* **High Scalability**: Easier to scale horizontally as no session data needs to be replicated.
+* **Improved Performance**: Lightweight and fast, ideal for APIs and microservices.
+
+### 💡 Use Cases:
+
+* **RESTful APIs**: Stateless by design; all context is sent with each HTTP request.
+* **Microservices**: Promotes simplicity and scalability.
+* **Serverless Apps**: Where each function invocation is isolated.
+
+### 📦 Example:
+
+A weather API where each request includes a city name and API key, and the server returns weather data without knowing anything about previous requests.
+
+
+## 🧠 Stateful vs Stateless: Side-by-Side Comparison
+
+| Feature             | **Stateful**                             | **Stateless**                             |
+| ------------------- | ---------------------------------------- | ----------------------------------------- |
+| **Session Memory**  | Maintains session state                  | No session memory                         |
+| **Resource Usage**  | Higher (stores user state)               | Lower (no storage of session data)        |
+| **Scalability**     | Harder to scale                          | Highly scalable                           |
+| **Complexity**      | More complex (requires session tracking) | Simpler (each request is independent)     |
+| **User Experience** | Personalized interactions                | Consistent, stateless experience          |
+| **Examples**        | Online shopping, games, banking          | REST APIs, microservices, serverless apps |
+
+
+![Statefull and Stateless](https://www.designgurus.io/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fdownload%2Fstorage%2Fv1%2Fb%2Fdesigngurus-prod.appspot.com%2Fo%2F61c378677de12c6b7ece7dc00%3Fgeneration%3D1712171114043093%26alt%3Dmedia&w=1920&q=75&dpl=dpl_9D1PXqJy4yiqij9rCYxrxP5hsJHy)
+
+## 📝 Conclusion
+
+The choice between **stateful and stateless architecture** depends on your application's needs:
+
+* Choose **Stateful** if:
+
+  * You need to track user sessions.
+  * You require personalization or persistent interactions.
+  * You're building real-time or transactional systems.
+
+* Choose **Stateless** if:
+
+  * Scalability and simplicity are priorities.
+  * You're building APIs or microservices.
+  * You want to reduce server-side memory usage.
+
+Understanding these models is key to designing efficient, scalable, and user-friendly applications.
+
