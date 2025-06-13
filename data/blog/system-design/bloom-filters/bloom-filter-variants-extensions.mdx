@@ -1,0 +1,92 @@
+---
+title: Top 5 Variants of Bloom Filters You Should Know
+date: '2025-06-13'
+lastmod: '2025-06-13'
+tags: ['system-design', 'bloom-filters']
+draft: false
+authors: ['default']
+layout: PostSimple
+images: []
+summary: Explore the most popular Bloom Filter variants like Counting, Compressed, and Cuckoo Filters. Learn how each extension improves performance, scalability, or adds new features.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+Bloom Filters are amazing when it comes to fast and space-efficient membership checks. But as powerful as they are, the **standard Bloom Filter has its limitations**—like not supporting deletions or growing datasets well.
+
+That's where **variants and extensions** come in. These advanced versions improve functionality, performance, and flexibility to handle more complex use cases.
+
+Here are the **top 5 Bloom Filter variants** you should know about:
+
+### 1. 🧮 **Counting Bloom Filters**
+
+**Problem solved:** Standard Bloom filters can't remove elements.
+**How it works:** Instead of just using a bit array, Counting Bloom Filters use **an array of counters**. When you add an item, the counters increase. When you remove it, they decrease.
+
+**Pros:**
+
+- Supports deletions
+- Works well in dynamic datasets
+
+**Cons:**
+
+- Needs more space
+- More complex than the original version
+
+### 2. 📦 **Compressed Bloom Filters**
+
+**Problem solved:** Save even more storage.
+**How it works:** These filters use **compression techniques** like Run-Length Encoding or Golomb Coding to reduce the memory usage of the bit array.
+
+**Pros:**
+
+- Saves space
+- Useful for data transfer or embedded systems
+
+**Cons:**
+
+- Slower insert and query times due to decompression
+
+### 3. 📊 **Spectral Bloom Filters**
+
+**Problem solved:** Estimate how often an element appears, not just whether it exists.
+**How it works:** These filters run **multiple Bloom filters in parallel**, each representing a frequency range. By checking which filters contain an item, you can guess how frequently it shows up.
+
+**Use cases:**
+
+- Data mining
+- Spam detection
+- Network traffic monitoring
+
+### 4. 📈 **Scalable Bloom Filters**
+
+**Problem solved:** Standard Bloom filters don't grow with your data.
+**How it works:** Instead of resizing, **Scalable Bloom Filters add new layers** with updated parameters as the dataset grows. This keeps performance stable and the false positive rate under control.
+
+**Pros:**
+
+- Great for unpredictable or expanding data
+- Keeps false positive rate steady
+
+### 5. 🐦 **Cuckoo Filters**
+
+**Problem solved:** Combine high performance, deletion support, and compact storage.
+**How it works:** Cuckoo Filters use **Cuckoo Hashing** and store compact fingerprints of items. This makes them highly space-efficient and fast.
+
+**Pros:**
+
+- Supports deletion
+- Often more space-efficient than standard Bloom filters
+- Faster in many real-world use cases
+
+
+### 🔚 **Wrapping Up**
+
+Bloom Filters are already a brilliant tool—but their **variants push the boundaries** of what you can do with them. Whether you need to delete items, estimate frequency, or scale with growing data, there's a Bloom Filter variant for your needs.
+
+**Choose wisely**:
+
+- For deletions: Counting or Cuckoo Filters
+- For space-saving: Compressed Bloom Filters
+- For analytics: Spectral Bloom Filters
+- For flexibility: Scalable Bloom Filters
