@@ -1,0 +1,131 @@
+---
+title: Real-World Examples of the CAP Theorem in Action
+date: '2025-06-14'
+tags: ['system-design', 'databases']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.png']
+summary: See how CAP Theorem plays out in real systems like MongoDB, Cassandra, ZooKeeper, and DynamoDB. Understand which trade-offs each system makes and why. ⚙️🔄📡
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+We've discussed the **CAP Theorem**—how distributed systems must choose **two of three**:
+📏 **Consistency**, 🔄 **Availability**, and 🌐 **Partition Tolerance**.
+
+Now, let's explore **real systems** and how they each make their CAP trade-offs.
+
+## 🍃 MongoDB — CP (Consistency + Partition Tolerance)
+
+MongoDB is a **document-based NoSQL database** that prioritizes **strong consistency** by default.
+
+🛠️ **How it works**:
+
+* Uses a **primary-secondary replication** model.
+* Only the **primary node** accepts writes.
+* If the primary is **partitioned or crashes**, the cluster **elects a new one**.
+* During this election, **writes are blocked** (availability is sacrificed).
+
+🎯 **Why?** To **prevent multiple primaries** and **ensure data consistency**.
+
+✅ Great for:
+
+* Applications where **stale or conflicting data** is unacceptable (e.g., transactions, profiles).
+* Systems needing **event ordering or integrity**.
+
+❌ Trade-Off:
+
+* Brief unavailability during failover.
+* Sacrifices uptime for correctness.
+
+
+## 🌍 Cassandra — AP (Availability + Partition Tolerance)
+
+Cassandra is a **highly available distributed database** known for **horizontal scalability**.
+
+🛠️ **How it works**:
+
+* No single leader – **any node can handle reads/writes**.
+* During a partition, all nodes continue operating.
+* Writes might **conflict**, but are **reconciled later** using timestamps and background repair processes.
+
+⚙️ Offers **tunable consistency**, but defaults to “**always available**” mode.
+
+🎯 **Why?** Designed for **always-on** systems where **availability > strict correctness**.
+
+✅ Great for:
+
+* **User activity feeds**
+* **IoT data**
+* **Web apps** where delays are worse than slight staleness
+
+❌ Trade-Off:
+
+* You **might read outdated data** temporarily
+* Eventual consistency by default
+
+
+## 🧭 ZooKeeper — CP (Consistency + Partition Tolerance)
+
+ZooKeeper is a **coordination service** used in distributed systems for leader election, configuration, and more.
+
+🛠️ **How it works**:
+
+* Uses the **Zab protocol** requiring **quorum-based consensus**.
+* If a quorum is lost (e.g., due to a network partition), the minority **stops responding**.
+* ZooKeeper **refuses operations** it cannot guarantee are consistent.
+
+🎯 **Why?** To **preserve a single agreed state** (vital for consensus-critical services like leader election).
+
+✅ Great for:
+
+* Distributed **locks**
+* **Service discovery**
+* **Cluster coordination** (like Kafka, HDFS)
+
+❌ Trade-Off:
+
+* **Availability sacrificed** during partition
+* Strong consistency is non-negotiable
+
+
+## 🛒 DynamoDB — AP (Availability + Partition Tolerance)
+
+Amazon's DynamoDB is a **cloud-native key-value store**, inspired by the **Amazon Dynamo** paper.
+
+🛠️ **How it works**:
+
+* Automatically **replicates across zones**.
+* Continues to **serve reads and writes** even during failures.
+* Uses **eventual consistency** by default, but offers **strong consistency** within a region if configured.
+
+🎯 **Why?** Built for **always-on services** like shopping carts and preferences, where **availability is critical**.
+
+✅ Great for:
+
+* **E-commerce systems**
+* **Session storage**
+* **Gaming state and preferences**
+
+❌ Trade-Off:
+
+* Data may **briefly diverge** across replicas
+* Strong consistency costs performance and must be explicitly enabled
+
+
+## 🧩 Summary Table
+
+| System        | Type | Guarantees                          | Sacrifices                      | Best For                         |
+| ------------- | ---- | ----------------------------------- | ------------------------------- | -------------------------------- |
+| **MongoDB**   | CP   | Strong Consistency, P-tolerance     | Availability                    | Financial or profile data        |
+| **Cassandra** | AP   | High Availability, P-tolerance      | Immediate Consistency           | Real-time feeds, logs            |
+| **ZooKeeper** | CP   | Strict Consensus, P-tolerance       | Availability                    | Leader election, config mgmt     |
+| **DynamoDB**  | AP   | Always-on availability, P-tolerance | Strong consistency (by default) | Shopping carts, user preferences |
+
+
+## 🎯 Final Thought
+
+There's **no perfect system**—only trade-offs.
+
+Each of these tools excels in a specific niche by **choosing two CAP properties over a third**, based on what matters most: consistency, uptime, or resilience. Understanding these trade-offs helps you pick the right system for your needs.
+

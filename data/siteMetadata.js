@@ -3,7 +3,7 @@ const siteMetadata = {
   title: 'HatfLabs - Where Ideas Meet Innovation',
   author: 'Muhammad Yasir',
   headerTitle: 'HatfLabs',
-  description: 'A software design and development agency',
+  description: 'Software design and development',
   language: 'en-us',
   theme: 'system', // system, dark or light
   siteUrl: 'https://yasir.com.pk',

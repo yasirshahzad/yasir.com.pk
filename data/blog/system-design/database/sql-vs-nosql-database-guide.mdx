@@ -1,0 +1,140 @@
+---
+title: SQL vs NoSQL - When to Use Which Database (and Why)
+date: '2025-06-14'
+tags: ['system-design', 'databases']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.png']
+summary: Discover the key differences between SQL and NoSQL databases. Learn when to use each, based on schema, scalability, performance, and consistency needs. ⚖️
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+Choosing the right database is crucial for your application's performance, scalability, and success—especially in **system design interviews** or real-world projects.
+
+Let's break down when to use **SQL (Relational Databases)** vs **NoSQL (Non-Relational Databases)** — with real examples and practical insights.
+
+
+## 1️⃣ Data Model & Schema 📐
+
+**Use SQL when:**
+
+* Your data is structured and fits into tables (rows/columns)
+* Schema rarely changes (e.g. inventory, CRM, finance apps)
+* You need strong data integrity
+
+**Use NoSQL when:**
+
+* Your data is flexible, semi-structured, or unstructured (e.g. social media posts, IoT data, JSON)
+* Schema evolves frequently
+* Each record might have different attributes
+
+💡 *Example: A social app with diverse user content? Go NoSQL. A banking app with fixed rules? Go SQL.*
+
+
+## 2️⃣ Scalability 🚀
+
+**SQL:**
+
+* Scales *vertically* (add more power to a single machine)
+* Great for moderate traffic or when data fits on one server
+
+**NoSQL:**
+
+* Scales *horizontally* (add more machines as needed)
+* Ideal for massive traffic, distributed systems, big data, or global apps
+
+💡 *If you're building the next Netflix or handling petabytes of data—NoSQL wins.*
+
+
+## 3️⃣ Consistency & Transactions 🔐
+
+**SQL:**
+
+* Supports full **ACID** transactions
+* Strong consistency—perfect for apps where data must always be correct (e.g. payments, orders)
+
+**NoSQL:**
+
+* Often follows **eventual consistency** (CAP theorem)
+* Prioritizes availability and partition tolerance
+
+💡 *For money transfers or inventory updates, use SQL. For a social feed or product recommendations, NoSQL is just fine.*
+
+
+## 4️⃣ Querying & Reporting 🔎
+
+**SQL:**
+
+* Powerful querying with joins, filters, aggregations
+* Best for analytics, dashboards, reports
+
+**NoSQL:**
+
+* Query capabilities vary by type (key-value, document, graph, etc.)
+* Best for simple queries or domain-specific access patterns
+
+💡 *If you need to do complex analysis or use BI tools like Tableau—SQL is your friend.*
+
+
+## 5️⃣ Performance & Latency ⚡
+
+**SQL:**
+
+* Reliable for general workloads
+* Can slow down under extreme write loads or massive scale
+
+**NoSQL:**
+
+* Optimized for specific tasks: blazing fast reads/writes, low-latency caching, real-time analytics
+* Best for high-volume, low-latency apps
+
+💡 *Using Redis as a cache? MongoDB for logs? You're already benefiting from NoSQL speed.*
+
+
+## 6️⃣ Operations, Maintenance & Cost 💸
+
+**Consider:**
+
+* **Ease of deployment**: Managed NoSQL services (e.g. Firebase, DynamoDB) reduce DevOps load
+* **Monitoring**: SQL tools are mature; NoSQL needs extra care
+* **Backup & recovery**: SQL often wins for reliability
+* **Security**: Both can be secure, but SQL has mature tooling
+* **Community & Support**: SQL has broader adoption; NoSQL tools vary in maturity
+* **Cost**: NoSQL cloud solutions can be cheaper to scale; SQL may cost more with licensing/hardware
+
+💡 *If your team knows SQL inside out, and your app doesn't demand NoSQL—stick to what works.*
+
+
+## ✅ Summary: When to Use What?
+
+| Need / Feature                  | SQL 📘 | NoSQL 📗 |
+| ------------------------------- | ------ | -------- |
+| Structured, consistent data     | ✅      | ❌        |
+| Evolving schema / flexible data | ❌      | ✅        |
+| High-volume, global scale       | ⚠️     | ✅        |
+| Strong transactions (ACID)      | ✅      | ⚠️       |
+| Complex analytics & joins       | ✅      | ⚠️       |
+| Real-time performance           | ⚠️     | ✅        |
+| Simple app with moderate scale  | ✅      | ❌        |
+| Big data, logs, caching         | ❌      | ✅        |
+
+
+## 🔄 Polyglot Persistence: Why Not Both?
+
+Modern apps often use **both**:
+
+* SQL for transactions (e.g. Postgres)
+* NoSQL for caching, sessions, logs, etc. (e.g. Redis, MongoDB)
+
+🎯 *Use the right tool for the job—not just the most hyped one.*
+
+
+## 📌 Final Thoughts
+
+Don't just follow trends—choose based on **use case, performance, and team expertise**. Start simple, and scale smart. Know your needs and adapt as your system grows.
+
+💬 Got questions or real-world use cases? Drop them in the comments below 👇
+
+

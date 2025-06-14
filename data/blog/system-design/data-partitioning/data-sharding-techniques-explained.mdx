@@ -8,13 +8,14 @@ images: ['/static/images/system-design/01-mastering-system-design.png']
 summary: Learn the top 6 data sharding techniques—including range-based, hash-based, directory-based, and hybrid sharding—with real-world examples. Boost your system's scalability and performance.
 ---
 
-## **Top 6 Data Sharding Techniques (With Examples)**
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
 
 Data sharding is a powerful method used in distributed systems to break large datasets into smaller, more manageable chunks called _shards_. This helps boost **performance, scalability, and resource utilization**.
 
 Let's explore the most popular sharding techniques with simple examples.
 
-### **1. Range-Based Sharding**
+## **1. Range-Based Sharding**
 
 **What it is:**
 Data is divided into shards based on a range of values from a partitioning key.
@@ -29,7 +30,7 @@ An e-commerce platform stores order records by date. Orders from Jan–Mar go to
 
 ![Range Based Sharding](https://www.designgurus.io/_next/image?url=https%3A%2F%2Fstorage.googleapis.com%2Fdownload%2Fstorage%2Fv1%2Fb%2Fdesigngurus-prod.appspot.com%2Fo%2FdocImages%252F64224e46a763c048c9763eef%252Fimg%3A33fee0-08bb-630f-3bb1-ce45723777be.png%3Fgeneration%3D1679970382131466%26alt%3Dmedia&w=1920&q=75&dpl=dpl_2QAwxwmUj8ZMPJpgj3tjBxkRHYRV)
 
-### **2. Hash-Based Sharding**
+## **2. Hash-Based Sharding**
 
 **What it is:**
 A hash function is applied to a key (like user ID), and the result determines which shard to store data in.
@@ -46,7 +47,7 @@ A social media app hashes user IDs so user data is evenly distributed across 10 
 
 - Harder to range query (e.g., finding users between ID 1000–2000)
 
-### **3. Directory-Based Sharding**
+## **3. Directory-Based Sharding**
 
 **What it is:**
 A lookup table (directory) maps each data item to a specific shard.
@@ -66,7 +67,7 @@ An online game maps each player's username to a shard using a directory.
 
 ![Directory Based Sharding](https://storage.googleapis.com/download/storage/v1/b/designgurus-prod.appspot.com/o/60c796deb1f1f779a6e9b4100?generation=1721568124213623&alt=media)
 
-### **4. Geographical Sharding**
+## **4. Geographical Sharding**
 
 **What it is:**
 Data is divided based on users' geographic locations.
@@ -79,7 +80,7 @@ A video streaming platform stores U.S. user data in U.S. data centers and EU use
 - Low latency for users
 - Improves content delivery performance
 
-### **5. Dynamic Sharding**
+## **5. Dynamic Sharding**
 
 **What it is:**
 Shards are automatically created, merged, or resized based on the amount or frequency of data.
@@ -92,7 +93,7 @@ An IoT system adds new shards as more sensor devices come online, then merges th
 - Adaptable to changing workloads
 - Optimizes storage and performance in real-time
 
-### **6. Hybrid Sharding**
+## **6. Hybrid Sharding**
 
 **What it is:**
 Combines multiple sharding strategies (like geographic + directory-based) for maximum flexibility.
