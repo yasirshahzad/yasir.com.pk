@@ -1,0 +1,109 @@
+---
+title: Beyond the CAP Theorem - PACELC, CRDTs, and Real-World Trade-offs
+date: '2025-06-14'
+tags: ['system-design', 'theorem']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.png']
+summary: CAP explains trade-offs during failures, but what about during normal operation? Explore PACELC, CRDTs, and application-specific strategies that go beyond CAP. 🔁⚡🧠
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+The **CAP Theorem** introduced a powerful but simplified lens: in the face of a network partition (P), distributed systems must choose between **Consistency (C)** and **Availability (A)**. While it remains foundational, CAP only considers **binary failure states**: partition or no partition.
+
+But what about when the system is operating normally—no partition, just **users expecting fast, correct responses**?
+
+Enter: **PACELC** and other modern models.
+
+
+## 📐 PACELC Theorem: A Deeper Model of Distributed Trade-offs
+
+Proposed by **Daniel Abadi (2010)**, the **PACELC Theorem** extends CAP by considering trade-offs **both during and outside of partitions**:
+
+> **If P** (a partition occurs): the system must choose **A** (availability) or **C** (consistency).
+> **Else** (no partition): the system must choose **L** (low latency) or **C** (consistency).
+
+In shorthand:
+👉 **PACELC = "if P then A or C, else L or C"**
+
+This model reflects a more **realistic design tension**: even without failures, distributed systems must often choose between **quick responses** and **consistent data**.
+
+
+### 🧪 Real-World Examples of PACELC
+
+#### 📘 Cassandra → **PA / EL**
+
+* **Partition**: Prioritizes **Availability** over Consistency.
+* **Else**: Chooses **low Latency** over strict Consistency.
+* Cassandra embraces **eventual consistency** and **low-latency operations**.
+* 📌 **Summary**: Always-on performance-first system – ideal for feeds, metrics, logs.
+
+#### 🍃 MongoDB → **PC / EC**
+
+* **Partition**: Sacrifices Availability to preserve **Consistency**.
+* **Else**: Still prioritizes **Consistency**, even at the cost of higher Latency.
+* Writes go through a **single primary**, synchronized to secondaries.
+* 📌 **Summary**: Strong data integrity, preferred for user profiles, financial apps.
+
+#### 🌍 Google Spanner → **PC / EC**
+
+* **Partition**: CP behavior (sacrifices Availability).
+* **Else**: Uses **TrueTime** and synchronized clocks to ensure **Consistency**.
+* Waits for **bounded clock uncertainty**, which introduces **latency**.
+* 📌 **Summary**: Consistency-first global SQL database, even if slower.
+
+
+## 🧩 CRDTs and Hybrid Systems
+
+**Convergent Replicated Data Types (CRDTs)** are specialized data structures that:
+
+* Allow updates on **multiple replicas independently**.
+* Automatically **converge** to a consistent state without coordination.
+* Enable **high availability + strong eventual consistency**.
+
+🔀 **Hybrid systems** use CRDTs with other techniques to:
+
+* Provide **tunable consistency**.
+* Adapt based on **application-specific needs**.
+* Balance latency, correctness, and partition tolerance on a **per-operation basis**.
+
+🛠️ CRDTs are particularly powerful in systems like:
+
+* **Collaborative editors** (e.g., Google Docs)
+* **Distributed counters or registers**
+* **Offline-first applications**
+
+
+## 🧠 Application-Specific Trade-offs
+
+Distributed system design is **not one-size-fits-all**. CAP and PACELC provide broad guidance, but **every application is unique**.
+
+✅ Ask yourself:
+
+* Can my users tolerate **stale reads**?
+* Is **low latency** more important than absolute correctness?
+* What happens if **some nodes go offline**?
+* Can I allow **eventual reconciliation**, or must I block until consensus?
+
+**Examples**:
+
+* A **banking system** might prefer PC/EC – no tolerance for inconsistent transactions.
+* A **chat app** or **news feed** might go PA/EL – prioritizing speed and availability.
+
+
+## 🧾 Summary
+
+| Model      | Focus                     | Describes                   | Real Example                       |
+| ---------- | ------------------------- | --------------------------- | ---------------------------------- |
+| **CAP**    | Partition-era trade-offs  | Choose 2 of C, A, P         | MongoDB (CP), Cassandra (AP)       |
+| **PACELC** | Always-on trade-offs too  | P: A or C; Else: L or C     | Cassandra (PA/EL), Spanner (PC/EC) |
+| **CRDTs**  | Conflict-free convergence | High availability with sync | Automerge, Riak, Redis CRDTs       |
+
+
+## 🚧 Final Thoughts
+
+While the **CAP Theorem** remains a cornerstone of distributed theory, **real-world systems demand deeper thinking**.
+
+By understanding and applying models like **PACELC**, using tools like **CRDTs**, and making **application-specific decisions**, engineers can build systems that strike the right balance—delivering correctness, speed, and fault tolerance in just the right mix.

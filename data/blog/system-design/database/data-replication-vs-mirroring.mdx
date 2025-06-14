@@ -1,0 +1,91 @@
+---
+title: Data Replication vs. Data Mirroring - What's the Difference?
+date: '2025-06-15'
+tags: ['system-design', 'databases']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.png']
+summary: Understand the key differences between data replication and data mirroring. Learn when to use each for availability, backup, and disaster recovery. 📊
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+When it comes to protecting your data and ensuring system availability, two terms often come up: **data replication** and **data mirroring**. While both involve creating copies of data, they serve very different purposes and function differently under the hood.
+
+In this post, we’ll break down each method, compare them side-by-side, and help you decide when to use replication, mirroring, or both.
+
+
+## 🔁 What is Data Replication?
+
+**Data replication** is the process of **copying data from one location to another**, which can be done either **synchronously** (in real time) or **asynchronously** (with a time delay).
+
+### 🔧 Characteristics:
+
+* ✅ **Synchronous or Asynchronous**
+* 🌍 **Can span multiple locations or servers**
+* 🧠 **Used for performance, reporting, backup, and availability**
+
+### 💡 Example:
+
+> A multinational company replicates its product database across regional servers, so each region can access local copies for faster performance.
+
+
+## 🪞 What is Data Mirroring?
+
+**Data mirroring** creates an **exact, real-time copy** of data, usually between a **primary** and a **mirror server**.
+
+### 🔧 Characteristics:
+
+* ⚡ **Typically synchronous**
+* 🔒 **Used for high availability and redundancy**
+* 🔁 **One-to-one relationship (original ↔ mirror)**
+
+### 💡 Example:
+
+> A financial institution mirrors its live transaction database to a backup server so if the main server fails, operations continue instantly with zero data loss.
+
+
+## ⚖️ Key Differences Between Replication and Mirroring
+
+| Feature                | Data Replication                        | Data Mirroring                                |
+| ---------------------- | --------------------------------------- | --------------------------------------------- |
+| **Synchronization**    | Synchronous or Asynchronous             | Usually Synchronous                           |
+| **Number of Copies**   | Multiple                                | One (Mirror)                                  |
+| **Purpose**            | Load balancing, backup, reporting       | Disaster recovery, high availability          |
+| **Performance Impact** | Low (especially async)                  | Potentially higher (due to real-time syncing) |
+| **Flexibility**        | Highly flexible, customizable           | More rigid, focused on redundancy             |
+| **Best For**           | Distributed systems, backups, analytics | Critical apps (e.g., finance, healthcare)     |
+
+
+## 📌 When Should You Use Replication vs. Mirroring?
+
+### ✅ Use **Replication** When:
+
+* You want **scalable** data access across regions or services
+* You need **data for analytics or reporting**
+* You want to **offload reads** from the primary database
+* Some delay (in case of async replication) is acceptable
+
+### ✅ Use **Mirroring** When:
+
+* **Downtime is unacceptable** (e.g., banking, healthcare)
+* You need **instant failover** and **zero data loss**
+* You're focused on **disaster recovery**
+
+
+## 🔀 Can You Use Both?
+
+Absolutely. Many robust systems use **data mirroring for high availability** and **replication for performance and analytics**.
+
+> 💡 For example: A primary database is mirrored for redundancy, while also asynchronously replicating to a data warehouse for reporting.
+
+
+## 🧠 Final Thoughts
+
+Both **data replication** and **data mirroring** are essential strategies in modern data architecture, each with unique strengths:
+
+* **Replication** is about **distribution, flexibility, and performance**.
+* **Mirroring** is about **redundancy, reliability, and recovery**.
+
+Choosing the right method depends on your **business needs, data sensitivity**, and **availability requirements**.

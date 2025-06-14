@@ -1,0 +1,77 @@
+---
+title: ACID vs BASE - Key Differences, Trade-Offs, and When to Use Each
+date: '2025-06-15'
+tags: ['system-design', 'databases']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.png']
+summary: Compare ACID and BASE database models. Learn key differences, CAP theorem trade-offs, and when to use each in real-world systems like banking, e-commerce, or social media.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+Designing a database for your system isn't just about choosing SQL or NoSQL — it's about choosing the **right model** for **data reliability, speed, and scalability**. That's where **ACID** and **BASE** come in.
+
+They represent **two opposing philosophies** in database design:
+
+* **ACID** = Accuracy & Consistency (perfect for financial and transactional systems)
+* **BASE** = Availability & Scalability (ideal for modern distributed web apps)
+
+
+## 🧠 The CAP Theorem: The Core of the Debate
+
+The **CAP Theorem** says a distributed system can only guarantee **two out of three** properties at the same time:
+
+* 🟢 **Consistency**: All users see the same data at the same time
+* 🟡 **Availability**: Every request gets a response (success or fail)
+* 🔵 **Partition Tolerance**: The system keeps running even when network parts fail
+
+🧩 **ACID systems** favor **Consistency + Partition Tolerance**, possibly sacrificing Availability
+🧩 **BASE systems** favor **Availability + Partition Tolerance**, possibly sacrificing immediate Consistency
+
+
+## 🔍 ACID vs BASE: Feature-by-Feature Breakdown
+
+| Feature                     | **ACID** – Accuracy Focused                      | **BASE** – Availability Focused                       |
+| --------------------------- | ------------------------------------------------ | ----------------------------------------------------- |
+| 💥 **Consistency Priority** | Strong – strict rules after every transaction    | Eventual – data may sync later                        |
+| ⏱️ **Timing of Updates**    | Immediate – always reflects latest data          | Delayed – different nodes may lag temporarily         |
+| 🔁 **Transaction Model**    | All-or-nothing – rollback on failure             | Partial/flexible – updates happen in pieces           |
+| 🚦 **Concurrency Handling** | Isolation & locking – may slow things down       | Loose handling – faster, more concurrent              |
+| 📊 **Performance & Scale**  | Slower with high traffic; hard to scale globally | Highly scalable; handles massive loads                |
+| 🧠 **Dev Responsibility**   | DB handles integrity checks                      | Devs must handle conflicts, merging, fallback logic   |
+| 🛠️ **Use Cases**           | Banking, ERP, CMS – trust & precision needed     | Social media, e-commerce, IoT – speed over strictness |
+
+
+## 🧪 Real-World Scenarios: Which One to Use?
+
+### ✅ **Use ACID When:**
+
+* You're building a **banking or financial app**
+* You need **transactional integrity** (e.g., transfers, booking)
+* Data errors or inconsistencies would cause **serious consequences**
+* You need immediate **reporting and traceability**
+
+📌 Example: A withdrawal from one account and a deposit to another must **both succeed or both fail**. You can't lose money or miscalculate balances.
+
+
+### ✅ **Use BASE When:**
+
+* You need to scale to **millions of users**
+* You're building **real-time apps** like chats, social feeds, or product listings
+* Uptime and **low latency** matter more than perfect accuracy
+* **Temporary inconsistencies** are acceptable
+
+📌 Example: A user posts a comment on a social app. It shows instantly to them, and a few seconds later to their friends. Speed and uptime matter more than perfect sync.
+
+
+## ⚖️ Final Thought: Choose Based on Context
+
+ACID and BASE **aren't rivals** — they're tools for different jobs.
+
+If **data integrity and trust** are non-negotiable, go with **ACID**.
+If you need **massive scale and uptime**, and can tolerate a few seconds of inconsistency, **BASE** is your friend.
+
+👨‍💻 System design interviews often test your understanding of this trade-off. Show that you know **why** you're choosing one over the other — not just what they stand for.
+

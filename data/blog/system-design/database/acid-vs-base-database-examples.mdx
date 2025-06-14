@@ -1,0 +1,114 @@
+---
+title: Real-World Examples of ACID and BASE Databases - When to Use Which
+date: '2025-06-15'
+tags: ['system-design', 'databases']
+draft: false
+layout: PostSimple
+images: ['/static/images/system-design/01-mastering-system-design.png']
+summary: Explore real-world examples of ACID and BASE databases. Learn how MySQL, PostgreSQL, Cassandra, DynamoDB, and others align with different data models, and when to use each.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+Now that we've understood what **ACID** and **BASE** are, let's look at **real database systems** that follow these models and the **situations they're best suited for**.
+
+## 🧪 ACID-Compliant Databases
+
+**ACID databases** follow strict rules for **atomicity, consistency, isolation, and durability**. These systems guarantee that **transactions are reliable and predictable**, which is essential in scenarios where **accuracy is non-negotiable**.
+
+### 📚 Popular ACID Databases:
+
+* **MySQL**
+* **PostgreSQL**
+* **Oracle Database**
+* **SQLite**
+* **Microsoft SQL Server**
+
+These are all **relational databases** that use SQL and are widely adopted for systems like:
+
+* 🔐 **Banking & finance systems**
+* 🛒 **E-commerce orders**
+* 🧾 **Inventory management**
+* 🏥 **Healthcare records**
+
+✅ **Example:**
+If you're transferring money from one account to another in a PostgreSQL database, either both debit and credit steps succeed **together**, or both are rolled back. This avoids half-finished updates and keeps financial records safe.
+
+⚠️ **Note:**
+Some modern NoSQL databases, like **MongoDB**, can support **ACID transactions** in certain configurations (e.g., within a single document or shard), but generally, SQL = ACID is a safe and simple mental model.
+
+## 🔁 BASE-Oriented Databases
+
+**BASE databases** follow the model of **Basically Available, Soft state, and Eventually consistent**. These databases prioritize **availability and partition tolerance**, making them ideal for **distributed and large-scale systems**.
+
+### ⚙️ Popular BASE Databases:
+
+* **Apache Cassandra**
+* **Amazon DynamoDB**
+* **Couchbase**
+* **MongoDB** (in BASE-style configs)
+* **Redis** (for caching, often BASE-behaved)
+
+These systems are used where:
+
+* 🧠 **High traffic** and **low latency** matter
+* 🌍 **Global replication** is needed
+* 🤖 **Real-time features** are more important than strict accuracy
+
+✅ **Example:**
+**Netflix** uses **Cassandra** to store massive user and content data across multiple data centers, allowing high availability and fault tolerance, even if some data takes time to sync.
+**Amazon DynamoDB** powers many high-traffic apps on AWS and provides **eventual consistency** unless strong consistency is explicitly requested.
+
+## 🧠 Conclusion: Choosing Between ACID and BASE
+
+### 🏛️ Use **ACID** when:
+
+* You need **perfect consistency and accuracy**
+* Data correctness is more important than speed
+* You're handling **financial records**, **orders**, or **legal data**
+
+**Examples:**
+
+* Banking apps
+* ERP systems
+* Flight or hotel bookings
+* Online payments
+
+### 🚀 Use **BASE** when:
+
+* You need **massive scalability and uptime**
+* You can tolerate **slight delays in consistency**
+* Your system is **globally distributed**
+
+**Examples:**
+
+* Social media platforms
+* Content delivery networks
+* Multiplayer games
+* Product feeds during flash sales
+
+### ⚖️ Hybrid Approaches
+
+Many modern architectures use a **hybrid approach**:
+
+* ACID for **critical transactional operations**
+* BASE for **analytics, caching, or background syncing**
+
+🧩 Example:
+An e-commerce app might use **PostgreSQL** for processing payments (ACID), and **Cassandra** or **Redis** for product availability, user sessions, or recommendations (BASE).
+
+## ✅ Final Word
+
+Choosing between ACID and BASE isn't about which is “better” — it's about which is **right for your problem**.
+
+* Need **accuracy**? Go ACID.
+* Need **scalability and speed**? Go BASE.
+
+💡 For beginners:
+
+* **ACID** = Think **banks**
+* **BASE** = Think **Facebook or Amazon**
+
+Understanding these principles will help you design systems that are not only functional, but also **resilient and scalable** — especially important for both **interview prep** and **real-world system architecture**.
+
