@@ -1,0 +1,281 @@
+---
+title: Mastering SOLID Principles in TypeScript - Real Examples & Best Practices
+date: '2025-06-18'
+tags: ['low-level-design', 'solid']
+draft: false
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Learn how to apply SOLID design principles in TypeScript with real-world examples, bad vs. improved code, and pro tips for writing scalable, maintainable, and testable software.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+When building robust, scalable, and maintainable software, design principles are your best ally. **SOLID** is an acronym for five core object-oriented design principles that lead to better software architecture. Understanding and applying these principles can significantly improve your code quality, testability, and flexibility.
+
+Let's dive into each principle, understand what it means, and walk through **bad vs. improved TypeScript code examples**.
+
+
+## 🔹 1. Single Responsibility Principle (SRP)
+
+> **Definition**: A class should have only one reason to change.
+
+### 🔍 Explanation:
+
+A class should do **one job** and do it well. Mixing multiple responsibilities makes code harder to maintain, test, and scale.
+
+### ❌ Bad Code
+
+```ts
+class ReportGenerator {
+  generateReport(data: any) { /* ... */ }
+  saveToDatabase(report: string) { /* ... */ }
+  printReport(report: string) { /* ... */ }
+}
+```
+
+This class is handling **three responsibilities**, violating SRP.
+
+### ✅ Improved Code
+
+```ts
+class ReportGenerator {
+  generateReport(data: any): string {
+    return "Generated Report";
+  }
+}
+
+class ReportSaver {
+  saveToDatabase(report: string) { /* ... */ }
+}
+
+class ReportPrinter {
+  printReport(report: string) { /* ... */ }
+}
+
+// Usage
+const generator = new ReportGenerator();
+const saver = new ReportSaver();
+const printer = new ReportPrinter();
+
+const report = generator.generateReport({});
+saver.saveToDatabase(report);
+printer.printReport(report);
+```
+
+Now, each class has **one responsibility**, making the system modular and easy to test or extend.
+
+
+## 🔹 2. Open/Closed Principle (OCP)
+
+> **Definition**: Software entities should be open for extension but closed for modification.
+
+### 🔍 Explanation:
+
+Add new functionality **without changing existing code**. This prevents bugs and keeps your codebase stable.
+
+### ❌ Bad Code
+
+```ts
+class NotificationService {
+  sendNotification(type: string, message: string) {
+    if (type === "email") { /* ... */ }
+    else if (type === "sms") { /* ... */ }
+  }
+}
+```
+
+Every time you add a new notification type, you must modify this method.
+
+### ✅ Improved Code
+
+```ts
+interface Notification {
+  send(message: string): void;
+}
+
+class EmailNotification implements Notification {
+  send(message: string) { /* ... */ }
+}
+
+class SMSNotification implements Notification {
+  send(message: string) { /* ... */ }
+}
+
+class NotificationService {
+  constructor(private notification: Notification) {}
+
+  notify(message: string) {
+    this.notification.send(message);
+  }
+}
+
+// Usage
+new NotificationService(new EmailNotification()).notify("Email Msg");
+```
+
+Now, to support a new notification type, you **only add a new class**—no existing code needs changing.
+
+
+## 🔹 3. Liskov Substitution Principle (LSP)
+
+> **Definition**: Subtypes must be substitutable for their base types without altering program behavior.
+
+### 🔍 Explanation:
+
+Subclasses should behave like their parent class. Violating this leads to unexpected behavior in polymorphic code.
+
+### ❌ Bad Code
+
+```ts
+class Bird {
+  fly() {
+    console.log("Flying");
+  }
+}
+
+class Penguin extends Bird {
+  fly() {
+    throw new Error("Penguins can't fly");
+  }
+}
+```
+
+### ✅ Improved Code
+
+```ts
+abstract class Bird {
+  abstract move(): void;
+}
+
+class FlyingBird extends Bird {
+  move() {
+    console.log("Flying");
+  }
+}
+
+class NonFlyingBird extends Bird {
+  move() {
+    console.log("Walking");
+  }
+}
+```
+
+Now, all subclasses respect the contract and behave as expected, ensuring **safe substitution**.
+
+
+## 🔹 4. Interface Segregation Principle (ISP)
+
+> **Definition**: Clients should not be forced to implement interfaces they do not use.
+
+### 🔍 Explanation:
+
+Break large interfaces into **smaller, specific ones**. This avoids forcing classes to implement irrelevant methods.
+
+### ❌ Bad Code
+
+```ts
+interface Animal {
+  eat(): void;
+  fly(): void;
+  swim(): void;
+}
+
+class Dog implements Animal {
+  eat() { /* ... */ }
+  fly() { throw new Error("Dogs can't fly"); }
+  swim() { /* ... */ }
+}
+```
+
+### ✅ Improved Code
+
+```ts
+interface Eatable { eat(): void; }
+interface Flyable { fly(): void; }
+interface Swimmable { swim(): void; }
+
+class Dog implements Eatable, Swimmable {
+  eat() { /* ... */ }
+  swim() { /* ... */ }
+}
+```
+
+Now, classes implement only what they need. Interfaces are **tailored and lean**.
+
+
+## 🔹 5. Dependency Inversion Principle (DIP)
+
+> **Definition**: High-level modules should not depend on low-level modules. Both should depend on abstractions.
+
+### 🔍 Explanation:
+
+Relying on **interfaces instead of concrete classes** improves flexibility and testability.
+
+### ❌ Bad Code
+
+```ts
+class SQLDatabase {
+  connect() { /* ... */ }
+}
+
+class App {
+  private db = new SQLDatabase();
+
+  start() {
+    this.db.connect();
+  }
+}
+```
+
+Tightly coupled. You can't swap databases easily.
+
+### ✅ Improved Code
+
+```ts
+interface Database {
+  connect(): void;
+}
+
+class SQLDatabase implements Database {
+  connect() { /* ... */ }
+}
+
+class MongoDB implements Database {
+  connect() { /* ... */ }
+}
+
+class App {
+  constructor(private db: Database) {}
+
+  start() {
+    this.db.connect();
+  }
+}
+
+// Usage
+new App(new MongoDB()).start();
+```
+
+Now, your app is **flexible and testable**, thanks to abstractions.
+
+
+## 🧠 Pro Tips for Applying SOLID in Real Projects
+
+* ✅ Use **dependency injection** frameworks like InversifyJS in TypeScript.
+* ✅ Favor **composition over inheritance**.
+* ✅ Start **small**—refactor legacy code incrementally.
+* ✅ Use **unit tests** to detect and prevent SRP and LSP violations.
+* ✅ Review large classes (>300 lines) or those with too many constructor params—they often violate SRP or DIP.
+
+
+## 📈 Benefits of SOLID
+
+* Better **scalability** and **maintainability**
+* Easier **unit testing** and mocking
+* Enhanced **team collaboration** due to clear responsibilities
+* Reduced **bugs** from changes in existing code
+* Future-proof and **extensible** architecture
+
+
+By mastering these principles, your TypeScript code becomes cleaner, more modular, and easier to evolve over time.

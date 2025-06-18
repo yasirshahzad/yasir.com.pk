@@ -1,0 +1,359 @@
+---
+title: What Is an Orchestrator?
+date: '2025-06-18'
+tags: ['low-level-design']
+draft: false
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: An Orchestrator is a class (or module) responsible for coordinating multiple responsibilities by delegating tasks to other services or components. It does not implement logic itself — it uses others to get the job done.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## 🔧 **What Is an Orchestrator?**
+
+An **Orchestrator** is a class (or module) responsible for **coordinating multiple responsibilities** by **delegating** tasks to other services or components. It **does not** implement logic itself — it **uses** others to get the job done.
+
+### 🔑 Key Idea:
+
+> An **Orchestrator** orchestrates the flow between components that each follow the **Single Responsibility Principle (SRP)**.
+
+### ✅ **Example Definition**
+
+```ts
+class CheckoutOrchestrator {
+  constructor(
+    private cartService: CartService,
+    private cartValidator: CartValidator,
+    private discountCalculator: DiscountCalculator,
+    private paymentProcessor: PaymentProcessor,
+    private orderPersister: OrderPersister,
+    private orderNotifier: OrderNotifier
+  ) {}
+
+  async checkout(userId: string) {
+    const cart = await this.cartService.getCart(userId);
+    this.cartValidator.validate(cart);
+    const total = this.discountCalculator.calculate(cart);
+    const paid = await this.paymentProcessor.process(userId, total);
+    if (!paid) throw new Error("Payment failed");
+    await this.orderPersister.persist(cart);
+    await this.orderNotifier.notify(userId);
+  }
+}
+```
+
+🔁 It connects **many small, specialized services** — and just controls **how** and **when** to call them.
+
+## 🧱 **Difference Between Class, Service, and Orchestrator**
+
+| Term             | Responsibility                           | Contains Logic?                | Used For                                               |
+| ---------------- | ---------------------------------------- | ------------------------------ | ------------------------------------------------------ |
+| **Class**        | Generic unit of code                     | Depends on the use case        | Represents any abstraction or structure                |
+| **Service**      | Performs a *single responsibility* (SRP) | ✅ Yes                          | Business logic like "send email", "calculate discount" |
+| **Orchestrator** | Coordinates multiple services            | ❌ No (logic lives in services) | Workflows, use cases like "checkout", "place order"    |
+
+
+### 🧠 Think of it Like:
+
+> * **Services** = the *musicians* (each plays one instrument well)
+> * **Orchestrator** = the *conductor* (coordinates them to play a symphony)
+
+
+## 🎯 **Why Use an Orchestrator?**
+
+### ✅ **Benefits**:
+
+| Benefit                       | Explanation                                                                       |
+| ----------------------------- | --------------------------------------------------------------------------------- |
+| 📦 **Separation of Concerns** | Keeps coordination logic separate from business logic                             |
+| 🔄 **Reusability**            | Services can be reused elsewhere without the orchestration                        |
+| 🧪 **Testability**            | You can mock services in orchestrator tests                                       |
+| 🧰 **Scalability**            | Complex flows (e.g., workflows, transactions) stay clean and manageable           |
+| 🕸 **Flexibility**            | Easy to swap services (e.g., change PaymentProcessor) without touching flow logic |
+
+
+## ❌ But... Isn’t the Original `CheckoutService` an Orchestrator?
+
+Great question!
+
+It **looks** like one — but **it violates SRP** because:
+
+* It does **orchestration + logic** in the same place
+* It knows **too much** about everything: validation, discounts, payment, persistence, communication
+
+So it's not a **true orchestrator**. It's a **God class**, not a conductor.
+
+
+### 👎 Original `CheckoutService`:
+
+```ts
+class CheckoutService {
+  // does everything: validation, discount, payment, saving, notification
+}
+```
+
+### ✅ True Orchestrator:
+
+```ts
+class CheckoutOrchestrator {
+  // coordinates services that handle the above individually
+}
+```
+
+
+## 💡 How to Create an Orchestrator (Step-by-Step)
+
+1. **Identify the Use Case**
+   (e.g., *Checkout*, *RegisterUser*, *PlaceOrder*)
+
+2. **List All Steps**
+   What services/operations are required?
+   e.g., ValidateCart → ApplyDiscount → ChargePayment → SaveOrder → SendEmail
+
+3. **Create SRP Services for Each Step**
+
+```ts
+class CartValidator {}
+class DiscountCalculator {}
+class PaymentProcessor {}
+class OrderPersister {}
+class OrderNotifier {}
+```
+
+4. **Create the Orchestrator to Glue the Flow**
+
+```ts
+class CheckoutOrchestrator {
+  constructor(private services...) {}
+
+  execute(userId: string) {
+    // call each service in correct order
+  }
+}
+```
+
+5. **Test Each Service Separately** + Test Orchestrator as Integration
+
+
+## 🔍 Bonus: Orchestrator vs Aggregator
+
+| Concept          | Role                                   |
+| ---------------- | -------------------------------------- |
+| **Orchestrator** | Controls the flow of execution         |
+| **Aggregator**   | Gathers results from multiple services |
+
+Sometimes an orchestrator also aggregates, but orchestration is about **control flow**, not data gathering.
+
+
+## ✅ Summary
+
+| Concept          | Description                                       |
+| ---------------- | ------------------------------------------------- |
+| **Class**        | General-purpose container of data/behavior        |
+| **Service**      | Small, focused logic unit with one responsibility |
+| **Orchestrator** | Coordinates services to fulfill a use case        |
+
+> ✅ The orchestrator **uses SRP-compliant services** to keep workflows clean, scalable, and testable.
+
+We’ll use the example of a **User Registration** system in a backend-style architecture.
+
+
+## 📦 Project Structure: `src/`
+
+```bash
+src/
+│
+├── domain/
+│   └── models/
+│       └── User.ts
+│
+├── services/
+│   ├── UserValidator.ts
+│   ├── PasswordEncryptor.ts
+│   ├── UserRepository.ts
+│   └── WelcomeMailer.ts
+│
+├── orchestrators/
+│   └── RegisterUser.ts
+│
+├── controllers/
+│   └── RegisterController.ts
+│
+├── index.ts
+└── types/
+    └── UserDTO.ts
+```
+
+
+## 🧩 1. `domain/models/User.ts`
+
+```ts
+export class User {
+  constructor(
+    public id: string,
+    public name: string,
+    public email: string,
+    public hashedPassword: string
+  ) {}
+}
+```
+
+
+## 📥 2. `types/UserDTO.ts`
+
+```ts
+export interface UserDTO {
+  name: string;
+  email: string;
+  password: string;
+}
+```
+
+
+## 🧪 3. `services/UserValidator.ts`
+
+```ts
+import { UserDTO } from "../types/UserDTO";
+
+export class UserValidator {
+  validate(user: UserDTO) {
+    if (!user.email.includes("@")) {
+      throw new Error("Invalid email");
+    }
+    if (user.password.length < 6) {
+      throw new Error("Password must be at least 6 characters");
+    }
+  }
+}
+```
+
+
+## 🔐 4. `services/PasswordEncryptor.ts`
+
+```ts
+import bcrypt from "bcryptjs";
+
+export class PasswordEncryptor {
+  async encrypt(password: string): Promise<string> {
+    return bcrypt.hash(password, 10);
+  }
+}
+```
+
+
+## 💾 5. `services/UserRepository.ts`
+
+```ts
+import { User } from "../domain/models/User";
+import { v4 as uuid } from "uuid";
+
+export class UserRepository {
+  private users: User[] = [];
+
+  async save(name: string, email: string, hashedPassword: string): Promise<User> {
+    const user = new User(uuid(), name, email, hashedPassword);
+    this.users.push(user);
+    return user;
+  }
+
+  findByEmail(email: string): User | undefined {
+    return this.users.find(u => u.email === email);
+  }
+}
+```
+
+
+## 📧 6. `services/WelcomeMailer.ts`
+
+```ts
+export class WelcomeMailer {
+  async send(email: string) {
+    console.log(`📨 Sent welcome email to ${email}`);
+  }
+}
+```
+
+
+## 🎯 7. `orchestrators/RegisterUser.ts`
+
+```ts
+import { UserDTO } from "../types/UserDTO";
+import { UserValidator } from "../services/UserValidator";
+import { PasswordEncryptor } from "../services/PasswordEncryptor";
+import { UserRepository } from "../services/UserRepository";
+import { WelcomeMailer } from "../services/WelcomeMailer";
+import { User } from "../domain/models/User";
+
+export class RegisterUser {
+  constructor(
+    private validator: UserValidator,
+    private encryptor: PasswordEncryptor,
+    private repository: UserRepository,
+    private mailer: WelcomeMailer
+  ) {}
+
+  async execute(data: UserDTO): Promise<User> {
+    this.validator.validate(data);
+    const hashed = await this.encryptor.encrypt(data.password);
+    const user = await this.repository.save(data.name, data.email, hashed);
+    await this.mailer.send(data.email);
+    return user;
+  }
+}
+```
+
+
+## 🌐 8. `controllers/RegisterController.ts`
+
+```ts
+import { Request, Response } from "express";
+import { RegisterUser } from "../orchestrators/RegisterUser";
+import { UserValidator } from "../services/UserValidator";
+import { PasswordEncryptor } from "../services/PasswordEncryptor";
+import { UserRepository } from "../services/UserRepository";
+import { WelcomeMailer } from "../services/WelcomeMailer";
+
+export const RegisterController = async (req: Request, res: Response) => {
+  const validator = new UserValidator();
+  const encryptor = new PasswordEncryptor();
+  const repository = new UserRepository();
+  const mailer = new WelcomeMailer();
+
+  const useCase = new RegisterUser(validator, encryptor, repository, mailer);
+
+  try {
+    const user = await useCase.execute(req.body);
+    res.status(201).json({ id: user.id, email: user.email });
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+};
+```
+
+
+## 🚀 9. `index.ts` (Express Setup)
+
+```ts
+import express from "express";
+import { RegisterController } from "./controllers/RegisterController";
+
+const app = express();
+app.use(express.json());
+
+app.post("/register", RegisterController);
+
+app.listen(3000, () => console.log("🚀 Server on http://localhost:3000"));
+```
+
+
+## ✅ Benefits Recap
+
+| Feature                    | Outcome                                                  |
+| -------------------------- | -------------------------------------------------------- |
+| **SRP**                    | Each service does one job only                           |
+| **Testable**               | You can unit test services and orchestrator separately   |
+| **Scalable**               | Easy to add features like "Send SMS" or "Log metrics"    |
+| **Replaceable**            | Swap Email service or Repository without rewriting logic |
+| **Separation of Concerns** | Clear roles between workflow and logic                   |
+

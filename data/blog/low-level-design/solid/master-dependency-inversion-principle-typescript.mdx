@@ -1,0 +1,311 @@
+---
+title: Mastering the Dependency Inversion Principle with Advanced Code Refactoring
+date: '2025-06-18'
+tags: ['low-level-design', 'solid']
+draft: false
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Learn the Interface Segregation Principle (ISP) with real-world TypeScript examples. Identify bad interfaces, refactor for flexibility, and build scalable, decoupled, and testable applications with ISP from SOLID principles.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+
+The **Dependency Inversion Principle (DIP)** is the final principle in SOLID design. It helps reduce tight coupling by ensuring **high-level modules don't depend on low-level modules directly**, but both depend on **abstractions**.
+
+
+## 📜 Definition
+
+> High-level modules should not depend on low-level modules. Both should depend on abstractions.
+>
+> Abstractions should not depend on details. Details should depend on abstractions.
+
+
+## 🧩 Problem: Complex Order Processing System
+
+### ❌ Bad Code (Without DIP)
+
+```ts
+// Low-level module
+class MySQLDatabase {
+  saveOrder(order: string) {
+    console.log(`Saving order to MySQL: ${order}`);
+  }
+}
+
+// High-level module
+class OrderService {
+  private db: MySQLDatabase;
+
+  constructor() {
+    this.db = new MySQLDatabase(); // tightly coupled
+  }
+
+  process(order: string) {
+    console.log(`Processing order: ${order}`);
+    this.db.saveOrder(order);
+  }
+}
+
+// Usage
+const service = new OrderService();
+service.process("Book");
+```
+
+### 🔍 Problems
+
+* High-level module (`OrderService`) is tightly coupled to a specific implementation (`MySQLDatabase`).
+* Difficult to switch to another database (e.g., MongoDB, Redis).
+* Hard to mock for unit testing.
+* Breaks **Open/Closed** and **Single Responsibility** principles.
+
+
+## ✅ Good Code (With DIP)
+
+### 🔧 Step 1: Define an Abstraction
+
+```ts
+// Abstraction
+interface IOrderRepository {
+  saveOrder(order: string): void;
+}
+```
+
+### 🧱 Step 2: Implement Low-Level Modules
+
+```ts
+class MySQLOrderRepository implements IOrderRepository {
+  saveOrder(order: string) {
+    console.log(`Saving order to MySQL: ${order}`);
+  }
+}
+
+class MongoOrderRepository implements IOrderRepository {
+  saveOrder(order: string) {
+    console.log(`Saving order to MongoDB: ${order}`);
+  }
+}
+```
+
+### 🏗️ Step 3: Refactor High-Level Module
+
+```ts
+class OrderService {
+  constructor(private repository: IOrderRepository) {}
+
+  process(order: string) {
+    console.log(`Processing order: ${order}`);
+    this.repository.saveOrder(order);
+  }
+}
+
+// Usage
+const mysqlRepo = new MySQLOrderRepository();
+const mongoRepo = new MongoOrderRepository();
+
+const service = new OrderService(mysqlRepo);
+service.process("Laptop");
+
+const testService = new OrderService(mongoRepo);
+testService.process("Phone");
+```
+
+
+## ✅ Benefits of DIP
+
+| Benefit                | Explanation                                                          |
+| ---------------------- | -------------------------------------------------------------------- |
+| 🔄 **Flexibility**     | Easily swap implementations (e.g., switch DBs or APIs).              |
+| 🧪 **Testability**     | Mock dependencies during unit tests using fake implementations.      |
+| 🔧 **Maintainability** | High-level logic doesn't break with low-level changes.               |
+| 🧱 **Decoupling**      | Reduces dependency on concrete implementations.                      |
+| 🚀 **Scalability**     | Easy to extend or modify functionality without modifying core logic. |
+
+
+
+## 🔍 How to Detect the Need for DIP?
+
+Here are common signs that indicate a need for the Dependency Inversion Principle:
+
+| Symptom                                             | What It Means                                         |
+| --------------------------------------------------- | ----------------------------------------------------- |
+| 🔗 Direct usage of concrete classes in services     | Leads to rigid code and hard to test or extend.       |
+| ❌ Inability to replace dependencies easily          | Shows tight coupling between layers.                  |
+| 🧪 Unit testing is hard due to real implementations | You're locked into actual services, hard to mock.     |
+| 🛠️ Changing low-level code breaks high-level logic | Signals low-level classes aren't abstracted properly. |
+
+
+## 🛠️ How to Apply DIP Effectively
+
+1. **Extract Interfaces**
+   Define contracts (`IRepository`, `ILogger`, `INotifier`, etc.).
+
+2. **Inject via Constructor**
+   Pass dependencies through constructor parameters or DI containers.
+
+3. **Use Inversion of Control (IoC)**
+   Leverage frameworks like `InversifyJS`, `NestJS`, or service locators.
+
+4. **Keep Abstractions Simple**
+   Only expose necessary methods in the interface to maintain SRP.
+
+
+## 💡 Pro Tip for Large Systems
+
+If you're building a layered architecture (e.g., controllers, services, repositories):
+
+* Keep **infrastructure (e.g., DB, network)** in outer layers.
+* Keep **core domain logic** in the center (depends only on abstractions).
+* Use **dependency injection containers** for managing bindings.
+
+
+## 🧪 Bonus: Unit Test with Mock
+
+```ts
+class MockOrderRepository implements IOrderRepository {
+  saveOrder(order: string) {
+    console.log(`Mock save: ${order}`);
+  }
+}
+
+const testService = new OrderService(new MockOrderRepository());
+testService.process("Test Order");
+```
+
+## ⚙️ Real-World Example: **Notification System in a CRM**
+
+### 🧩 Context:
+
+You are building a **Customer Relationship Management (CRM)** system that sends notifications to customers via different channels: **Email**, **SMS**, **Push Notifications**, etc.
+
+### ❌ **Bad Code (Violating DIP)**
+
+```ts
+class EmailService {
+  sendEmail(to: string, message: string) {
+    console.log(`Sending EMAIL to ${to}: ${message}`);
+  }
+}
+
+class NotificationService {
+  private emailService = new EmailService(); // directly depends on concrete class
+
+  notifyCustomer(to: string, message: string) {
+    this.emailService.sendEmail(to, message);
+  }
+}
+
+// Usage
+const notifier = new NotificationService();
+notifier.notifyCustomer("alice@example.com", "Your order has shipped!");
+```
+
+### 🚨 Problems:
+
+* `NotificationService` is **tightly coupled** to `EmailService`.
+* If you want to send SMS or Push Notifications later, you have to **modify** the `NotificationService` (breaks Open/Closed Principle).
+* **Unit testing** is hard due to concrete dependency.
+
+
+## ✅ **Good Code (Following DIP)**
+
+### 1. **Define an Abstraction**
+
+```ts
+interface INotifier {
+  send(to: string, message: string): void;
+}
+```
+
+### 2. **Create Multiple Implementations**
+
+```ts
+class EmailNotifier implements INotifier {
+  send(to: string, message: string): void {
+    console.log(`📧 Email sent to ${to}: ${message}`);
+  }
+}
+
+class SMSNotifier implements INotifier {
+  send(to: string, message: string): void {
+    console.log(`📱 SMS sent to ${to}: ${message}`);
+  }
+}
+
+class PushNotifier implements INotifier {
+  send(to: string, message: string): void {
+    console.log(`🔔 Push Notification to ${to}: ${message}`);
+  }
+}
+```
+
+### 3. **Refactor High-Level Module to Depend on Abstraction**
+
+```ts
+class NotificationService {
+  constructor(private notifier: INotifier) {}
+
+  notifyCustomer(to: string, message: string) {
+    this.notifier.send(to, message);
+  }
+}
+```
+
+### 4. **Usage Example**
+
+```ts
+const emailNotifier = new EmailNotifier();
+const smsNotifier = new SMSNotifier();
+const pushNotifier = new PushNotifier();
+
+const notificationService1 = new NotificationService(emailNotifier);
+notificationService1.notifyCustomer("alice@example.com", "Email: Order Confirmed!");
+
+const notificationService2 = new NotificationService(smsNotifier);
+notificationService2.notifyCustomer("+1234567890", "SMS: Your OTP is 1234");
+
+const notificationService3 = new NotificationService(pushNotifier);
+notificationService3.notifyCustomer("aliceDeviceToken", "Push: You have a new message");
+```
+
+
+## ✅ Benefits in Practice
+
+| Benefit                  | Description                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| ✅ **Testability**        | You can easily inject a `MockNotifier` in tests.                                |
+| ✅ **Extensibility**      | Add `SlackNotifier`, `WhatsappNotifier` without touching `NotificationService`. |
+| ✅ **Maintainability**    | Change how an SMS is sent without affecting the business logic.                 |
+| ✅ **Clean Architecture** | Core logic is decoupled from infrastructure code like APIs or DBs.              |
+
+
+## 🧪 Mocking for Unit Tests
+
+```ts
+class MockNotifier implements INotifier {
+  send(to: string, message: string): void {
+    console.log(`🧪 MockNotifier: to=${to}, message=${message}`);
+  }
+}
+
+const mockService = new NotificationService(new MockNotifier());
+mockService.notifyCustomer("test@fake.com", "Testing mock!");
+```
+
+
+## 🧠 DIP Detection Tips
+
+| Symptom                                          | Sign DIP Needed     |
+| ------------------------------------------------ | ------------------- |
+| A service has `new SomeClass()` inside           | Violating IoC & DIP |
+| You must edit core logic to swap implementations | Tight coupling      |
+| You can't easily unit test without real services | Missing abstraction |
+
+
+## 🚀 Conclusion
+
+The Dependency Inversion Principle is crucial for building **scalable**, **testable**, and **decoupled** systems. By inverting dependencies and relying on **abstractions over implementations**, you'll dramatically improve the **quality of your architecture**.
+
+If you're experiencing pain when changing low-level implementations or struggle to test high-level modules—**that's your cue to apply DIP**.
+

@@ -1,0 +1,530 @@
+---
+title: Mastering the Liskov Substitution Principle with Real-World TypeScript Examples
+date: '2025-06-18'
+tags: ['low-level-design', 'solid']
+draft: false
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Learn the Liskov Substitution Principle with real-world TypeScript examples. Identify bad practices, apply LSP properly, and write scalable, testable, and maintainable code by mastering this SOLID principle.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## 📘 Mastering the Liskov Substitution Principle (LSP) with Real-World Code Examples
+
+The **Liskov Substitution Principle** (LSP) is the **L** in **SOLID**—a set of principles for writing clean, maintainable, and extendable object-oriented code.
+
+
+## 🧠 What Is the Liskov Substitution Principle?
+
+> **Definition**:
+> *If class B is a subclass of class A, then objects of type A may be replaced with objects of type B without altering the correctness of the program.*
+
+In other words, a child class must behave in such a way that it doesn't break the functionality or expectations of its parent class.
+
+
+## ❌ Bad Example: Violating LSP
+
+### Scenario:
+
+You have a class `Bird` with a method `fly()`, and you create a `Penguin` class as a subtype. But penguins can't fly!
+
+```ts
+class Bird {
+  fly() {
+    console.log("Flying high in the sky!");
+  }
+}
+
+class Sparrow extends Bird {}
+
+class Penguin extends Bird {
+  fly() {
+    throw new Error("Penguins can't fly!");
+  }
+}
+
+function letTheBirdFly(bird: Bird) {
+  bird.fly();
+}
+
+const penguin = new Penguin();
+letTheBirdFly(penguin); // ❌ Breaks the system!
+```
+
+### 🧨 Problem:
+
+* The client code expects all `Bird` instances to **fly**, but `Penguin` **breaks the contract**.
+* This violates LSP and can cause runtime errors, making the system brittle and hard to test.
+
+
+## ✅ Good Example: Applying LSP Correctly
+
+### Solution:
+
+Refactor by introducing an abstraction that respects capabilities.
+
+```ts
+abstract class Bird {}
+
+interface FlyingBird {
+  fly(): void;
+}
+
+class Sparrow extends Bird implements FlyingBird {
+  fly() {
+    console.log("Sparrow flying!");
+  }
+}
+
+class Penguin extends Bird {
+  swim() {
+    console.log("Penguin swimming!");
+  }
+}
+
+function letTheBirdFly(bird: FlyingBird) {
+  bird.fly();
+}
+
+const sparrow = new Sparrow();
+letTheBirdFly(sparrow); // ✅ Works perfectly
+
+const penguin = new Penguin();
+// letTheBirdFly(penguin); ❌ Not allowed at compile time
+```
+
+
+## 🛠 How to Achieve the Liskov Substitution Principle
+
+1. **Use interfaces or abstract classes** to define clear contracts.
+2. **Ensure subclasses fulfill the contract** of the base class without weakening preconditions or strengthening postconditions.
+3. **Don't override methods to throw exceptions** for expected behavior.
+4. **Design hierarchies around behavior**, not taxonomy. (A penguin is a bird, but not a flying bird.)
+
+
+## 🧭 How to Detect LSP Violations
+
+Ask yourself:
+
+* ❓ Does the subclass override a method to throw exceptions or skip behavior?
+* ❓ Do you have `if instanceof` checks in client code?
+* ❓ Does a subclass break assumptions of the superclass?
+* ❓ Are your unit tests failing when a subclass replaces the parent?
+
+If yes to any, you're likely **violating LSP**.
+
+
+## 💎 Benefits of Applying LSP
+
+| Benefit            | Explanation                                                   |
+| ------------------ | ------------------------------------------------------------- |
+| 🔄 Polymorphism    | Allows safe substitution of classes without changing behavior |
+| ✅ Predictability   | Reduces bugs caused by unexpected subclass behavior           |
+| 🧪 Testability     | Easier unit testing and mocking                               |
+| ⚙️ Maintainability | Easier to add new behavior without breaking existing code     |
+| 📈 Scalability     | Promotes extensible system architecture                       |
+
+
+
+## 🔥 Advanced Example: HTTP Request Handlers
+
+### ❌ **Bad Code: Violating LSP**
+
+You have a `RequestHandler` base class, and you extend it for different request types like `AuthenticatedRequestHandler`. But the subclass throws errors if the request isn't authenticated, breaking expectations.
+
+```ts
+class Request {
+  constructor(public headers: Record<string, string>) {}
+}
+
+class RequestHandler {
+  handle(req: Request): string {
+    return "Request handled";
+  }
+}
+
+class AuthenticatedRequestHandler extends RequestHandler {
+  handle(req: Request): string {
+    if (!req.headers["Authorization"]) {
+      throw new Error("Unauthorized request"); // ❌ Violates LSP
+    }
+    return "Authenticated request handled";
+  }
+}
+
+function processRequest(handler: RequestHandler, req: Request) {
+  console.log(handler.handle(req));
+}
+
+const req1 = new Request({});
+const handler1 = new AuthenticatedRequestHandler();
+
+processRequest(handler1, req1); // ❌ Throws unexpected error
+```
+
+### 🚨 Problem:
+
+* `processRequest` expects **any `RequestHandler`** to handle a request safely.
+* But `AuthenticatedRequestHandler` **changes the contract**—it throws an error instead.
+* This breaks the **substitutability**, violating LSP.
+
+---
+
+## ✅ **Good Code: Respecting LSP**
+
+### ✅ Solution: Separate concerns using interfaces or strategy pattern
+
+```ts
+class Request {
+  constructor(public headers: Record<string, string>) {}
+}
+
+interface IRequestHandler {
+  handle(req: Request): string;
+}
+
+class PublicRequestHandler implements IRequestHandler {
+  handle(req: Request): string {
+    return "Public request handled";
+  }
+}
+
+class AuthenticatedRequestHandler implements IRequestHandler {
+  handle(req: Request): string {
+    const token = req.headers["Authorization"];
+    return token
+      ? "Authenticated request handled"
+      : "Guest access: limited features";
+  }
+}
+
+function processRequest(handler: IRequestHandler, req: Request) {
+  console.log(handler.handle(req));
+}
+
+const req1 = new Request({});
+const req2 = new Request({ Authorization: "Bearer token" });
+
+processRequest(new PublicRequestHandler(), req1);  // ✅ Public request handled
+processRequest(new AuthenticatedRequestHandler(), req1); // ✅ Guest access: limited features
+processRequest(new AuthenticatedRequestHandler(), req2); // ✅ Authenticated request handled
+```
+
+---
+
+## 🎯 Key Takeaways from This Example
+
+| Principle           | Explanation                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------------- |
+| 🔄 LSP              | Any `IRequestHandler` can be used in place of another without surprising behavior                  |
+| 🛡️ Safety          | No unexpected exceptions or broken flow                                                            |
+| 🔍 Detect Violation | If a subclass **strengthens preconditions** (like requiring headers), it's a sign of LSP violation |
+| 🛠 Fix              | Create clearer contracts or segregate responsibilities using interfaces                            |
+
+---
+
+This pattern is very useful in **middleware systems**, **API routers**, or **request pipelines** where different handlers must **conform to the same interface** and expectations.
+
+
+## 🧠 Advanced Problem: Shape Area Calculator
+
+### ❌ Bad Example (Violating LSP)
+
+```ts
+class Rectangle {
+  constructor(public width: number, public height: number) {}
+
+  setWidth(width: number) {
+    this.width = width;
+  }
+
+  setHeight(height: number) {
+    this.height = height;
+  }
+
+  getArea() {
+    return this.width * this.height;
+  }
+}
+
+class Square extends Rectangle {
+  setWidth(width: number) {
+    this.width = width;
+    this.height = width;
+  }
+
+  setHeight(height: number) {
+    this.width = height;
+    this.height = height;
+  }
+}
+
+function resize(rect: Rectangle) {
+  rect.setWidth(5);
+  rect.setHeight(4);
+  console.log(rect.getArea()); // Expected 20
+}
+
+resize(new Rectangle(2, 3)); // ✅ 20
+resize(new Square(2, 2));    // ❌ 16
+```
+
+### ✅ Good Example (Respecting LSP)
+
+```ts
+interface Shape {
+  getArea(): number;
+}
+
+class Rectangle implements Shape {
+  constructor(public width: number, public height: number) {}
+
+  getArea() {
+    return this.width * this.height;
+  }
+}
+
+class Square implements Shape {
+  constructor(public size: number) {}
+
+  getArea() {
+    return this.size * this.size;
+  }
+}
+
+function printArea(shape: Shape) {
+  console.log(shape.getArea());
+}
+
+printArea(new Rectangle(5, 4)); // ✅ 20
+printArea(new Square(4));       // ✅ 16
+```
+
+Absolutely! Here's **one more advanced Liskov Substitution Principle (LSP) violation example** from the **programming world**, especially relevant for **API request handling** in backend/frontend systems (e.g., TypeScript or Node.js).
+
+---
+
+## 🔥 Advanced Example: HTTP Request Handlers
+
+### ❌ **Bad Code: Violating LSP**
+
+You have a `RequestHandler` base class, and you extend it for different request types like `AuthenticatedRequestHandler`. But the subclass throws errors if the request isn't authenticated, breaking expectations.
+
+```ts
+class Request {
+  constructor(public headers: Record<string, string>) {}
+}
+
+class RequestHandler {
+  handle(req: Request): string {
+    return "Request handled";
+  }
+}
+
+class AuthenticatedRequestHandler extends RequestHandler {
+  handle(req: Request): string {
+    if (!req.headers["Authorization"]) {
+      throw new Error("Unauthorized request"); // ❌ Violates LSP
+    }
+    return "Authenticated request handled";
+  }
+}
+
+function processRequest(handler: RequestHandler, req: Request) {
+  console.log(handler.handle(req));
+}
+
+const req1 = new Request({});
+const handler1 = new AuthenticatedRequestHandler();
+
+processRequest(handler1, req1); // ❌ Throws unexpected error
+```
+
+### 🚨 Problem:
+
+* `processRequest` expects **any `RequestHandler`** to handle a request safely.
+* But `AuthenticatedRequestHandler` **changes the contract**—it throws an error instead.
+* This breaks the **substitutability**, violating LSP.
+
+---
+
+## ✅ **Good Code: Respecting LSP**
+
+### ✅ Solution: Separate concerns using interfaces or strategy pattern
+
+```ts
+class Request {
+  constructor(public headers: Record<string, string>) {}
+}
+
+interface IRequestHandler {
+  handle(req: Request): string;
+}
+
+class PublicRequestHandler implements IRequestHandler {
+  handle(req: Request): string {
+    return "Public request handled";
+  }
+}
+
+class AuthenticatedRequestHandler implements IRequestHandler {
+  handle(req: Request): string {
+    const token = req.headers["Authorization"];
+    return token
+      ? "Authenticated request handled"
+      : "Guest access: limited features";
+  }
+}
+
+function processRequest(handler: IRequestHandler, req: Request) {
+  console.log(handler.handle(req));
+}
+
+const req1 = new Request({});
+const req2 = new Request({ Authorization: "Bearer token" });
+
+processRequest(new PublicRequestHandler(), req1);  // ✅ Public request handled
+processRequest(new AuthenticatedRequestHandler(), req1); // ✅ Guest access: limited features
+processRequest(new AuthenticatedRequestHandler(), req2); // ✅ Authenticated request handled
+```
+
+
+## 🎯 Key Takeaways from This Example
+
+| Principle           | Explanation                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------------- |
+| 🔄 LSP              | Any `IRequestHandler` can be used in place of another without surprising behavior                  |
+| 🛡️ Safety          | No unexpected exceptions or broken flow                                                            |
+| 🔍 Detect Violation | If a subclass **strengthens preconditions** (like requiring headers), it's a sign of LSP violation |
+| 🛠 Fix              | Create clearer contracts or segregate responsibilities using interfaces                            |
+
+---
+
+This pattern is very useful in **middleware systems**, **API routers**, or **request pipelines** where different handlers must **conform to the same interface** and expectations.
+
+Would you like to turn all examples into a downloadable cheat sheet or a printable PDF for reference?
+
+
+## 🧰 Pro Tips
+
+* Use composition over inheritance when behaviors don't fit a strict “is-a” relationship.
+* Write unit tests that pass parent classes into your system. Then try subclasses and see if expectations are met.
+* Avoid subclassing for the sake of DRY (Don't Repeat Yourself); behavior compatibility matters more.
+
+Absolutely! Here's **one more advanced Liskov Substitution Principle (LSP) violation example** from the **programming world**, especially relevant for **API request handling** in backend/frontend systems (e.g., TypeScript or Node.js).
+
+---
+
+## 🔥 Advanced Example: HTTP Request Handlers
+
+### ❌ **Bad Code: Violating LSP**
+
+You have a `RequestHandler` base class, and you extend it for different request types like `AuthenticatedRequestHandler`. But the subclass throws errors if the request isn't authenticated, breaking expectations.
+
+```ts
+class Request {
+  constructor(public headers: Record<string, string>) {}
+}
+
+class RequestHandler {
+  handle(req: Request): string {
+    return "Request handled";
+  }
+}
+
+class AuthenticatedRequestHandler extends RequestHandler {
+  handle(req: Request): string {
+    if (!req.headers["Authorization"]) {
+      throw new Error("Unauthorized request"); // ❌ Violates LSP
+    }
+    return "Authenticated request handled";
+  }
+}
+
+function processRequest(handler: RequestHandler, req: Request) {
+  console.log(handler.handle(req));
+}
+
+const req1 = new Request({});
+const handler1 = new AuthenticatedRequestHandler();
+
+processRequest(handler1, req1); // ❌ Throws unexpected error
+```
+
+### 🚨 Problem:
+
+* `processRequest` expects **any `RequestHandler`** to handle a request safely.
+* But `AuthenticatedRequestHandler` **changes the contract**—it throws an error instead.
+* This breaks the **substitutability**, violating LSP.
+
+---
+
+## ✅ **Good Code: Respecting LSP**
+
+### ✅ Solution: Separate concerns using interfaces or strategy pattern
+
+```ts
+class Request {
+  constructor(public headers: Record<string, string>) {}
+}
+
+interface IRequestHandler {
+  handle(req: Request): string;
+}
+
+class PublicRequestHandler implements IRequestHandler {
+  handle(req: Request): string {
+    return "Public request handled";
+  }
+}
+
+class AuthenticatedRequestHandler implements IRequestHandler {
+  handle(req: Request): string {
+    const token = req.headers["Authorization"];
+    return token
+      ? "Authenticated request handled"
+      : "Guest access: limited features";
+  }
+}
+
+function processRequest(handler: IRequestHandler, req: Request) {
+  console.log(handler.handle(req));
+}
+
+const req1 = new Request({});
+const req2 = new Request({ Authorization: "Bearer token" });
+
+processRequest(new PublicRequestHandler(), req1);  // ✅ Public request handled
+processRequest(new AuthenticatedRequestHandler(), req1); // ✅ Guest access: limited features
+processRequest(new AuthenticatedRequestHandler(), req2); // ✅ Authenticated request handled
+```
+
+---
+
+## 🎯 Key Takeaways from This Example
+
+| Principle           | Explanation                                                                                        |
+| ------------------- | -------------------------------------------------------------------------------------------------- |
+| 🔄 LSP              | Any `IRequestHandler` can be used in place of another without surprising behavior                  |
+| 🛡️ Safety          | No unexpected exceptions or broken flow                                                            |
+| 🔍 Detect Violation | If a subclass **strengthens preconditions** (like requiring headers), it's a sign of LSP violation |
+| 🛠 Fix              | Create clearer contracts or segregate responsibilities using interfaces                            |
+
+---
+
+This pattern is very useful in **middleware systems**, **API routers**, or **request pipelines** where different handlers must **conform to the same interface** and expectations.
+
+Would you like to turn all examples into a downloadable cheat sheet or a printable PDF for reference?
+
+
+## 📌 Summary
+
+| Topic             | Notes                                                                                  |
+| ----------------- | -------------------------------------------------------------------------------------- |
+| ❓ **What is LSP** | Subclasses should be replaceable for parent classes without altering program behavior. |
+| ❌ **Bad Example** | Penguin flying or Square as a Rectangle violates LSP                                   |
+| ✅ **Good Design** | Use composition, interfaces, and behavior-centric design                               |
+| 🔍 **Detection**  | Watch for exceptions, if-checks, or broken assumptions in subclasses                   |
+| 🛠 **Fixes**      | Refactor using interfaces, split behaviors, rethink hierarchies                        |
+

@@ -1,0 +1,436 @@
+---
+title: Mastering the Single Responsibility Principle (SRP) in Software Design
+date: '2025-06-18'
+tags: ['low-level-design', 'solid']
+draft: false
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Learn the Single Responsibility Principle (SRP) from the SOLID principles of software design. Discover its importance, real-world examples, detection techniques, benefits, and how to refactor code for better scalability, testability, and maintainability.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+## 🚀 Introduction
+
+One of the cornerstones of clean and scalable software architecture is the **Single Responsibility Principle (SRP)**—the 'S' in the famous **SOLID** principles of object-oriented design.
+
+SRP ensures that a class, module, or function has only one reason to change, making your code **easier to maintain, test, extend, and refactor**.
+
+In this blog post, we'll explore:
+
+* What SRP is and why it matters
+* How to identify code that violates SRP
+* Techniques and strategies to apply SRP
+* Real-world code examples (bad vs good)
+* Pro tips, testing benefits, and how SRP improves scalability
+
+
+## 📖 What is the Single Responsibility Principle?
+
+**Definition**:
+
+> "A class should have only one reason to change."
+
+This means that a class should do **one thing** and do it well. Each module or class should encapsulate one responsibility and not be burdened with others.
+
+
+## 🎯 Why Is SRP Important?
+
+Here are some reasons why SRP is crucial in modern software development:
+
+* 🔧 **Maintainability**: Small, focused classes are easier to understand and maintain.
+* 🧪 **Testability**: A class with a single responsibility has fewer dependencies, making unit testing straightforward.
+* 🔁 **Reusability**: Focused classes can be reused in different parts of the application.
+* 📈 **Scalability**: As your codebase grows, SRP makes it easier to extend the functionality without introducing bugs.
+
+
+## 🚩 How to Detect the Violation of SRP
+
+Violations of SRP usually emerge in the following scenarios:
+
+* A class has **more than one reason to change** (e.g., UI logic and business logic in the same class).
+* You see **too many methods** handling **different concerns**.
+* The constructor injects **many dependencies** (often more than 5–6).
+* Frequent changes to a class from **multiple developers** with different goals.
+* Difficulty in writing isolated unit tests.
+
+**Code Smells** indicating SRP violation:
+
+* **God Classes** (classes with 800+ lines of code)
+* **Too many if-else or switch-case statements**
+* **Duplicated code in multiple classes**
+* **Commented sections separating logic (e.g., // database logic, // UI logic)**
+
+
+## 👎 Polluted Code Example (SRP Violation)
+
+```ts
+class UserService {
+  constructor(private db: Database, private emailService: EmailService) {}
+
+  registerUser(user: User) {
+    // Save to database
+    this.db.save(user);
+
+    // Send welcome email
+    this.emailService.sendWelcomeEmail(user.email);
+  }
+}
+```
+
+❌ The above class does **two things**:
+
+1. Handles **persistence**.
+2. Handles **communication (email sending)**.
+
+
+## ✅ Refactored Code (Following SRP)
+
+```ts
+class UserRepository {
+  constructor(private db: Database) {}
+
+  save(user: User) {
+    this.db.save(user);
+  }
+}
+
+class WelcomeEmailService {
+  constructor(private emailService: EmailService) {}
+
+  send(user: User) {
+    this.emailService.sendWelcomeEmail(user.email);
+  }
+}
+
+class UserRegistrationService {
+  constructor(
+    private userRepository: UserRepository,
+    private welcomeEmailService: WelcomeEmailService
+  ) {}
+
+  register(user: User) {
+    this.userRepository.save(user);
+    this.welcomeEmailService.send(user);
+  }
+}
+```
+
+✅ Now each class has **a single responsibility**:
+
+* `UserRepository`: Persistence
+* `WelcomeEmailService`: Communication
+* `UserRegistrationService`: Orchestration
+
+
+## 🛠️ Techniques to Apply SRP
+
+1. **Use Interfaces**
+   Abstract responsibilities using interfaces (ISP helps here too).
+
+2. **Apply Composition Over Inheritance**
+   Delegate responsibilities to other smaller classes.
+
+3. **Group Code by Responsibility, Not Layer**
+   Avoid only grouping by "Controllers", "Services", "Repositories". Instead, consider "Features".
+
+4. **Use Dependency Injection**
+   Make dependencies explicit and manageable.
+
+5. **Keep Classes Small (prefer < 100 LOC)**
+   Break up long classes and isolate concerns.
+
+6. **Extract Functions or Services**
+   If a function within a class does something unrelated, extract it.
+
+
+## ⚡ Benefits of SRP in Practice
+
+| Benefit                   | Impact                                                      |
+| ------------------------- | ----------------------------------------------------------- |
+| 🔍 Easier Debugging       | Focused classes isolate bugs                                |
+| 🔄 Lower Refactoring Cost | Only one change reason                                      |
+| 🧪 Faster Testing         | Smaller scope = faster and more reliable tests              |
+| 👥 Easier Collaboration   | Clear ownership of code                                     |
+| 🧱 Modular Architecture   | SRP naturally leads to microservices and clean architecture |
+
+
+
+## 🧠 Pro Tips
+
+* **Follow the "Rule of Three"**: If your class has more than 3 major responsibilities, it likely needs to be refactored.
+* **Cohesion over Convenience**: Avoid packing functionality for convenience. Prioritize cohesion.
+* **Use Version Control Logs**: If multiple unrelated changes happen in one class often, it's violating SRP.
+* **Code Reviews**: Watch out for classes with excessive responsibilities during PR reviews.
+
+
+## 🧪 SRP and Testing
+
+SRP leads to **unit-testable code**. Instead of mocking multiple dependencies and behaviors, you can test focused functionality in isolation.
+
+Bad Test Example:
+
+```ts
+// Requires mocking DB + Email service!
+```
+
+Good Test Example:
+
+```ts
+// Only test save() or send() independently
+```
+
+
+## 🧩 Real-World Applications of SRP
+
+* ✅ In a **React/Angular frontend**, split API logic, state logic, and rendering logic.
+* ✅ In a **backend microservice**, separate layers: controllers (HTTP), services (business logic), repositories (data).
+* ✅ In **DevOps scripts**, isolate environment setup from application deployment.
+
+
+## 🧭 When to Refactor for SRP
+
+* During **onboarding**, new developers say: “I don't know what this class is supposed to do.”
+* During **unit testing**, too many mocks are required.
+* When **features are breaking existing functionality**.
+* When **code duplication** is becoming unmanageable.
+
+
+## 🧱 Bonus: SRP in Domain-Driven Design (DDD)
+
+In DDD, **Entities, Value Objects, Repositories, and Services** are natural outcomes of applying SRP. DDD encourages high cohesion and low coupling, perfectly aligned with SRP.
+
+
+## 📚 Further Reading
+
+* “Clean Code” by Robert C. Martin
+* “Design Patterns: Elements of Reusable Object-Oriented Software” (GoF)
+* Martin Fowler's Refactoring Catalog
+
+
+Absolutely! Let’s tackle a more **advanced, real-world problem** and solve it step-by-step using the **Single Responsibility Principle (SRP)**.
+
+
+
+## 🧩 **Advanced Problem: Order Checkout in an E-Commerce System**
+
+In large-scale systems like an e-commerce platform, a single use case (like *order checkout*) can become a **God class** nightmare — trying to do **too much**: validating a cart, applying discounts, saving to DB, charging payment, sending emails, etc.
+
+
+
+### ❌ Problem: Violating SRP in Checkout Service
+
+```ts
+class CheckoutService {
+  constructor(
+    private cartService: CartService,
+    private discountService: DiscountService,
+    private paymentGateway: PaymentGateway,
+    private orderRepository: OrderRepository,
+    private emailService: EmailService,
+  ) {}
+
+  checkout(userId: string) {
+    const cart = this.cartService.getCart(userId);
+    
+    if (cart.items.length === 0) {
+      throw new Error("Cart is empty");
+    }
+
+    const total = this.discountService.applyDiscount(cart);
+
+    const paymentSuccess = this.paymentGateway.charge(userId, total);
+    if (!paymentSuccess) {
+      throw new Error("Payment failed");
+    }
+
+    this.orderRepository.save(cart);
+
+    this.emailService.sendOrderConfirmation(userId);
+  }
+}
+```
+
+
+### 🚩 Why This Violates SRP?
+
+This `CheckoutService` class has **multiple responsibilities**:
+
+1. Cart validation
+2. Applying discounts
+3. Charging payment
+4. Saving the order
+5. Sending notifications
+
+That’s **5 reasons to change** — making the class fragile, hard to test, and impossible to extend without risk.
+
+
+## ✅ Solution: Refactoring with SRP
+
+### 🔄 Step 1: Extract responsibilities into their own services
+
+#### 1. CartValidator
+
+```ts
+class CartValidator {
+  validate(cart: Cart) {
+    if (cart.items.length === 0) {
+      throw new Error("Cart is empty");
+    }
+  }
+}
+```
+
+#### 2. DiscountCalculator
+
+```ts
+class DiscountCalculator {
+  constructor(private discountService: DiscountService) {}
+
+  calculate(cart: Cart): number {
+    return this.discountService.applyDiscount(cart);
+  }
+}
+```
+
+
+#### 3. PaymentProcessor
+
+```ts
+class PaymentProcessor {
+  constructor(private paymentGateway: PaymentGateway) {}
+
+  process(userId: string, amount: number): boolean {
+    return this.paymentGateway.charge(userId, amount);
+  }
+}
+```
+
+
+#### 4. OrderPersister
+
+```ts
+class OrderPersister {
+  constructor(private orderRepository: OrderRepository) {}
+
+  persist(cart: Cart) {
+    this.orderRepository.save(cart);
+  }
+}
+```
+
+#### 5. OrderNotifier
+
+```ts
+class OrderNotifier {
+  constructor(private emailService: EmailService) {}
+
+  notify(userId: string) {
+    this.emailService.sendOrderConfirmation(userId);
+  }
+}
+```
+
+
+### 🔄 Step 2: Compose the Orchestrator
+
+```ts
+class CheckoutService {
+  constructor(
+    private cartService: CartService,
+    private cartValidator: CartValidator,
+    private discountCalculator: DiscountCalculator,
+    private paymentProcessor: PaymentProcessor,
+    private orderPersister: OrderPersister,
+    private orderNotifier: OrderNotifier,
+  ) {}
+
+  checkout(userId: string) {
+    const cart = this.cartService.getCart(userId);
+
+    this.cartValidator.validate(cart);
+
+    const total = this.discountCalculator.calculate(cart);
+
+    const paymentSuccess = this.paymentProcessor.process(userId, total);
+    if (!paymentSuccess) {
+      throw new Error("Payment failed");
+    }
+
+    this.orderPersister.persist(cart);
+
+    this.orderNotifier.notify(userId);
+  }
+}
+```
+
+
+## 🎉 Final Result: SRP Applied
+
+### ✅ Each class:
+
+* Has **one clear responsibility**
+* Can be **unit tested independently**
+* Can be **extended or replaced** easily
+* Keeps **dependencies isolated**
+
+
+
+## 🔍 Testing Becomes Easier
+
+### Example: Unit Testing `PaymentProcessor`
+
+```ts
+it("should charge the user correctly", () => {
+  const mockGateway = { charge: jest.fn().mockReturnValue(true) };
+  const processor = new PaymentProcessor(mockGateway);
+
+  const result = processor.process("user123", 500);
+
+  expect(result).toBe(true);
+  expect(mockGateway.charge).toHaveBeenCalledWith("user123", 500);
+});
+```
+
+No need to mock cart, email, or DB!
+
+
+
+## ⚙️ Real-World Application of SRP in Microservices
+
+Each of the SRP-compliant classes can eventually become:
+
+* Microservices (e.g., `DiscountService`, `OrderService`)
+* Serverless functions
+* Event-driven consumers (e.g., `OrderNotifier` triggered by event)
+
+
+
+## 💡 Pro Tip: Use UseCase Classes or Command Handlers
+
+In **Clean Architecture** or **CQRS**, `CheckoutService` is called a **Use Case / Command Handler**, and should only orchestrate logic.
+
+
+## 🧠 Summary
+
+| Before                         | After                       |
+| --------------------------- | --------------------------- |
+| One huge class doing 5+ things | Small, focused services     |
+| Hard to test                   | Easy unit testing           |
+| Fragile to change              | Stable and maintainable     |
+| Tight coupling                 | Low coupling, high cohesion |
+
+
+## 🏁 Conclusion
+
+The Single Responsibility Principle **transforms complex, risky logic** into **modular, maintainable components**. When applied to advanced domains like e-commerce, payment systems, and SaaS platforms, it dramatically reduces technical debt and boosts engineering velocity.
+
+> “Big classes break silently. Small classes fail loudly—and that's a good thing.”
+
+
+The Single Responsibility Principle is not just a rule—it's a **habit** that leads to cleaner, more modular, and maintainable code. It helps you scale your architecture, make testing effortless, and reduce bugs.
+
+If you're building software that lasts, **SRP should be at the heart of your design philosophy**.
+
+> ✍️ *“A class should do one thing, and do it well.”* – Follow this, and your code will thank you.
