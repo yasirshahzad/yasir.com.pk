@@ -11,18 +11,16 @@ summary: Learn the Interface Segregation Principle (ISP) with real-world TypeScr
 <TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
 
 
-## 📘 Mastering the Interface Segregation Principle (ISP) in TypeScript
-
-The **Interface Segregation Principle (ISP)** is the **I** in **SOLID**—a set of principles for designing robust, clean, and flexible object-oriented software.
-
-
-## 🧠 What Is the Interface Segregation Principle?
-
 > **Definition:**
 > *Clients should not be forced to depend upon interfaces they do not use.*
 
-This means that **large interfaces** should be broken down into **smaller, more specific ones**, so that classes only implement the **behavior they actually need**.
+**Explanation:** Large interfaces should be broken into smaller, more specific ones. This ensures that classes only implement the methods they need.
 
+**Key Points**
+  - Interfaces (design of contracts)
+  - Avoid forcing a class to implement irrelevant methods
+  - Prevents fat interfaces and unnecessary dependencies
+  - Interfaces are small, focused, and tailored to client needs
 
 ## ❌ Bad Example: A Monolithic Interface
 

@@ -11,29 +11,11 @@ summary: Learn the Single Responsibility Principle (SRP) from the SOLID principl
 <TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
 
 
-## 🚀 Introduction
-
-One of the cornerstones of clean and scalable software architecture is the **Single Responsibility Principle (SRP)**—the 'S' in the famous **SOLID** principles of object-oriented design.
-
-SRP ensures that a class, module, or function has only one reason to change, making your code **easier to maintain, test, extend, and refactor**.
-
-In this blog post, we'll explore:
-
-* What SRP is and why it matters
-* How to identify code that violates SRP
-* Techniques and strategies to apply SRP
-* Real-world code examples (bad vs good)
-* Pro tips, testing benefits, and how SRP improves scalability
-
-
-## 📖 What is the Single Responsibility Principle?
-
 **Definition**:
 
 > "A class should have only one reason to change."
 
-This means that a class should do **one thing** and do it well. Each module or class should encapsulate one responsibility and not be burdened with others.
-
+**Explanation:** A class or module should do one thing and do it well. If a class is handling multiple responsibilities, a change in one responsibility can potentially impact others, leading to fragile and tightly coupled code.
 
 ## 🎯 Why Is SRP Important?
 
@@ -145,50 +127,6 @@ class UserRegistrationService {
    If a function within a class does something unrelated, extract it.
 
 
-## ⚡ Benefits of SRP in Practice
-
-| Benefit                   | Impact                                                      |
-| ------------------------- | ----------------------------------------------------------- |
-| 🔍 Easier Debugging       | Focused classes isolate bugs                                |
-| 🔄 Lower Refactoring Cost | Only one change reason                                      |
-| 🧪 Faster Testing         | Smaller scope = faster and more reliable tests              |
-| 👥 Easier Collaboration   | Clear ownership of code                                     |
-| 🧱 Modular Architecture   | SRP naturally leads to microservices and clean architecture |
-
-
-
-## 🧠 Pro Tips
-
-* **Follow the "Rule of Three"**: If your class has more than 3 major responsibilities, it likely needs to be refactored.
-* **Cohesion over Convenience**: Avoid packing functionality for convenience. Prioritize cohesion.
-* **Use Version Control Logs**: If multiple unrelated changes happen in one class often, it's violating SRP.
-* **Code Reviews**: Watch out for classes with excessive responsibilities during PR reviews.
-
-
-## 🧪 SRP and Testing
-
-SRP leads to **unit-testable code**. Instead of mocking multiple dependencies and behaviors, you can test focused functionality in isolation.
-
-Bad Test Example:
-
-```ts
-// Requires mocking DB + Email service!
-```
-
-Good Test Example:
-
-```ts
-// Only test save() or send() independently
-```
-
-
-## 🧩 Real-World Applications of SRP
-
-* ✅ In a **React/Angular frontend**, split API logic, state logic, and rendering logic.
-* ✅ In a **backend microservice**, separate layers: controllers (HTTP), services (business logic), repositories (data).
-* ✅ In **DevOps scripts**, isolate environment setup from application deployment.
-
-
 ## 🧭 When to Refactor for SRP
 
 * During **onboarding**, new developers say: “I don't know what this class is supposed to do.”
@@ -200,17 +138,6 @@ Good Test Example:
 ## 🧱 Bonus: SRP in Domain-Driven Design (DDD)
 
 In DDD, **Entities, Value Objects, Repositories, and Services** are natural outcomes of applying SRP. DDD encourages high cohesion and low coupling, perfectly aligned with SRP.
-
-
-## 📚 Further Reading
-
-* “Clean Code” by Robert C. Martin
-* “Design Patterns: Elements of Reusable Object-Oriented Software” (GoF)
-* Martin Fowler's Refactoring Catalog
-
-
-Absolutely! Let’s tackle a more **advanced, real-world problem** and solve it step-by-step using the **Single Responsibility Principle (SRP)**.
-
 
 
 ## 🧩 **Advanced Problem: Order Checkout in an E-Commerce System**
@@ -365,18 +292,6 @@ class CheckoutService {
 }
 ```
 
-
-## 🎉 Final Result: SRP Applied
-
-### ✅ Each class:
-
-* Has **one clear responsibility**
-* Can be **unit tested independently**
-* Can be **extended or replaced** easily
-* Keeps **dependencies isolated**
-
-
-
 ## 🔍 Testing Becomes Easier
 
 ### Example: Unit Testing `PaymentProcessor`
@@ -395,31 +310,222 @@ it("should charge the user correctly", () => {
 
 No need to mock cart, email, or DB!
 
-
-
-## ⚙️ Real-World Application of SRP in Microservices
-
-Each of the SRP-compliant classes can eventually become:
-
-* Microservices (e.g., `DiscountService`, `OrderService`)
-* Serverless functions
-* Event-driven consumers (e.g., `OrderNotifier` triggered by event)
-
-
-
 ## 💡 Pro Tip: Use UseCase Classes or Command Handlers
 
 In **Clean Architecture** or **CQRS**, `CheckoutService` is called a **Use Case / Command Handler**, and should only orchestrate logic.
 
+---
 
-## 🧠 Summary
+## 🚨 Bad Code: Violating SRP
 
-| Before                         | After                       |
-| --------------------------- | --------------------------- |
-| One huge class doing 5+ things | Small, focused services     |
-| Hard to test                   | Easy unit testing           |
-| Fragile to change              | Stable and maintainable     |
-| Tight coupling                 | Low coupling, high cohesion |
+In this example, we simulate a complex scenario: managing a **user registration service** that:
+
+* Validates user input
+* Creates a user
+* Sends a welcome email
+* Logs the activity
+
+```ts
+// userService.ts
+
+type User = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+export class UserService {
+  private users: User[] = [];
+
+  register(user: User): string {
+    if (!user.email.includes('@')) throw new Error('Invalid email');
+    if (user.password.length < 6) throw new Error('Password too short');
+
+    this.users.push(user);
+
+    // Simulate sending email
+    console.log(`Email sent to ${user.email}`);
+
+    // Log registration
+    console.log(`User ${user.email} registered.`);
+
+    return 'User registered successfully';
+  }
+}
+```
+
+### ❌ What’s wrong?
+
+* **Validation**, **persistence**, **email logic**, and **logging** are all in **one class**.
+* This makes the class **hard to test**, **hard to maintain**, and **not reusable**.
+
+---
+
+## ✅ Good Code: Applying SRP
+
+### We'll split responsibilities:
+
+1. **UserValidator** – validates user input
+2. **UserRepository** – persists users
+3. **EmailService** – sends emails
+4. **Logger** – handles logs
+5. **UserService** – orchestrates all the above
+
+
+
+### 1. `UserValidator.ts`
+
+```ts
+export class UserValidator {
+  validate(email: string, password: string): void {
+    if (!email.includes('@')) throw new Error('Invalid email');
+    if (password.length < 6) throw new Error('Password too short');
+  }
+}
+```
+
+
+
+### 2. `UserRepository.ts`
+
+```ts
+type User = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+export class UserRepository {
+  private users: User[] = [];
+
+  save(user: User): void {
+    this.users.push(user);
+  }
+
+  getAll(): User[] {
+    return this.users;
+  }
+}
+```
+
+
+
+### 3. `EmailService.ts`
+
+```ts
+export class EmailService {
+  sendWelcomeEmail(email: string): void {
+    console.log(`Email sent to ${email}`);
+  }
+}
+```
+
+
+
+### 4. `Logger.ts`
+
+```ts
+export class Logger {
+  log(message: string): void {
+    console.log(`LOG: ${message}`);
+  }
+}
+```
+
+
+
+### 5. `UserService.ts`
+
+```ts
+import { UserValidator } from './UserValidator';
+import { UserRepository } from './UserRepository';
+import { EmailService } from './EmailService';
+import { Logger } from './Logger';
+
+type User = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+export class UserService {
+  constructor(
+    private validator: UserValidator,
+    private repository: UserRepository,
+    private emailService: EmailService,
+    private logger: Logger
+  ) {}
+
+  register(user: User): string {
+    this.validator.validate(user.email, user.password);
+    this.repository.save(user);
+    this.emailService.sendWelcomeEmail(user.email);
+    this.logger.log(`User ${user.email} registered.`);
+    return 'User registered successfully';
+  }
+}
+```
+
+
+
+## ✅ Jest Unit Tests
+
+Create a test file `UserService.test.ts`
+
+```ts
+import { UserService } from './UserService';
+import { UserValidator } from './UserValidator';
+import { UserRepository } from './UserRepository';
+import { EmailService } from './EmailService';
+import { Logger } from './Logger';
+
+describe('UserService', () => {
+  let userValidator: UserValidator;
+  let userRepository: UserRepository;
+  let emailService: EmailService;
+  let logger: Logger;
+  let userService: UserService;
+
+  beforeEach(() => {
+    userValidator = new UserValidator();
+    userRepository = new UserRepository();
+    emailService = new EmailService();
+    logger = new Logger();
+
+    // Mock side effects
+    jest.spyOn(emailService, 'sendWelcomeEmail').mockImplementation(() => {});
+    jest.spyOn(logger, 'log').mockImplementation(() => {});
+
+    userService = new UserService(
+      userValidator,
+      userRepository,
+      emailService,
+      logger
+    );
+  });
+
+  it('should register user successfully', () => {
+    const user = { name: 'Alice', email: 'alice@example.com', password: '123456' };
+
+    const result = userService.register(user);
+
+    expect(result).toBe('User registered successfully');
+    expect(userRepository.getAll()).toContainEqual(user);
+  });
+
+  it('should throw error for invalid email', () => {
+    const user = { name: 'Bob', email: 'bobexample.com', password: '123456' };
+
+    expect(() => userService.register(user)).toThrow('Invalid email');
+  });
+
+  it('should throw error for short password', () => {
+    const user = { name: 'Charlie', email: 'charlie@example.com', password: '123' };
+
+    expect(() => userService.register(user)).toThrow('Password too short');
+  });
+});
+```
 
 
 ## 🏁 Conclusion
@@ -431,6 +537,9 @@ The Single Responsibility Principle **transforms complex, risky logic** into **m
 
 The Single Responsibility Principle is not just a rule—it's a **habit** that leads to cleaner, more modular, and maintainable code. It helps you scale your architecture, make testing effortless, and reduce bugs.
 
-If you're building software that lasts, **SRP should be at the heart of your design philosophy**.
-
-> ✍️ *“A class should do one thing, and do it well.”* – Follow this, and your code will thank you.
+| Before                         | After                       |
+| --------------------------- | --------------------------- |
+| One huge class doing 5+ things | Small, focused services     |
+| Hard to test                   | Easy unit testing           |
+| Fragile to change              | Stable and maintainable     |
+| Tight coupling                 | Low coupling, high cohesion |

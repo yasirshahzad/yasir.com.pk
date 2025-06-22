@@ -11,16 +11,14 @@ summary: Learn the Open/Closed Principle with advanced TypeScript examples. Disc
 <TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
 
 
-## 📘 **Mastering the Open/Closed Principle in TypeScript with Real-World Examples**
 
-### 🚀 Introduction
 
 The **Open/Closed Principle (OCP)** is the second principle of SOLID and one of the most powerful tools in a software engineer's toolkit.
 
-> **Definition**:
+**Definition**:
 > **Software entities (classes, modules, functions, etc.) should be open for extension but closed for modification.**
 
-That means your system should allow you to add new functionality without changing existing code.
+**Explanation:** You should be able to add new functionality without altering existing code. Modifying existing code can introduce bugs and cause regressions. Instead, use abstractions like interfaces or inheritance to extend functionality.
 
 ### ❌ **Bad Example — Violating OCP**
 
