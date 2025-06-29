@@ -1,0 +1,181 @@
+---
+title: Cohesion vs Coupling vs Delegation in OOP - Advanced Design Principles Explained with Examples
+date: '2025-06-29'
+tags: ['low-level-design', 'oop', "oop-principle"]
+draft: false
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Understand cohesion, coupling, and delegation in OOP with real-world examples, Java code, design principles, and interview prep. Learn how to build high-quality, maintainable, and loosely coupled object-oriented systems.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## 1️⃣ Cohesion
+
+### 🔍 Definition
+
+> **Cohesion** refers to **how strongly-related and focused the responsibilities of a single class are**.
+
+A class with **high cohesion** does **one thing well** and is easier to maintain, test, and reuse.
+
+### ✅ Key Points:
+
+* High cohesion = **single responsibility principle (SRP)**
+* Improves **readability**, **reusability**, and **maintainability**
+* Cohesive classes have **fewer reasons to change**
+
+### ❌ Bad Example (Low Cohesion):
+
+```java
+class Utility {
+    void saveFile() { ... }
+    void printReport() { ... }
+    void calculateSalary() { ... }
+}
+```
+
+### ✅ Good Example (High Cohesion):
+
+```java
+class SalaryCalculator {
+    void calculateSalary(Employee e) { ... }
+}
+```
+
+### 📌 Real-world Analogy:
+
+* **Low Cohesion**: A Swiss army knife — does everything, but not very well.
+* **High Cohesion**: A laser cutter — focused on one specific task.
+
+
+## 2️⃣ Coupling
+
+### 🔍 Definition
+
+> **Coupling** measures the **degree of dependency** between different classes or modules.
+
+Lower coupling means classes are more **independent** and **modular** — a hallmark of good OOP design.
+
+### ✅ Key Points:
+
+* **Low coupling** = **loose dependencies**, easier testing, and flexibility
+* **High coupling** = classes are tightly bound and hard to change in isolation
+* Often goes hand-in-hand with **high cohesion**
+
+### ❌ Bad Example (Tight Coupling):
+
+```java
+class OrderService {
+    PaymentProcessor processor = new PaymentProcessor(); // hard-coded
+
+    void process() {
+        processor.charge();
+    }
+}
+```
+
+### ✅ Good Example (Loose Coupling):
+
+```java
+class OrderService {
+    PaymentProcessor processor;
+
+    OrderService(PaymentProcessor processor) {
+        this.processor = processor;
+    }
+
+    void process() {
+        processor.charge();
+    }
+}
+```
+
+### 📌 Real-world Analogy:
+
+* **High Coupling**: Gear wheels locked together — change one, all break.
+* **Low Coupling**: USB plug — can work with any device conforming to the interface.
+
+
+## 3️⃣ Delegation
+
+### 🔍 Definition
+
+> **Delegation** is an OOP technique where an object **hands off responsibility** for a task to another object.
+
+It's a form of **composition** where behavior is reused by **calling another object** instead of inheriting.
+
+### ✅ Key Points:
+
+* Promotes **code reuse** without tight inheritance
+* Supports **Separation of Concerns**
+* Core part of **composition over inheritance**
+
+### 🛠️ Java Example:
+
+```java
+class Printer {
+    void print(String doc) {
+        System.out.println("Printing: " + doc);
+    }
+}
+
+class Report {
+    private Printer printer = new Printer();  // Delegation
+
+    void printReport() {
+        printer.print("Monthly Report");
+    }
+}
+```
+
+### 📌 Real-world Analogy:
+
+* **Delegation**: A manager asks their assistant to schedule a meeting instead of doing it themselves.
+
+
+## 📊 Comparison Table
+
+| Feature       | Cohesion                              | Coupling                             | Delegation                               |
+| ------------- | ------------------------------------- | ------------------------------------ | ---------------------------------------- |
+| Definition    | How focused a class is                | How dependent a class is             | Passing responsibility to another object |
+| Goal          | Keep responsibilities grouped         | Reduce inter-class dependencies      | Reuse behavior through composition       |
+| Best Practice | High cohesion                         | Low coupling                         | Use when behavior is reusable            |
+| Principle     | SRP (Single Responsibility Principle) | DIP (Dependency Inversion Principle) | Composition over Inheritance             |
+| Real Analogy  | Laser cutter (focused tool)           | USB cable (plug-and-play)            | Manager delegating to assistant          |
+
+
+
+## ✅ Best Practices
+
+* 📦 **Cohesion**: Design classes that have **one clear purpose**
+* 🔌 **Coupling**: Use **interfaces** and **dependency injection** to decouple classes
+* 📤 **Delegation**: Use **composition** and **delegation** instead of deep inheritance
+
+
+## 🎯 Interview Questions & Answers
+
+**Q1: What is the relationship between cohesion and coupling?**
+**A:** High cohesion and low coupling are both desirable. High cohesion means focused responsibility; low coupling means independent components.
+
+**Q2: Why is delegation preferred over inheritance?**
+**A:** Delegation avoids tight class hierarchies and promotes code reuse by composing behavior rather than inheriting it.
+
+**Q3: How can you measure cohesion and coupling in code?**
+**A:** Cohesion is qualitative (single purpose). Coupling can be measured by counting direct references to other classes or lack of interfaces.
+
+**Q4: Give an example of coupling in real-world architecture.**
+**A:** In monolith applications, tight coupling exists when all services are interdependent. Microservices aim for low coupling.
+
+**Q5: What's the role of interfaces in coupling?**
+**A:** Interfaces **reduce coupling** by hiding concrete implementation and enabling flexibility.
+
+
+## ✅ Summary
+
+| Concept    | Ideal Form               | Design Principle                |
+| ---------- | ------------------------ | ------------------------------- |
+| Cohesion   | High                     | Single Responsibility Principle |
+| Coupling   | Low                      | Dependency Inversion Principle  |
+| Delegation | Preferred to inheritance | Composition over Inheritance    |
+
+Mastering these design principles is essential for writing **scalable**, **maintainable**, and **clean code** in real-world OOP applications.
