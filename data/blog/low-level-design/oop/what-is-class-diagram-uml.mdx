@@ -1,0 +1,112 @@
+---
+title: What is a Class Diagram in UML? A Beginner-Friendly Guide
+date: '2025-07-02'
+tags: ['low-level-design', 'oop', "uml"]
+draft: false
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Learn what a UML class diagram is, its key components like associations, multiplicity, aggregation, composition, and how it helps design object-oriented systems clearly.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+A **UML Class Diagram** is one of the most important tools in object-oriented programming. It shows how different parts of a system—like people, things, or data—are related to each other. Think of it as a **blueprint of your application’s structure**.
+
+This type of diagram helps software developers visualize and plan the static parts of the system: the classes, their properties, their functions, and how they connect.
+
+
+## ✅ **Why Use a Class Diagram?**
+
+Class diagrams are essential because:
+
+* 🔍 They **analyze and design** the structure of an application.
+* 🧠 They define the **responsibilities** of each class.
+* 🧱 They act as a base for more detailed diagrams like component and deployment diagrams.
+* 🔄 They support both **forward engineering** (from model to code) and **reverse engineering** (from code to model).
+
+![class-diagram](/static/images/oop/class1.png)
+
+## 🧱 **Basic Structure of a Class**
+
+In a class diagram, each class is shown as a **rectangle divided into three sections**:
+
+1. **Class Name** (e.g., `Flight`)
+2. **Attributes** or properties (e.g., `flightNumber`, `destination`)
+3. **Operations** or methods (e.g., `cancelFlight()`, `reschedule()`)
+
+
+## 🔗 **Relationships Between Classes**
+
+Understanding how classes connect is the heart of class diagrams. Here are the key types of relationships:
+
+
+### 1. **Association**
+
+* This is a **basic connection** between two classes.
+* **Example:** A `Pilot` is associated with a `FlightInstance`.
+
+#### 🔄 Bi-Directional Association:
+
+Both classes know about each other.
+
+#### 🔁 Uni-Directional Association:
+
+Only one class knows the relationship exists.
+**Example:** `Flight` knows about `Aircraft`, but not the other way around.
+
+
+### 2. **Multiplicity**
+
+Multiplicity tells you **how many instances** of a class can be associated with another class.
+
+**Examples:**
+
+* `0..*` means zero to many
+* `2..4` means two to four
+
+👉 A `FlightInstance` has **exactly two Pilots**, while a `Pilot` can be associated with **many FlightInstances**.
+
+
+### 3. **Aggregation (Has-A Relationship)**
+
+* Models a **whole-part** relationship.
+* The child (part) can exist **independently** of the parent.
+* **Example:** An `Aircraft` can exist without an `Airline`.
+
+
+### 4. **Composition (Strong Has-A Relationship)**
+
+* A stronger form of aggregation.
+* The child **cannot exist without** the parent.
+* **Example:** A `WeeklySchedule` exists only as long as the `Flight` exists.
+
+
+### 5. **Generalization (Is-A Relationship)**
+
+* Shows **inheritance**: a way to group common traits into a parent class.
+* **Example:** `Pilot`, `Crew`, and `Admin` are all types of `Person`.
+
+
+### 6. **Dependency**
+
+* One class **uses** another temporarily.
+* **Example:** `FlightReservation` depends on `Payment`.
+
+
+### 7. **Abstract Classes**
+
+* These are **base classes** that cannot be directly instantiated.
+* Their names are written in *italics* in the diagram.
+* **Example:** `Person` and `Account` are abstract classes.
+
+
+![class-diagram](/static/images/oop/class.png)
+
+
+## 👩‍💻 Final Thoughts
+
+UML Class Diagrams are the **foundation of object-oriented design**. They help you plan your software before writing a single line of code. Understanding relationships like association, aggregation, composition, and generalization makes your system **scalable, organized, and easier to maintain**.
+
+If you're just starting with software design or working on a large project, class diagrams will make your life much easier!
+
+![class-diagram](/static/images/oop/uml.png)
