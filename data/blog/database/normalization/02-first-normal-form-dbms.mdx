@@ -1,0 +1,97 @@
+---
+title: First Normal Form (1NF) in DBMS – Definition, Examples, and Conversion
+date: '2025-07-14'
+tags: ['database', 'normalization']
+
+layout: PostSimple
+draft: false
+images: ['/static/images/solid/solid.jpg']
+summary: Learn what First Normal Form (1NF) is, why it's important in DBMS, and how to convert tables to 1NF using real-life examples.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## First Normal Form (1NF) in DBMS – Definition, Examples, and Conversion
+
+**First Normal Form (1NF)** is the foundational step in the database normalization process. It ensures that each attribute in a table contains **atomic (indivisible) values** and that **no repeating groups** exist within a row. This lays the groundwork for organizing data efficiently, reducing redundancy, and improving consistency.
+
+### ✅ Requirements of First Normal Form (1NF)
+
+To comply with 1NF, a table must:
+
+* 🔹 Have only **atomic values** (no arrays or comma-separated lists).
+* 🔹 Ensure all attributes store **a single value per cell**.
+* 🔹 Avoid **repeating groups** by creating new rows for each repeating item.
+* 🔹 Maintain **unique rows**, where each row represents one distinct record.
+
+### 🧪 Example 1: Student Contact Numbers (Not in 1NF)
+
+| Student\_ID | Name        | Contact\_Number            | Course  |
+| ----------- | ----------- | -------------------------- | ------- |
+| 101         | Alice Smith | 123-456-7890, 098-765-4321 | Math    |
+| 102         | Bob Johnson | 234-567-8901               | Science |
+| 103         | Carol White | 345-678-9012, 543-210-6789 | History |
+
+❌ This table **violates 1NF** because:
+
+* The `Contact_Number` column contains **multiple values in a single cell**.
+
+### ✅ Converted to 1NF
+
+| Student\_ID | Name        | Contact\_Number |
+| ----------- | ----------- | --------------- |
+| 101         | Alice Smith | 123-456-7890    |
+| 101         | Alice Smith | 098-765-4321    |
+| 102         | Bob Johnson | 234-567-8901    |
+| 103         | Carol White | 345-678-9012    |
+| 103         | Carol White | 543-210-6789    |
+
+Each row now:
+
+* Contains only **atomic values**.
+* Has **no repeating groups**.
+* Maintains clear, organized records.
+
+### 🧪 Example 2: Student Course Enrollments (Not in 1NF)
+
+| Student\_ID | Name        | Courses                |
+| ----------- | ----------- | ---------------------- |
+| 101         | Alice Smith | Math, Science          |
+| 102         | Bob Johnson | History                |
+| 103         | Carol White | Math, History, Science |
+
+❌ The `Courses` column includes **multiple values**, violating 1NF.
+
+### ✅ Converted to 1NF
+
+| Student\_ID | Name        | Course  |
+| ----------- | ----------- | ------- |
+| 101         | Alice Smith | Math    |
+| 101         | Alice Smith | Science |
+| 102         | Bob Johnson | History |
+| 103         | Carol White | Math    |
+| 103         | Carol White | History |
+| 103         | Carol White | Science |
+
+Now the table:
+
+* **Satisfies atomicity**
+* **Eliminates multivalued attributes**
+* Is ready for **further normalization**
+
+### 🎯 Benefits of Applying 1NF
+
+* 📉 **Reduces redundancy**
+* ✅ **Improves consistency and accuracy**
+* 🔄 **Eliminates update, insert, and delete anomalies**
+* 🧱 **Builds a solid foundation for 2NF and 3NF**
+
+### 🧠 Summary
+
+First Normal Form (1NF) ensures that:
+
+* Each cell in a table holds only a **single atomic value**.
+* There are **no repeating groups** within a row.
+
+By converting your tables to 1NF, you lay the groundwork for a cleaner and more scalable database structure.
+
