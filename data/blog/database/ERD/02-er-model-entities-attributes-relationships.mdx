@@ -1,0 +1,126 @@
+---
+title: Understanding Entities, Attributes, and Relationships in ER Models
+date: '2025-07-14'
+tags: ['database', 'erd']
+draft: false
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Learn the core components of ER models in DBMS—entities, attributes, and relationships. Discover ER diagram symbols and how to represent data structures visually and efficiently.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+## 🧠 **Introduction to Entities, Attributes & Relationships in ER Models**
+
+The **Entity-Relationship (ER) model** is a visual framework used in database design to represent how real-world data is structured. It helps define the **entities**, their **attributes**, and the **relationships** between them.
+
+Understanding these components is **crucial** for creating a logical, scalable, and well-organized database system.
+
+In this post, you’ll learn:
+
+* Common **ER diagram symbols**
+* The concept of **entities** and **entity sets**
+* Different types of **attributes**
+* How **relationships** work between entities
+
+
+## 🔣 **Symbols Used in ER Diagrams**
+
+ER diagrams use specific visual symbols to represent data structure clearly:
+
+| Symbol                  | Meaning                    | Example                                           |
+| ----------------------- | -------------------------- | ------------------------------------------------- |
+| 🟥 **Rectangle**        | Entity or Entity Set       | `Student`, `Course`                               |
+| 🟠 **Ellipse**          | Attribute                  | `Name`, `Student ID`                              |
+| 💎 **Diamond**          | Relationship               | `Enrolled In`, `Teaches`                          |
+| ➖ **Line**              | Connection between symbols | Entity ↔ Attribute or Relationship                |
+| 🟠 **Double Ellipse**   | Derived Attribute          | `Age` (derived from `Date of Birth`)              |
+| 🟥 **Double Rectangle** | Weak Entity                | `Dependent` (cannot exist without another entity) |
+
+These symbols make ER diagrams **intuitive**, even for non-technical users.
+
+
+## 👤 **Entities and Entity Sets**
+
+### ✅ **What Is an Entity?**
+
+An **entity** is a real-world object or concept that stores data in the database.
+
+> 📌 *Example:* A `Student` in a school system is an entity with attributes like Name and ID.
+
+Entities are shown as **rectangles** in ER diagrams.
+
+### ✅ **What Is an Entity Set?**
+
+An **entity set** is a group of similar entities that share the same attributes.
+
+> 📌 *Example:* The `Student` entity set includes all students enrolled, each with a `StudentID`, `Name`, and `Date of Birth`.
+
+
+## 🧾 **Types of Attributes in ER Models**
+
+Attributes are the **details** or **properties** of an entity. They are shown as **ellipses** in ER diagrams.
+
+### 🔑 **1. Key Attribute**
+
+* Uniquely identifies each entity in the set
+* Drawn with **underlined text** in diagrams
+
+> *Example:* `StudentID` for the `Student` entity.
+
+### 🧩 **2. Composite Attribute**
+
+* Made up of **multiple sub-parts**, each meaningful
+
+> *Example:* `Address` → `Street`, `City`, `State`, `Country`
+
+### 🔁 **3. Multivalued Attribute**
+
+* Stores **multiple values** for one entity
+
+> *Example:* `Phone Numbers` for a student
+
+* Represented by a **double ellipse**
+
+### ➗ **4. Derived Attribute**
+
+* Not stored directly; **calculated** from other attributes
+
+> *Example:* `Age` derived from `Date of Birth`
+
+* Represented by a **dashed ellipse**
+
+
+## 🔗 **Relationship Types and Sets**
+
+Relationships show how **entities are connected**.
+
+### 💎 **Relationship Type**
+
+* Describes **how entity types relate**
+
+> *Example:* A `Student` **enrolls in** a `Course`
+
+### 📚 **Relationship Set**
+
+* Collection of **actual instances** of a relationship
+
+> *Example:* All student-course enrollments form the set for the “enrolls in” relationship
+
+In ER diagrams:
+
+* Relationships are shown with **diamonds**
+* Connected to entities using **lines**
+
+
+## ✅ **Conclusion**
+
+Entities, attributes, and relationships are the **building blocks of ER modeling** in database design. When represented using standard ER diagram symbols, they help you:
+
+* Visualize the data structure
+* Understand entity interactions
+* Design databases that are efficient, scalable, and maintainable
+
+By mastering these components, you can confidently build data models that reflect real-world systems.
+

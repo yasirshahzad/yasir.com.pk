@@ -1,0 +1,107 @@
+---
+title: Relational Integrity Constraints in DBMS – Types and Examples
+date: '2025-07-14'
+tags: ['database', 'integrity-constraints']
+draft: false
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg'] 
+summary: Understand relational integrity constraints in DBMS with simple examples. Learn about domain, entity integrity, referential integrity, key, and check constraints that ensure data accuracy and consistency.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+
+## ✅ What Are Relational Integrity Constraints?
+
+In a relational database, **integrity constraints** are rules that ensure your data stays **accurate, consistent, and reliable**. They prevent invalid or contradictory data from being added and help maintain the structure and trustworthiness of the database.
+
+These rules are especially important for maintaining relationships between tables and avoiding issues like duplicate records, orphan data, or incorrect inputs.
+
+
+## 🔍 Types of Integrity Constraints in DBMS
+
+### 1. **Domain Constraint**
+
+Defines the **allowed values** for an attribute. It includes data types and valid ranges.
+
+✅ **Example:**
+In a `Student` table, the `CGPA` attribute should only accept values between **0.0 and 4.0**.
+
+
+### 2. **Entity Integrity Constraint**
+
+Ensures that every record has a **unique, non-null** primary key.
+
+✅ **Example:**
+In the `Student` table, `Roll Number` is the **primary key** and must **never be null**. This guarantees every student is uniquely identifiable.
+
+
+### 3. **Referential Integrity Constraint**
+
+Maintains consistency between **related tables** by ensuring foreign key values exist in the referenced table.
+
+✅ **Example:**
+Let’s say:
+
+* The `Course` table stores available courses (Course ID is the primary key).
+* The `Student` table contains `Course ID` as a **foreign key**.
+
+Every course a student enrolls in must already exist in the `Course` table.
+
+**📌 Example Tables:**
+
+**Course Table**
+
+| Course ID | Course Name        | Credits |
+| --------- | ------------------ | ------- |
+| C101      | Introduction to DB | 3       |
+| C102      | Data Structures    | 4       |
+| C103      | Algorithms         | 3       |
+
+**Student Table**
+
+| Student ID | Name        | Course ID |
+| ---------- | ----------- | --------- |
+| S001       | Alice Smith | C101      |
+| S002       | Bob Johnson | C102      |
+| S003       | Carol White | C103      |
+| S004       | David Brown | C101 ✅    |
+
+The system will reject any student record referencing a **nonexistent Course ID** like `C999`.
+
+
+### 4. **Key Constraint (Uniqueness Constraint)**
+
+Enforces that specific fields (like primary or candidate keys) must hold **unique values**.
+
+✅ **Example:**
+The `Email` attribute in the `Student` table must be **unique**, so no two students can register with the same email.
+
+
+### 5. **Check Constraint**
+
+Applies **custom rules** to attribute values.
+
+✅ **Example:**
+A `Check` constraint can ensure that `Age` in the `Student` table is **greater than or equal to 18**, allowing only adult students to register.
+
+
+## 📋 Summary Table of Constraints
+
+| Constraint Type           | Purpose                                          | Example                                   |
+| ------------------------- | ------------------------------------------------ | ----------------------------------------- |
+| **Domain Constraint**     | Validates attribute values fall in allowed range | CGPA between 0.0 and 4.0                  |
+| **Entity Integrity**      | Ensures unique and non-null primary keys         | Roll Number in Student table              |
+| **Referential Integrity** | Ensures foreign key matches a valid primary key  | Course ID in Student must exist in Course |
+| **Key Constraint**        | Avoids duplicate values in key attributes        | Unique Email in Student table             |
+| **Check Constraint**      | Validates custom conditions                      | Age ≥ 18                                  |
+
+## 🧠 Why Integrity Constraints Matter
+
+Without integrity constraints:
+
+* Data could become **duplicated, inconsistent, or incomplete**.
+* Relationships across tables might **break**.
+* Application logic would have to handle data validity manually.
+
+These constraints **automate data validation** at the database level and are essential for any well-designed relational system.

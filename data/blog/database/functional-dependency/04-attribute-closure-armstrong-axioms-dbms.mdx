@@ -1,0 +1,118 @@
+---
+title: How to Find Attribute Closure Using Armstrong’s Axioms in DBMS
+date: '2025-07-14'
+tags: ['database', 'functional-dependency', 'normalization']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Learn how to find the closure of a set of attributes using Armstrong’s Axioms in DBMS. Understand step-by-step examples for computing closures and verifying functional dependencies.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+## How to Find Attribute Closure Using Armstrong’s Axioms in DBMS
+
+In database design, the **closure of a set of attributes** (denoted as **X⁺**) is the set of all attributes that can be functionally determined from a given attribute set X using a given set of functional dependencies (FDs). This process is vital for checking whether a set of attributes is a **super key** and plays a central role in **normalization** and **schema refinement**.
+
+We use **Armstrong’s Axioms** (Reflexivity, Augmentation, and Transitivity) to calculate the attribute closure.
+
+
+### 🧠 Why Attribute Closure Matters
+
+* ✅ Verifies whether an attribute (or set) is a **super key**
+* ✅ Helps in **decomposition** and **normal form** identification
+* ✅ Identifies **implied dependencies** from a known set of FDs
+
+
+### 🔍 Step-by-Step Method to Compute Closure
+
+Given:
+
+* A set of attributes **X**
+* A set of functional dependencies **F**
+
+We want to compute **X⁺** (the closure of X under F).
+
+#### ✅ Algorithm:
+
+1. Start with `X⁺ = X`
+2. Repeat:
+
+   * For each functional dependency `A → B` in F
+   * If `A ⊆ X⁺`, then add `B` to `X⁺`
+3. Continue until no more attributes can be added to `X⁺`
+
+
+### 📘 Example 1: Simple Closure Calculation
+
+Let’s say you have:
+
+* **Attributes:** `{A, B, C, D}`
+* **Functional Dependencies (F):**
+
+  * A → B
+  * B → C
+  * A → D
+
+Find the closure of `{A}` (i.e., **A⁺**).
+
+#### 🔎 Steps:
+
+1. `Start: A⁺ = {A}`
+2. `Apply A → B ⇒ A⁺ = {A, B}`
+3. `Apply B → C ⇒ A⁺ = {A, B, C}`
+4. `Apply A → D ⇒ A⁺ = {A, B, C, D}`
+
+✅ `Final closure: A⁺ = {A, B, C, D}`
+
+So, **A is a super key** for this relation.
+
+
+### 📘 Example 2: Check if X is a Super Key
+
+Given:
+
+* **F:**
+
+  * A → B
+  * B → C
+  * CD → E
+  * E → F
+* **Find:** Is `{A, D}` a super key?
+
+#### 🔎 Steps:
+
+Start with `(A, D)⁺ = {A, D}`
+
+* `A → B ⇒ Add B → {A, B, D}`
+* `B → C ⇒ Add C → {A, B, C, D}`
+* `CD → E: C and D are in closure ⇒ Add E → {A, B, C, D, E}`
+* `E → F ⇒ Add F → {A, B, C, D, E, F}`
+
+✅ Final closure: `{A, B, C, D, E, F}`
+
+Yes, `{A, D}` is a **super key**.
+
+
+### 🧮 Use Cases of Attribute Closure
+
+| Use Case                  | Purpose                                              |
+| ------------------------- | ---------------------------------------------------- |
+| Super Key Check           | Determines if X can uniquely identify all attributes |
+| Minimal Cover Computation | Helps in simplifying the FD set                      |
+| Normalization             | Essential for 2NF, 3NF, and BCNF decomposition       |
+| FD Inference              | Finds all implied dependencies from a known FD set   |
+
+
+### 📘 Quick Recap of Armstrong's Axioms
+
+| Axiom        | Rule Description               | Example              |
+| ------------ | ------------------------------ | -------------------- |
+| Reflexivity  | If Y ⊆ X then X → Y            | `{A, B}` → A           |
+| Augmentation | If X → Y then XZ → YZ          | A → B ⇒ AC → BC      |
+| Transitivity | If X → Y and Y → Z, then X → Z | A → B, B → C ⇒ A → C |
+
+
+### ✅ Final Thoughts
+
+**Attribute closure** is a foundational concept in **DBMS and normalization**. With a solid grasp of **Armstrong’s Axioms**, you can confidently determine super keys, simplify FDs, and ensure your database design is **efficient and consistent**.
+
