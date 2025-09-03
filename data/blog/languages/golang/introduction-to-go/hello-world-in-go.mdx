@@ -635,35 +635,412 @@ func main() {
 ## Interview Questions
 
 ### **Basic Understanding**
-1. **What is the purpose of `package main`?**
-   - Indicates an executable program with entry point
 
-2. **Why is the `main()` function special?**
-   - It's the entry point for executable programs
+1. **What is the purpose of `package main` and why is it special?**
+   
+   **Answer:** `package main` serves as the entry point for executable Go programs:
+   - **Executable Indicator**: Tells the Go compiler this is an executable program, not a library
+   - **Entry Point**: Only `main` package can contain the `main()` function
+   - **Compilation Target**: `go build` creates an executable binary for main packages
+   - **Convention**: All executable Go programs must start with `package main`
+   
+   ```go
+   package main // Required for executables
+   
+   func main() { // Entry point function
+       // Program logic here
+   }
+   ```
+
+2. **Why is the `main()` function special in Go?**
+   
+   **Answer:** The `main()` function is the program's entry point:
+   - **Automatic Execution**: Called automatically when the program starts
+   - **No Parameters**: Unlike C/C++, Go's main() takes no arguments
+   - **No Return Value**: Cannot return values (use os.Exit() for exit codes)
+   - **Single Instance**: Only one main() function allowed per program
+   - **Goroutine**: Runs in the main goroutine
+   
+   ```go
+   func main() {
+       // Program starts here
+       // When main() returns, program exits
+   }
+   ```
 
 3. **What happens if you don't import a package you use?**
-   - Compilation error: undefined identifier
+   
+   **Answer:** Go will produce a compilation error:
+   ```go
+   package main
+   
+   func main() {
+       fmt.Println("Hello") // Error: undefined: fmt
+   }
+   ```
+   **Error message:** "undefined: fmt"
+   
+   **Why this happens:**
+   - **Explicit Dependencies**: Go requires explicit imports for all external packages
+   - **Compile-time Check**: Prevents runtime errors from missing dependencies
+   - **Clean Code**: Unused imports also cause compilation errors
+
+4. **What is the significance of the `import "fmt"` statement?**
+   
+   **Answer:** The import statement brings external packages into scope:
+   - **Standard Library**: `fmt` is part of Go's standard library for formatted I/O
+   - **Namespace**: Makes `fmt` functions available (fmt.Println, fmt.Printf)
+   - **Compile-time Resolution**: Import paths resolved during compilation
+   - **No Wildcards**: Go doesn't support wildcard imports like `import *`
 
 ### **Intermediate Questions**
-1. **Difference between `go run` and `go build`?**
-   - `go run`: compiles and executes immediately
-   - `go build`: creates executable file
 
-2. **How does Go handle unused imports?**
-   - Compilation error to keep code clean
+1. **What's the difference between `go run` and `go build`?**
+   
+   **Answer:** Key differences between these commands:
+   
+   **`go run`:**
+   - **Immediate Execution**: Compiles and runs in one step
+   - **Temporary Binary**: Creates temporary executable, then deletes it
+   - **Development**: Ideal for development and testing
+   - **Memory Usage**: Executable stored in memory/temp directory
+   
+   **`go build`:**
+   - **Persistent Binary**: Creates executable file that remains on disk
+   - **Two-step Process**: Compile first, then execute separately
+   - **Distribution**: Good for creating distributable binaries
+   - **Performance**: Slightly faster execution (no compilation overhead)
+   
+   ```bash
+   # Development workflow
+   go run main.go
+   
+   # Production build
+   go build -o myapp main.go
+   ./myapp
+   ```
 
-3. **What is the zero value in Go?**
-   - Default value assigned to variables (e.g., "" for strings, 0 for int)
+2. **How does Go handle unused imports and why?**
+   
+   **Answer:** Go treats unused imports as compilation errors:
+   
+   **Behavior:**
+   ```go
+   package main
+   
+   import (
+       "fmt"
+       "os"  // Error: imported and not used
+   )
+   
+   func main() {
+       fmt.Println("Hello")
+   }
+   ```
+   
+   **Reasons:**
+   - **Clean Code**: Prevents code bloat and confusion
+   - **Performance**: Reduces compilation time and binary size
+   - **Maintenance**: Easier to understand actual dependencies
+   - **Tooling**: goimports automatically manages imports
+
+3. **What is the zero value in Go and how does it apply to Hello World?**
+   
+   **Answer:** Zero value is the default value for uninitialized variables:
+   
+   **Common Zero Values:**
+   ```go
+   var i int        // 0
+   var s string     // ""
+   var b bool       // false
+   var p *int       // nil
+   var slice []int  // nil
+   ```
+   
+   **In Hello World context:**
+   ```go
+   package main
+   
+   import "fmt"
+   
+   func main() {
+       var message string // Zero value: ""
+       if message == "" {
+           message = "Hello, World!"
+       }
+       fmt.Println(message)
+   }
+   ```
+   
+   **Benefits:**
+   - **Safety**: No undefined behavior
+   - **Predictability**: Variables always have known values
+   - **Simplicity**: No need for explicit initialization
+
+4. **Explain the difference between `fmt.Print`, `fmt.Println`, and `fmt.Printf`**
+   
+   **Answer:** Three different formatting functions:
+   
+   **`fmt.Print`:**
+   ```go
+   fmt.Print("Hello", "World") // Output: HelloWorld
+   ```
+   - No spaces between arguments
+   - No newline at end
+   
+   **`fmt.Println`:**
+   ```go
+   fmt.Println("Hello", "World") // Output: Hello World\n
+   ```
+   - Spaces between arguments
+   - Newline at end
+   
+   **`fmt.Printf`:**
+   ```go
+   fmt.Printf("Hello, %s!\n", "World") // Output: Hello, World!\n
+   ```
+   - Format string with placeholders
+   - No automatic newline
+   - Type-safe formatting
 
 ### **Advanced Questions**
-1. **How would you optimize a Hello World program for size?**
-   - Use build flags: `-ldflags="-s -w"`
 
-2. **Explain Go's compilation process**
-   - Source → AST → SSA → Machine code
+1. **How would you optimize a Hello World program for binary size?**
+   
+   **Answer:** Several optimization techniques:
+   
+   **Build Flags:**
+   ```bash
+   # Strip debug information and symbol table
+   go build -ldflags="-s -w" hello.go
+   
+   # Static linking (if needed)
+   CGO_ENABLED=0 go build -a -ldflags '-extldflags "-static"' hello.go
+   ```
+   
+   **UPX Compression:**
+   ```bash
+   # Compress binary (after building)
+   upx --best hello
+   ```
+   
+   **Minimal Code:**
+   ```go
+   package main
+   
+   import "os"
+   
+   func main() {
+       os.Stdout.WriteString("Hello, World!\n")
+   }
+   ```
+   
+   **Size Comparison:**
+   - Standard build: ~2MB
+   - With -ldflags="-s -w": ~1.4MB
+   - With UPX: ~400KB
+   - Minimal version: ~1.2MB
 
-3. **How does Go's runtime work in Hello World?**
-   - Goroutine scheduler, garbage collector initialization
+2. **Explain Go's compilation process for Hello World**
+   
+   **Answer:** The compilation process involves several stages:
+   
+   **1. Lexical Analysis:**
+   - Source code → tokens
+   - Keywords, identifiers, operators identified
+   
+   **2. Parsing:**
+   - Tokens → Abstract Syntax Tree (AST)
+   - Syntax validation
+   
+   **3. Type Checking:**
+   - Type inference and validation
+   - Interface satisfaction checks
+   
+   **4. SSA Generation:**
+   - AST → Static Single Assignment form
+   - Optimization passes
+   
+   **5. Code Generation:**
+   - SSA → machine code
+   - Target-specific optimizations
+   
+   **6. Linking:**
+   - Combine object files and libraries
+   - Create final executable
+
+3. **How does Go's runtime work in a Hello World program?**
+   
+   **Answer:** Even simple programs use Go's runtime:
+   
+   **Runtime Initialization:**
+   - Initialize garbage collector
+   - Set up goroutine scheduler
+   - Initialize memory allocator
+   - Set up signal handlers
+   
+   **Execution:**
+   ```go
+   func main() {
+       // Main goroutine starts here
+       fmt.Println("Hello, World!")
+       // Main goroutine ends, program exits
+   }
+   ```
+   
+   **Runtime Components:**
+   - **Scheduler**: Manages the main goroutine
+   - **Memory Manager**: Handles stack allocation
+   - **Garbage Collector**: Ready for any allocations
+   - **System Calls**: Handle OS interactions (stdout)
+
+4. **What are the security implications of a Hello World program?**
+   
+   **Answer:** Even simple programs have security considerations:
+   
+   **Attack Surface:**
+   - **Binary Analysis**: Reverse engineering potential
+   - **Buffer Overflows**: Not applicable in Go (memory safe)
+   - **Injection Attacks**: Not relevant for static output
+   
+   **Security Features:**
+   - **Memory Safety**: Go prevents buffer overflows
+   - **Stack Protection**: Built-in stack overflow protection
+   - **Address Space Layout Randomization**: ASLR support
+   
+   **Best Practices:**
+   ```bash
+   # Strip symbols for production
+   go build -ldflags="-s -w" hello.go
+   
+   # Static linking for containerization
+   CGO_ENABLED=0 go build hello.go
+   ```
+
+### **System Design Questions**
+
+1. **How would you scale a Hello World web server to handle millions of requests?**
+   
+   **Answer:** Scaling strategies for a Go web server:
+   
+   **Load Balancing:**
+   ```go
+   // Multiple server instances
+   func main() {
+       http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+           fmt.Fprintf(w, "Hello, World!")
+       })
+       log.Fatal(http.ListenAndServe(":8080", nil))
+   }
+   ```
+   
+   **Horizontal Scaling:**
+   - Multiple server instances behind load balancer
+   - Container orchestration (Kubernetes)
+   - Auto-scaling based on CPU/memory metrics
+   
+   **Performance Optimizations:**
+   - Connection pooling
+   - Keep-alive connections
+   - Response caching
+   - CDN for static content
+   
+   **Monitoring:**
+   - Prometheus metrics
+   - Distributed tracing
+   - Health checks
+
+2. **Design a distributed Hello World service architecture**
+   
+   **Answer:** Microservices architecture:
+   
+   **Components:**
+   - **API Gateway**: Route requests, authentication
+   - **Hello Service**: Generate greetings
+   - **User Service**: Manage user preferences
+   - **Cache Layer**: Redis for fast responses
+   - **Database**: PostgreSQL for user data
+   
+   **Communication:**
+   ```go
+   // gRPC service definition
+   service GreetingService {
+       rpc SayHello(HelloRequest) returns (HelloResponse);
+   }
+   ```
+   
+   **Deployment:**
+   - Docker containers
+   - Kubernetes orchestration
+   - Service mesh (Istio)
+   - CI/CD pipeline
+
+### **Debugging and Troubleshooting**
+
+1. **How would you debug a Hello World program that's not working?**
+   
+   **Answer:** Systematic debugging approach:
+   
+   **Compilation Issues:**
+   ```bash
+   # Check for syntax errors
+   go build hello.go
+   
+   # Verbose compilation
+   go build -x hello.go
+   ```
+   
+   **Runtime Issues:**
+   ```bash
+   # Run with race detection
+   go run -race hello.go
+   
+   # Enable debugging symbols
+   go build -gcflags="-N -l" hello.go
+   ```
+   
+   **Common Problems:**
+   - Wrong package name
+   - Missing imports
+   - Incorrect function signature
+   - File permission issues
+
+2. **What tools would you use to analyze a Go binary's performance?**
+   
+   **Answer:** Performance analysis tools:
+   
+   **Profiling:**
+   ```bash
+   # CPU profiling
+   go tool pprof cpu.prof
+   
+   # Memory profiling
+   go tool pprof mem.prof
+   
+   # Web interface
+   go tool pprof -http=:8080 cpu.prof
+   ```
+   
+   **Binary Analysis:**
+   ```bash
+   # Check binary size
+   ls -lh hello
+   
+   # Analyze symbols
+   go tool nm hello
+   
+   # Disassemble
+   go tool objdump hello
+   ```
+   
+   **Runtime Analysis:**
+   ```bash
+   # Execution tracing
+   go tool trace trace.out
+   
+   # GC analysis
+   GODEBUG=gctrace=1 ./hello
+   ```
 
 ## Common Mistakes and Solutions
 
