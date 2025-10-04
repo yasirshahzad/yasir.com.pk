@@ -1,0 +1,863 @@
+---
+title: Complete Guide to Searching Algorithms - Linear, Binary, Ternary, Jump & Exponential Search
+date: '2025-10-04'
+tags: ['searching-algorithms', 'interview-prep', 'data-structures', 'algorithms']
+draft: false
+layout: PostSimple
+authors: ['default']
+images: []
+summary: Master all essential searching algorithms with detailed explanations, implementations, and time complexities. Complete notes on Linear, Binary, Ternary, Jump, and Exponential search for interview preparation.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# Complete Guide to Searching Algorithms
+
+Searching algorithms are fundamental to computer science and essential for technical interviews. This comprehensive guide covers all major searching techniques with detailed explanations, implementations, and analysis.
+
+## Overview of Searching Algorithms
+
+**What is Searching?** Finding a specific element in a collection of data.
+
+**Key Considerations:**
+- **Time Complexity**: How fast is the algorithm?
+- **Space Complexity**: How much extra memory is needed?
+- **Data Requirements**: Does the data need to be sorted?
+- **Use Cases**: When to use each algorithm?
+
+---
+
+## 1. Linear Search (Sequential Search)
+
+### 🔍 **Concept**
+Linear search checks each element one by one from the beginning until the target is found or the end is reached.
+
+### **Key Points to Remember**
+- **Simplest** searching algorithm
+- Works on both **sorted and unsorted** arrays
+- **No preprocessing** required
+- Checks elements **sequentially**
+
+### **Algorithm Steps**
+1. Start from the first element
+2. Compare current element with target
+3. If match found, return index
+4. If not found, move to next element
+5. Repeat until found or end reached
+
+### **Implementation**
+```go
+package main
+
+import "fmt"
+
+// LinearSearch performs linear search on an array
+func LinearSearch(arr []int, target int) int {
+    for i := 0; i < len(arr); i++ {
+        if arr[i] == target {
+            return i // Return index if found
+        }
+    }
+    return -1 // Return -1 if not found
+}
+
+// Example usage
+func main() {
+    arr := []int{64, 34, 25, 12, 22, 11, 90}
+    result := LinearSearch(arr, 22)
+    fmt.Printf("Element found at index: %d\n", result) // Output: 4
+}
+```
+
+### **Time & Space Complexity**
+- **Time Complexity**: 
+  - Best Case: O(1) - element at first position
+  - Average Case: O(n) - element at middle
+  - Worst Case: O(n) - element at last position or not found
+- **Space Complexity**: O(1) - no extra space needed
+
+### **When to Use**
+✅ **Use Linear Search When:**
+- Array is **unsorted**
+- **Small datasets** (< 100 elements)
+- **One-time search** operations
+- **Memory is limited**
+
+❌ **Avoid When:**
+- Large datasets with frequent searches
+- Data is already sorted
+
+### **Interview Questions**
+1. **Q**: Why use linear search when binary search is faster?
+   **A**: Linear search works on unsorted data and has O(1) space complexity.
+
+2. **Q**: Can you optimize linear search?
+   **A**: Yes, using sentinel search or early termination techniques.
+
+---
+
+## 2. Binary Search
+
+### 🔍 **Concept**
+Binary search repeatedly divides a **sorted array** in half, comparing the target with the middle element.
+
+### **Key Points to Remember**
+- **Requires sorted array** (crucial prerequisite)
+- **Divide and conquer** approach
+- **Most efficient** for sorted data
+- **Logarithmic time complexity**
+
+### **Algorithm Steps**
+1. Set low = 0, high = array length - 1
+2. Calculate mid = (low + high) / 2
+3. If arr[mid] == target, return mid
+4. If arr[mid] < target, search right half (low = mid + 1)
+5. If arr[mid] > target, search left half (high = mid - 1)
+6. Repeat until found or low > high
+
+### **Implementation**
+```go
+package main
+
+import "fmt"
+
+// BinarySearch performs iterative binary search
+func BinarySearch(arr []int, target int) int {
+    low, high := 0, len(arr)-1
+    
+    for low <= high {
+        mid := low + (high-low)/2 // Avoid overflow
+        
+        if arr[mid] == target {
+            return mid
+        } else if arr[mid] < target {
+            low = mid + 1 // Search right half
+        } else {
+            high = mid - 1 // Search left half
+        }
+    }
+    
+    return -1 // Not found
+}
+
+// BinarySearchRecursive performs recursive binary search
+func BinarySearchRecursive(arr []int, target, low, high int) int {
+    if low > high {
+        return -1
+    }
+    
+    mid := low + (high-low)/2
+    
+    if arr[mid] == target {
+        return mid
+    } else if arr[mid] < target {
+        return BinarySearchRecursive(arr, target, mid+1, high)
+    } else {
+        return BinarySearchRecursive(arr, target, low, mid-1)
+    }
+}
+
+// Example usage
+func main() {
+    arr := []int{11, 12, 22, 25, 34, 64, 90} // Must be sorted!
+    result := BinarySearch(arr, 22)
+    fmt.Printf("Element found at index: %d\n", result) // Output: 2
+}
+```
+
+### **Time & Space Complexity**
+- **Time Complexity**: O(log n)
+- **Space Complexity**: 
+  - Iterative: O(1)
+  - Recursive: O(log n) - due to call stack
+
+### **Important Notes**
+⚠️ **Common Pitfalls:**
+- **Integer Overflow**: Use `mid = low + (high - low) // 2` instead of `(low + high) // 2`
+- **Array must be sorted**
+- **Handle edge cases**: empty array, single element
+
+### **Binary Search Variants**
+```go
+// FindFirstOccurrence finds the first occurrence of target
+func FindFirstOccurrence(arr []int, target int) int {
+    result := -1
+    low, high := 0, len(arr)-1
+    
+    for low <= high {
+        mid := low + (high-low)/2
+        if arr[mid] == target {
+            result = mid
+            high = mid - 1 // Continue searching left
+        } else if arr[mid] < target {
+            low = mid + 1
+        } else {
+            high = mid - 1
+        }
+    }
+    
+    return result
+}
+
+// FindLastOccurrence finds the last occurrence of target
+func FindLastOccurrence(arr []int, target int) int {
+    result := -1
+    low, high := 0, len(arr)-1
+    
+    for low <= high {
+        mid := low + (high-low)/2
+        if arr[mid] == target {
+            result = mid
+            low = mid + 1 // Continue searching right
+        } else if arr[mid] < target {
+            low = mid + 1
+        } else {
+            high = mid - 1
+        }
+    }
+    
+    return result
+}
+```
+
+### **When to Use**
+✅ **Use Binary Search When:**
+- Array is **sorted**
+- **Frequent searches** on same dataset
+- **Large datasets** (> 100 elements)
+
+### **Interview Questions**
+1. **Q**: What if array has duplicates?
+   **A**: Use modified binary search to find first/last occurrence.
+
+2. **Q**: Can binary search work on unsorted arrays?
+   **A**: No, sorting is required. Consider sorting cost: O(n log n).
+
+---
+
+## 3. Ternary Search
+
+### 🔍 **Concept**
+Ternary search divides the array into **three parts** instead of two, comparing with two middle elements.
+
+### **Key Points to Remember**
+- **Requires sorted array**
+- **Divides into 3 parts** (not 2 like binary)
+- **Two comparison points**
+- **Theoretically faster** but practically slower due to more comparisons
+
+### **Algorithm Steps**
+1. Calculate mid1 = low + (high - low) / 3
+2. Calculate mid2 = high - (high - low) / 3
+3. If target == arr[mid1] or target == arr[mid2], return index
+4. If target < arr[mid1], search left third
+5. If target > arr[mid2], search right third
+6. Otherwise, search middle third
+
+### **Implementation**
+```go
+package main
+
+import "fmt"
+
+// TernarySearch performs recursive ternary search
+func TernarySearch(arr []int, target, low, high int) int {
+    if low > high {
+        return -1
+    }
+    
+    // Divide array into 3 parts
+    mid1 := low + (high-low)/3
+    mid2 := high - (high-low)/3
+    
+    // Check if target is at mid1 or mid2
+    if arr[mid1] == target {
+        return mid1
+    }
+    if arr[mid2] == target {
+        return mid2
+    }
+    
+    // Decide which third to search
+    if target < arr[mid1] {
+        return TernarySearch(arr, target, low, mid1-1)
+    } else if target > arr[mid2] {
+        return TernarySearch(arr, target, mid2+1, high)
+    } else {
+        return TernarySearch(arr, target, mid1+1, mid2-1)
+    }
+}
+
+// TernarySearchIterative performs iterative ternary search
+func TernarySearchIterative(arr []int, target int) int {
+    low, high := 0, len(arr)-1
+    
+    for low <= high {
+        mid1 := low + (high-low)/3
+        mid2 := high - (high-low)/3
+        
+        if arr[mid1] == target {
+            return mid1
+        }
+        if arr[mid2] == target {
+            return mid2
+        }
+        
+        if target < arr[mid1] {
+            high = mid1 - 1
+        } else if target > arr[mid2] {
+            low = mid2 + 1
+        } else {
+            low = mid1 + 1
+            high = mid2 - 1
+        }
+    }
+    
+    return -1
+}
+
+// Example usage
+func main() {
+    arr := []int{11, 12, 22, 25, 34, 64, 90}
+    result := TernarySearch(arr, 25, 0, len(arr)-1)
+    fmt.Printf("Element found at index: %d\n", result) // Output: 3
+}
+```
+
+### **Time & Space Complexity**
+- **Time Complexity**: O(log₃ n) ≈ O(log n)
+- **Space Complexity**: 
+  - Recursive: O(log n)
+  - Iterative: O(1)
+
+### **Binary vs Ternary Search**
+
+| Aspect | Binary Search | Ternary Search |
+|--------|---------------|----------------|
+| Divisions | 2 parts | 3 parts |
+| Comparisons per iteration | 1 | 2 |
+| Theoretical complexity | log₂ n | log₃ n |
+| Practical performance | Faster | Slower |
+
+### **Why Ternary is Slower in Practice**
+- **More comparisons**: 2 comparisons vs 1 in binary
+- **Cache performance**: Binary search has better locality
+- **Constant factors**: Higher constant in ternary search
+
+### **When to Use**
+✅ **Use Ternary Search When:**
+- **Theoretical analysis** required
+- **Educational purposes**
+- **Finding maximum/minimum** in unimodal functions
+
+❌ **Prefer Binary Search** for general searching
+
+---
+
+## 4. Jump Search (Block Search)
+
+### 🔍 **Concept**
+Jump search combines **linear and binary search** by jumping ahead by fixed steps, then performing linear search in the identified block.
+
+### **Key Points to Remember**
+- **Requires sorted array**
+- **Optimal jump size**: √n
+- **Two-phase approach**: Jump + Linear
+- **Better than linear**, worse than binary
+
+### **Algorithm Steps**
+1. Choose jump size (usually √n)
+2. Jump ahead by jump_size until arr[i] >= target or end reached
+3. Perform linear search in the identified block
+4. Return index if found, -1 otherwise
+
+### **Implementation**
+```go
+package main
+
+import (
+    "fmt"
+    "math"
+)
+
+// JumpSearch - Jump Search Implementation
+func JumpSearch(arr []int, target int) int {
+    n := len(arr)
+    jumpSize := int(math.Sqrt(float64(n)))
+    prev := 0
+    
+    // Jump ahead to find the block
+    for arr[min(jumpSize, n)-1] < target {
+        prev = jumpSize
+        jumpSize += int(math.Sqrt(float64(n)))
+        if prev >= n {
+            return -1 // Element not present
+        }
+    }
+    
+    // Linear search in the identified block
+    for arr[prev] < target {
+        prev++
+        if prev == min(jumpSize, n) {
+            return -1 // Element not present
+        }
+    }
+    
+    // Check if element is found
+    if arr[prev] == target {
+        return prev
+    }
+    
+    return -1 // Element not present
+}
+
+func min(a, b int) int {
+    if a < b {
+        return a
+    }
+    return b
+}
+
+// Example usage
+func main() {
+    arr := []int{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610}
+    result := JumpSearch(arr, 55)
+    fmt.Printf("Element found at index: %d\n", result) // Output: 10
+}
+```
+
+### **Optimal Jump Size Analysis**
+```go
+// Why √n is optimal?
+// Let jump size = m
+// Time complexity = O(n/m) + O(m)
+// To minimize: d/dm(n/m + m) = 0
+// This gives m = √n
+
+// JumpSearchWithCustomStep - Jump Search with custom step size
+func JumpSearchWithCustomStep(arr []int, target, stepSize int) int {
+    n := len(arr)
+    prev := 0
+    
+    for arr[min(stepSize, n)-1] < target {
+        prev = stepSize
+        stepSize += stepSize
+        if prev >= n {
+            return -1
+        }
+    }
+    
+    for arr[prev] < target {
+        prev++
+        if prev == min(stepSize, n) {
+            return -1
+        }
+    }
+    
+    if arr[prev] == target {
+        return prev
+    }
+    return -1
+}
+```
+
+### **Time & Space Complexity**
+- **Time Complexity**: O(√n)
+- **Space Complexity**: O(1)
+
+### **Advantages & Disadvantages**
+
+**✅ Advantages:**
+- **Better than linear search**: O(√n) vs O(n)
+- **Better cache performance** than binary search
+- **Simple implementation**
+- **Good for large datasets** where binary search might have cache misses
+
+**❌ Disadvantages:**
+- **Requires sorted array**
+- **Slower than binary search**
+- **Fixed jump size** might not be optimal for all datasets
+
+### **When to Use**
+✅ **Use Jump Search When:**
+- **Cache performance** is important
+- **Memory access cost** is high
+- **Dataset is large** and sorted
+- **Simple implementation** is preferred
+
+### **Interview Questions**
+1. **Q**: Why is √n the optimal jump size?
+   **A**: It minimizes the total time: O(n/m) for jumping + O(m) for linear search.
+
+2. **Q**: How does jump search compare to binary search?
+   **A**: Jump search: O(√n), Binary search: O(log n). Binary is faster but jump has better cache performance.
+
+---
+
+## 5. Exponential Search (Doubling Search)
+
+### 🔍 **Concept**
+Exponential search finds the range where the element might exist by **doubling the search size**, then applies **binary search** in that range.
+
+### **Key Points to Remember**
+- **Requires sorted array**
+- **Two-phase approach**: Find range + Binary search
+- **Exponential growth**: 1, 2, 4, 8, 16, ...
+- **Excellent for unbounded/infinite arrays**
+
+### **Algorithm Steps**
+1. Start with index = 1
+2. Keep doubling index until arr[index] >= target or end reached
+3. Apply binary search between previous_index and current_index
+4. Return result from binary search
+
+### **Implementation**
+```go
+package main
+
+import "fmt"
+
+// ExponentialSearch - Exponential Search Implementation
+func ExponentialSearch(arr []int, target int) int {
+    n := len(arr)
+    
+    // If element is at first position
+    if arr[0] == target {
+        return 0
+    }
+    
+    // Find range for binary search by repeated doubling
+    index := 1
+    for index < n && arr[index] <= target {
+        index *= 2
+    }
+    
+    // Apply binary search in the found range
+    return binarySearchRange(arr, target, index/2, min(index, n-1))
+}
+
+// binarySearchRange - Binary search in given range
+func binarySearchRange(arr []int, target, low, high int) int {
+    for low <= high {
+        mid := low + (high-low)/2
+        
+        if arr[mid] == target {
+            return mid
+        } else if arr[mid] < target {
+            low = mid + 1
+        } else {
+            high = mid - 1
+        }
+    }
+    
+    return -1 // Not found
+}
+
+// ExponentialSearchUnbounded - Exponential Search for unbounded arrays
+func ExponentialSearchUnbounded(arr []int, target int) int {
+    index := 1
+    
+    // Find the range where element may be present
+    for index < len(arr) && arr[index] <= target {
+        index *= 2
+    }
+    
+    // Binary search in the identified range
+    if index >= len(arr) {
+        return binarySearchRange(arr, target, index/2, len(arr)-1)
+    }
+    return binarySearchRange(arr, target, index/2, index-1)
+}
+
+// Example usage
+func main() {
+    arr := []int{2, 3, 4, 10, 40, 50, 80, 100, 120, 140}
+    result := ExponentialSearch(arr, 40)
+    fmt.Printf("Element found at index: %d\n", result) // Output: 4
+}
+```
+
+### **Step-by-Step Example**
+```go
+// Searching for 40 in [2, 3, 4, 10, 40, 50, 80, 100, 120, 140]
+
+// Step 1: index = 1, arr[1] = 3 <= 40, continue
+// Step 2: index = 2, arr[2] = 4 <= 40, continue  
+// Step 3: index = 4, arr[4] = 40 <= 40, continue
+// Step 4: index = 8, arr[8] = 120 > 40, stop
+
+# Range found: [index//2, index] = [4, 8]
+# Apply binary search in range [4, 8]
+```
+
+### **Time & Space Complexity**
+- **Time Complexity**: O(log n)
+- **Space Complexity**: O(1)
+
+### **Comparison with Other Algorithms**
+
+| Algorithm | Time Complexity | Space | Requirements |
+|-----------|----------------|--------|--------------|
+| Linear | O(n) | O(1) | None |
+| Binary | O(log n) | O(1) | Sorted array |
+| Ternary | O(log n) | O(1) | Sorted array |
+| Jump | O(√n) | O(1) | Sorted array |
+| Exponential | O(log n) | O(1) | Sorted array |
+
+### **Advantages & Disadvantages**
+
+**✅ Advantages:**
+- **Same time complexity** as binary search: O(log n)
+- **Excellent for unbounded arrays**
+- **Good cache performance**
+- **Finds range quickly** with exponential growth
+
+**❌ Disadvantages:**
+- **Requires sorted array**
+- **Slightly more complex** than binary search
+- **Two-phase approach** adds overhead
+
+### **When to Use**
+✅ **Use Exponential Search When:**
+- **Unbounded or infinite arrays**
+- **Unknown array size**
+- **Element likely to be at beginning**
+- **Cache-friendly search** needed
+
+### **Real-World Applications**
+1. **Database indexing**
+2. **File system searches**
+3. **Network routing tables**
+4. **Memory management**
+
+---
+
+## 📊 Algorithm Comparison Summary
+
+### **Performance Comparison**
+
+| Algorithm | Best Case | Average Case | Worst Case | Space | Sorted Required |
+|-----------|-----------|--------------|------------|-------|-----------------|
+| **Linear** | O(1) | O(n) | O(n) | O(1) | No |
+| **Binary** | O(1) | O(log n) | O(log n) | O(1) | Yes |
+| **Ternary** | O(1) | O(log n) | O(log n) | O(1) | Yes |
+| **Jump** | O(1) | O(√n) | O(√n) | O(1) | Yes |
+| **Exponential** | O(1) | O(log n) | O(log n) | O(1) | Yes |
+
+### **Detailed Use Case Comparison**
+
+| Algorithm | Ideal Use Cases | Avoid When | Real-World Examples |
+|-----------|----------------|------------|--------------------|
+| **Linear Search** | • Unsorted data<br/>• Small arrays (< 100 elements)<br/>• One-time searches<br/>• Memory-constrained systems<br/>• Simple implementation needed | • Large datasets<br/>• Frequent searches<br/>• Already sorted data<br/>• Performance critical apps | • Config file parsing<br/>• Small lookup tables<br/>• Debug/logging searches<br/>• Embedded systems |
+| **Binary Search** | • Large sorted arrays<br/>• Frequent searches<br/>• General-purpose searching<br/>• Interview problems<br/>• Database indexing | • Unsorted data<br/>• Frequent insertions/deletions<br/>• Very small datasets<br/>• Memory-sensitive applications | • Database indexes<br/>• Dictionary lookups<br/>• Library search systems<br/>• Algorithm competitions |
+| **Ternary Search** | • Academic research<br/>• Finding peaks/valleys<br/>• Unimodal functions<br/>• Theoretical analysis<br/>• Educational purposes | • General searching<br/>• Production systems<br/>• Performance-critical apps<br/>• Simple implementations | • Mathematical optimization<br/>• Signal processing<br/>• Research algorithms<br/>• Academic exercises |
+| **Jump Search** | • Large sorted arrays<br/>• Cache-sensitive systems<br/>• Block-based storage<br/>• Limited random access<br/>• Hybrid approaches | • Small datasets<br/>• Frequent searches<br/>• Unbounded arrays<br/>• Simple requirements | • File system searches<br/>• Disk-based databases<br/>• Memory hierarchies<br/>• Embedded databases |
+| **Exponential Search** | • Unbounded/infinite arrays<br/>• Unknown array sizes<br/>• Network/distributed systems<br/>• Stream processing<br/>• Dynamic data structures | • Known small arrays<br/>• Memory-constrained systems<br/>• Simple implementations<br/>• Static datasets | • Network routing<br/>• Stream processing<br/>• Dynamic arrays<br/>• Distributed systems |
+
+### **Decision Matrix by Scenario**
+
+| Scenario | Array Size | Is Sorted? | Search Frequency | Recommended Algorithm | Reasoning |
+|----------|-----------|------------|------------------|----------------------|----------|
+| **Web Search Engine** | Very Large (10M+) | Yes | Very High | Binary Search | O(log n) with high frequency |
+| **Mobile App Config** | Small (< 50) | No | Low | Linear Search | Simple, no sorting overhead |
+| **Database Index** | Large (1M+) | Yes | Very High | Binary Search | Optimized for frequent queries |
+| **IoT Sensor Data** | Medium (10K) | Yes | Medium | Jump Search | Cache-friendly for embedded |
+| **Real-time Stream** | Unknown/Growing | Yes | High | Exponential Search | Handles unbounded data |
+| **Game Leaderboard** | Medium (1K) | Yes | High | Binary Search | Fast lookups for rankings |
+| **Log File Analysis** | Large (1M+) | Partially | Low | Linear Search | Data not fully sorted |
+| **Scientific Computing** | Large (100K+) | Yes | Research | Ternary Search | Academic/research context |
+
+### **Performance vs Use Case Matrix**
+
+```
+Data Size →
+           Small    Medium    Large     Very Large
+          (< 100)   (100-10K) (10K-1M)   (1M+)
+Sorted ↓
+No      │ Linear   Linear    Linear     Linear
+        │          (sort?)   (sort?)    (sort?)
+Yes     │ Linear   Binary    Binary     Binary
+        │ Binary   Jump      Jump       Exponential
+        │          Ternary   Exponential (unbounded)
+```
+
+### **When to Use Each Algorithm**
+
+```go
+package main
+
+import "fmt"
+
+// ChooseSearchAlgorithm helps select the right search algorithm
+func ChooseSearchAlgorithm(dataSize int, isSorted bool, searchFreq, dataType string) string {
+    if !isSorted {
+        return "Linear Search - Only option for unsorted data"
+    }
+    
+    if dataSize < 100 {
+        return "Linear Search - Simple and efficient for small data"
+    }
+    
+    if searchFreq == "frequent" && dataSize > 1000 {
+        return "Binary Search - Best for frequent searches on large sorted data"
+    }
+    
+    if dataType == "unbounded" || dataType == "infinite" {
+        return "Exponential Search - Designed for unbounded arrays"
+    }
+    
+    if dataType == "cache_sensitive" {
+        return "Jump Search - Better cache performance"
+    }
+    
+    return "Binary Search - General purpose best choice"
+}
+
+// Example usage
+func main() {
+    recommendation := ChooseSearchAlgorithm(10000, true, "frequent", "normal")
+    fmt.Println(recommendation)
+    // Output: Binary Search - Best for frequent searches on large sorted data
+}
+```
+
+---
+
+## 🎯 Interview Preparation Tips
+
+### **Common Interview Questions**
+
+1. **Q**: Which search algorithm would you choose for a sorted array of 1 million elements?
+   **A**: Binary search - O(log n) time complexity, most efficient for large sorted arrays.
+
+2. **Q**: How would you search in a rotated sorted array?
+   **A**: Modified binary search by first identifying which half is sorted.
+
+3. **Q**: What if the array is sorted but you don't know its size?
+   **A**: Exponential search - designed for unbounded arrays.
+
+4. **Q**: When would you prefer linear search over binary search?
+   **A**: When array is unsorted, very small, or search is one-time operation.
+
+5. **Q**: How do you handle duplicates in binary search?
+   **A**: Use modified binary search to find first/last occurrence.
+
+### **Code Templates to Remember**
+
+```go
+// BinarySearchTemplate - Standard binary search template
+func BinarySearchTemplate(arr []int, target int) int {
+    left, right := 0, len(arr)-1
+    for left <= right {
+        mid := left + (right-left)/2
+        if arr[mid] == target {
+            return mid
+        } else if arr[mid] < target {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+    return -1
+}
+
+// FindFirst - Binary search for first occurrence
+func FindFirst(arr []int, target int) int {
+    left, right := 0, len(arr)-1
+    result := -1
+    for left <= right {
+        mid := left + (right-left)/2
+        if arr[mid] == target {
+            result = mid
+            right = mid - 1 // Continue searching left
+        } else if arr[mid] < target {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+    return result
+}
+
+// FindLast - Binary search for last occurrence
+func FindLast(arr []int, target int) int {
+    left, right := 0, len(arr)-1
+    result := -1
+    for left <= right {
+        mid := left + (right-left)/2
+        if arr[mid] == target {
+            result = mid
+            left = mid + 1 // Continue searching right
+        } else if arr[mid] < target {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+    return result
+}
+```
+
+### **Memory Aids**
+
+**🧠 Remember the "BLEEP" Framework:**
+- **B**inary - O(log n), requires sorted array
+- **L**inear - O(n), works on any array
+- **E**xponential - O(log n), great for unbounded arrays
+- **E**xponential doubling pattern: 1, 2, 4, 8, 16...
+- **P**erformance order: Binary = Exponential > Jump > Linear
+
+### **Quick Decision Tree**
+```
+Is array sorted?
+├── No → Linear Search
+└── Yes → Array size?
+    ├── < 100 → Linear Search
+    ├── 100-10k → Binary Search
+    └── > 10k → Consider:
+        ├── Frequent searches → Binary Search
+        ├── Unbounded array → Exponential Search
+        ├── Cache sensitive → Jump Search
+        └── Default → Binary Search
+```
+
+---
+
+## 🚀 Advanced Topics
+
+### **Binary Search Variations**
+1. **Search in Rotated Array**
+2. **Find Peak Element**
+3. **Search in 2D Matrix**
+4. **Find Minimum in Rotated Array**
+
+### **Optimization Techniques**
+1. **Interpolation Search** - O(log log n) for uniformly distributed data
+2. **Fibonacci Search** - Uses Fibonacci numbers for division
+3. **Sentinel Linear Search** - Optimized linear search
+
+### **Real-World Applications**
+- **Database Indexing**: B-trees use binary search principles
+- **System Design**: Load balancing, caching strategies
+- **Machine Learning**: Hyperparameter tuning, feature selection
+- **Networking**: Routing table lookups
+
+---
+
+## 📚 Practice Problems
+
+### **Easy Problems**
+1. Search insert position
+2. First bad version
+3. Square root using binary search
+
+### **Medium Problems**
+1. Search in rotated sorted array
+2. Find first and last position of element
+3. Search a 2D matrix
+
+### **Hard Problems**
+1. Median of two sorted arrays
+2. Find minimum in rotated sorted array II
+3. Search in rotated sorted array II
+
