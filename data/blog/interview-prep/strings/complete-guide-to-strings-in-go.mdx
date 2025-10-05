@@ -1,0 +1,1108 @@
+---
+title: Complete Guide to Strings in Go - From Basics to Advanced Operations
+date: '2025-10-05'
+tags: ['golang', 'strings', 'programming', 'interview-prep', 'data-structures']
+draft: false
+layout: PostSimple
+authors: ['default']
+images: []
+summary: Master Go strings with this comprehensive guide covering string fundamentals, UTF-8 encoding, basic operations, advanced manipulations, performance optimization, and real-world examples for interview preparation.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# Complete Guide to Strings in Go
+
+Strings are fundamental in Go programming and essential for technical interviews. This comprehensive guide covers everything from basic string operations to advanced manipulation techniques, with practical examples and performance considerations.
+
+## Understanding Strings in Go
+
+### What is a String in Go?
+
+In Go, a **string** is an immutable sequence of bytes that represents text. Unlike some languages, Go strings are:
+
+- **Immutable**: Once created, they cannot be changed
+- **UTF-8 encoded**: Support for international characters
+- **Byte sequences**: Internally stored as bytes
+- **Zero-terminated**: Not null-terminated like C strings
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    // String declaration and initialization
+    var str1 string = "Hello, World!"
+    str2 := "Go Programming"
+    str3 := `Multi-line
+    string using
+    backticks`
+    
+    fmt.Println(str1) // Hello, World!
+    fmt.Println(str2) // Go Programming
+    fmt.Println(str3) // Multi-line string
+}
+```
+
+### String Literals
+
+Go supports three types of string literals:
+
+1. **Interpreted strings**: Use double quotes `""`
+2. **Raw strings**: Use backticks `` ` ` ``
+3. **Rune literals**: Use single quotes `''` for characters
+
+```go
+package main
+
+import "fmt"
+
+func main() {
+    // Interpreted string (escape sequences work)
+    interpreted := "Hello\nWorld\t!"
+    
+    // Raw string (escape sequences don't work)
+    raw := `Hello\nWorld\t!`
+    
+    // Rune (single character)
+    var r rune = 'A'
+    
+    fmt.Println(interpreted) // Hello
+                            // World    !
+    fmt.Println(raw)        // Hello\nWorld\t!
+    fmt.Println(r)          // 65 (ASCII value)
+    fmt.Printf("%c\n", r)   // A
+}
+```
+
+## Basic String Operations
+
+### String Length and Indexing
+
+```go
+package main
+
+import (
+    "fmt"
+    "unicode/utf8"
+)
+
+func main() {
+    str := "Hello, 世界"
+    
+    // Length in bytes
+    fmt.Println("Byte length:", len(str))                    // 13
+    
+    // Length in runes (characters)
+    fmt.Println("Rune count:", utf8.RuneCountInString(str))  // 9
+    
+    // Accessing bytes (not recommended for Unicode)
+    fmt.Printf("First byte: %c\n", str[0])                  // H
+    
+    // Safe way to iterate over runes
+    for i, r := range str {
+        fmt.Printf("Index %d: %c\n", i, r)
+    }
+}
+```
+
+### String Concatenation
+
+Different methods for joining strings, with performance implications:
+
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func main() {
+    str1 := "Hello"
+    str2 := "World"
+    
+    // Method 1: Using + operator (simple but inefficient for many operations)
+    result1 := str1 + ", " + str2 + "!"
+    fmt.Println(result1) // Hello, World!
+    
+    // Method 2: Using fmt.Sprintf (flexible formatting)
+    result2 := fmt.Sprintf("%s, %s!", str1, str2)
+    fmt.Println(result2) // Hello, World!
+    
+    // Method 3: Using strings.Join (efficient for multiple strings)
+    parts := []string{str1, str2}
+    result3 := strings.Join(parts, ", ") + "!"
+    fmt.Println(result3) // Hello, World!
+    
+    // Method 4: Using strings.Builder (most efficient for many operations)
+    var builder strings.Builder
+    builder.WriteString(str1)
+    builder.WriteString(", ")
+    builder.WriteString(str2)
+    builder.WriteString("!")
+    result4 := builder.String()
+    fmt.Println(result4) // Hello, World!
+}
+```
+
+### String Comparison
+
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func main() {
+    str1 := "apple"
+    str2 := "Apple"
+    str3 := "apple"
+    
+    // Case-sensitive comparison
+    fmt.Println(str1 == str2)  // false
+    fmt.Println(str1 == str3)  // true
+    
+    // Case-insensitive comparison
+    fmt.Println(strings.EqualFold(str1, str2))  // true
+    
+    // Lexicographic comparison
+    fmt.Println(strings.Compare(str1, str2))    // 1 (str1 > str2)
+    fmt.Println(strings.Compare(str1, str3))    // 0 (str1 == str3)
+    fmt.Println(strings.Compare(str2, str1))    // -1 (str2 < str1)
+}
+```
+
+## String Manipulation Functions
+
+### Using the `strings` Package
+
+The `strings` package provides comprehensive string manipulation functions:
+
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func main() {
+    text := "  Hello, Go Programming World!  "
+    
+    // Trimming operations
+    fmt.Println("Original:", text)
+    fmt.Println("TrimSpace:", strings.TrimSpace(text))
+    fmt.Println("Trim 'H':", strings.Trim("Hello", "H"))
+    fmt.Println("TrimPrefix:", strings.TrimPrefix(text, "  Hello"))
+    fmt.Println("TrimSuffix:", strings.TrimSuffix(text, "!  "))
+    
+    // Case conversion
+    fmt.Println("ToUpper:", strings.ToUpper(text))
+    fmt.Println("ToLower:", strings.ToLower(text))
+    fmt.Println("Title:", strings.Title(strings.ToLower(text)))
+    
+    // Searching operations
+    fmt.Println("Contains 'Go':", strings.Contains(text, "Go"))
+    fmt.Println("Index of 'Go':", strings.Index(text, "Go"))
+    fmt.Println("LastIndex 'o':", strings.LastIndex(text, "o"))
+    fmt.Println("Count 'o':", strings.Count(text, "o"))
+    
+    // Prefix and Suffix checking
+    fmt.Println("HasPrefix '  H':", strings.HasPrefix(text, "  H"))
+    fmt.Println("HasSuffix '!  ':", strings.HasSuffix(text, "!  "))
+}
+```
+
+### String Splitting and Joining
+
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func main() {
+    text := "apple,banana,cherry,date"
+    
+    // Basic splitting
+    fruits := strings.Split(text, ",")
+    fmt.Println("Split:", fruits) // [apple banana cherry date]
+    
+    // Split with limit
+    limited := strings.SplitN(text, ",", 2)
+    fmt.Println("SplitN(2):", limited) // [apple banana,cherry,date]
+    
+    // Split by whitespace
+    sentence := "Hello   Go    World"
+    words := strings.Fields(sentence)
+    fmt.Println("Fields:", words) // [Hello Go World]
+    
+    // Custom split function
+    custom := strings.FieldsFunc(sentence, func(r rune) bool {
+        return r == ' ' || r == 'o'
+    })
+    fmt.Println("FieldsFunc:", custom) // [Hell G W rld]
+    
+    // Joining strings
+    joined := strings.Join(fruits, " | ")
+    fmt.Println("Joined:", joined) // apple | banana | cherry | date
+}
+```
+
+### String Replacement
+
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func main() {
+    text := "Hello World, Hello Go!"
+    
+    // Replace all occurrences
+    result1 := strings.ReplaceAll(text, "Hello", "Hi")
+    fmt.Println("ReplaceAll:", result1) // Hi World, Hi Go!
+    
+    // Replace limited occurrences
+    result2 := strings.Replace(text, "Hello", "Hi", 1)
+    fmt.Println("Replace(1):", result2) // Hi World, Hello Go!
+    
+    // Replace with custom function using Replacer
+    replacer := strings.NewReplacer(
+        "Hello", "Hi",
+        "World", "Universe",
+        "Go", "Golang",
+    )
+    result3 := replacer.Replace(text)
+    fmt.Println("Replacer:", result3) // Hi Universe, Hi Golang!
+}
+```
+
+## Advanced String Operations
+
+### String Builder for Efficient Concatenation
+
+When building strings incrementally, `strings.Builder` is the most efficient approach:
+
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+    "time"
+)
+
+// Inefficient way - creates new strings repeatedly
+func inefficientConcatenation(n int) string {
+    result := ""
+    for i := 0; i < n; i++ {
+        result += fmt.Sprintf("item%d ", i)
+    }
+    return result
+}
+
+// Efficient way - using strings.Builder
+func efficientConcatenation(n int) string {
+    var builder strings.Builder
+    // Pre-allocate capacity for better performance
+    builder.Grow(n * 10) // Estimate capacity
+    
+    for i := 0; i < n; i++ {
+        builder.WriteString(fmt.Sprintf("item%d ", i))
+    }
+    return builder.String()
+}
+
+func main() {
+    n := 10000
+    
+    // Benchmark inefficient method
+    start := time.Now()
+    _ = inefficientConcatenation(n)
+    inefficientTime := time.Since(start)
+    
+    // Benchmark efficient method
+    start = time.Now()
+    _ = efficientConcatenation(n)
+    efficientTime := time.Since(start)
+    
+    fmt.Printf("Inefficient: %v\n", inefficientTime)
+    fmt.Printf("Efficient: %v\n", efficientTime)
+    fmt.Printf("Speedup: %.2fx\n", float64(inefficientTime)/float64(efficientTime))
+}
+```
+
+### Working with Runes and UTF-8
+
+Go's string handling is UTF-8 aware, but you need to understand the distinction between bytes and runes:
+
+```go
+package main
+
+import (
+    "fmt"
+    "unicode/utf8"
+)
+
+func main() {
+    text := "Hello, 世界! 🌍"
+    
+    fmt.Printf("String: %s\n", text)
+    fmt.Printf("Byte length: %d\n", len(text))
+    fmt.Printf("Rune count: %d\n", utf8.RuneCountInString(text))
+    
+    // Convert string to runes for safe manipulation
+    runes := []rune(text)
+    fmt.Printf("Runes: %v\n", runes)
+    fmt.Printf("Rune length: %d\n", len(runes))
+    
+    // Reverse string safely
+    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+        runes[i], runes[j] = runes[j], runes[i]
+    }
+    reversed := string(runes)
+    fmt.Printf("Reversed: %s\n", reversed)
+    
+    // Iterate over runes with index
+    for i, r := range text {
+        fmt.Printf("Byte index %d: rune %c (U+%04X)\n", i, r, r)
+    }
+}
+```
+
+### Regular Expressions with Strings
+
+Regular expressions provide powerful pattern matching capabilities:
+
+```go
+package main
+
+import (
+    "fmt"
+    "regexp"
+)
+
+func main() {
+    text := "Contact us at: john@example.com or support@company.org"
+    
+    // Compile regex pattern
+    emailRegex := regexp.MustCompile(`[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}`)
+    
+    // Find all matches
+    emails := emailRegex.FindAllString(text, -1)
+    fmt.Println("Found emails:", emails)
+    
+    // Find with submatches
+    phoneRegex := regexp.MustCompile(`(\d{3})-(\d{3})-(\d{4})`)
+    phoneText := "Call me at 123-456-7890 or 987-654-3210"
+    
+    matches := phoneRegex.FindAllStringSubmatch(phoneText, -1)
+    for _, match := range matches {
+        fmt.Printf("Full match: %s, Area: %s, Exchange: %s, Number: %s\n",
+            match[0], match[1], match[2], match[3])
+    }
+    
+    // Replace with regex
+    cleanText := emailRegex.ReplaceAllString(text, "[EMAIL]")
+    fmt.Println("Cleaned text:", cleanText)
+}
+```
+
+## String Formatting and Templates
+
+### Advanced String Formatting
+
+Go provides powerful formatting capabilities through the `fmt` package:
+
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func main() {
+    name := "Alice"
+    age := 30
+    salary := 50000.50
+    
+    // Basic formatting
+    fmt.Printf("Name: %s, Age: %d, Salary: %.2f\n", name, age, salary)
+    
+    // Width and alignment
+    fmt.Printf("%-10s | %5d | %10.2f\n", name, age, salary)
+    fmt.Printf("%-10s | %05d | %010.2f\n", name, age, salary)
+    
+    // Using Sprintf for string creation
+    formatted := fmt.Sprintf("Employee: %s (%d years old) - $%.2f", name, age, salary)
+    fmt.Println(formatted)
+    
+    // Padding and alignment
+    title := "Report"
+    width := 50
+    padding := (width - len(title)) / 2
+    centeredTitle := strings.Repeat(" ", padding) + title + strings.Repeat(" ", padding)
+    fmt.Printf("|%s|\n", centeredTitle)
+    fmt.Println(strings.Repeat("-", width+2))
+}
+```
+
+### Text Templates
+
+For complex string formatting, Go's `text/template` package is invaluable:
+
+```go
+package main
+
+import (
+    "fmt"
+    "text/template"
+    "strings"
+)
+
+type Person struct {
+    Name   string
+    Age    int
+    Skills []string
+}
+
+func main() {
+    // Define template
+    tmplStr := `
+Name: {{.Name}}
+Age: {{.Age}}
+Skills: {{range .Skills}}
+  - {{.}}{{end}}
+Total Skills: {{len .Skills}}
+`
+    
+    // Parse template
+    tmpl, err := template.New("person").Parse(tmplStr)
+    if err != nil {
+        panic(err)
+    }
+    
+    // Data
+    person := Person{
+        Name:   "Bob",
+        Age:    25,
+        Skills: []string{"Go", "Python", "JavaScript"},
+    }
+    
+    // Execute template
+    var result strings.Builder
+    err = tmpl.Execute(&result, person)
+    if err != nil {
+        panic(err)
+    }
+    
+    fmt.Print(result.String())
+}
+```
+
+## String Performance Optimization
+
+### Understanding String Immutability
+
+String immutability in Go has important performance implications:
+
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+func demonstrateStringMemory() {
+    // Strings are immutable - each operation creates new string
+    original := "Hello"
+    
+    // This creates multiple intermediate strings (inefficient)
+    result1 := original + " " + "World" + " " + "from" + " " + "Go"
+    
+    // This is more efficient
+    var builder strings.Builder
+    builder.WriteString(original)
+    builder.WriteString(" World from Go")
+    result2 := builder.String()
+    
+    fmt.Println("Result1:", result1)
+    fmt.Println("Result2:", result2)
+    
+    // For substring operations, be aware of memory retention
+    largeString := strings.Repeat("a", 1000000) + "target" + strings.Repeat("b", 1000000)
+    
+    // This retains reference to entire large string
+    substring1 := largeString[1000000:1000006]
+    
+    // This creates independent copy
+    substring2 := string([]byte(largeString[1000000:1000006]))
+    
+    fmt.Printf("Substring1: %s (may retain large string)\n", substring1)
+    fmt.Printf("Substring2: %s (independent copy)\n", substring2)
+}
+
+func main() {
+    demonstrateStringMemory()
+}
+```
+
+### Memory-Efficient String Operations
+
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+// Memory-efficient string operations
+func efficientStringOperations() {
+    data := []string{"apple", "banana", "cherry", "date"}
+    
+    // Pre-calculate total length for builder capacity
+    totalLen := 0
+    for _, s := range data {
+        totalLen += len(s)
+    }
+    
+    var builder strings.Builder
+    builder.Grow(totalLen + len(data) - 1) // Include separators
+    
+    for i, s := range data {
+        if i > 0 {
+            builder.WriteString(",")
+        }
+        builder.WriteString(s)
+    }
+    
+    result := builder.String()
+    fmt.Println("Efficient result:", result)
+}
+
+func main() {
+    efficientStringOperations()
+}
+```
+
+## Common String Algorithms
+
+### String Reversal
+
+Different approaches to reversing strings, handling ASCII and Unicode correctly:
+
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+// Reverse ASCII string (byte-based)
+func reverseASCII(s string) string {
+    bytes := []byte(s)
+    for i, j := 0, len(bytes)-1; i < j; i, j = i+1, j-1 {
+        bytes[i], bytes[j] = bytes[j], bytes[i]
+    }
+    return string(bytes)
+}
+
+// Reverse Unicode string (rune-based) - handles multi-byte characters correctly
+func reverseUnicode(s string) string {
+    runes := []rune(s)
+    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+        runes[i], runes[j] = runes[j], runes[i]
+    }
+    return string(runes)
+}
+
+// Reverse words in a string
+func reverseWords(s string) string {
+    words := strings.Fields(strings.TrimSpace(s))
+    for i, j := 0, len(words)-1; i < j; i, j = i+1, j-1 {
+        words[i], words[j] = words[j], words[i]
+    }
+    return strings.Join(words, " ")
+}
+
+func main() {
+    // ASCII string
+    ascii := "Hello"
+    fmt.Printf("Original: %s, Reversed: %s\n", ascii, reverseASCII(ascii))
+    
+    // Unicode string
+    unicode := "Hello, 世界"
+    fmt.Printf("Original: %s, Reversed: %s\n", unicode, reverseUnicode(unicode))
+    
+    // Reverse words
+    sentence := "  Hello   World   from   Go  "
+    fmt.Printf("Original: '%s'\n", sentence)
+    fmt.Printf("Reversed words: '%s'\n", reverseWords(sentence))
+}
+```
+
+### Palindrome Check
+
+Implementation of palindrome detection with different complexity levels:
+
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+    "unicode"
+)
+
+// Simple palindrome check (case-sensitive, exact match)
+func isPalindromeSimple(s string) bool {
+    runes := []rune(s)
+    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+        if runes[i] != runes[j] {
+            return false
+        }
+    }
+    return true
+}
+
+// Advanced palindrome check (ignore case, spaces, punctuation)
+func isPalindromeAdvanced(s string) bool {
+    // Clean string: remove non-alphanumeric and convert to lowercase
+    var cleaned strings.Builder
+    for _, r := range s {
+        if unicode.IsLetter(r) || unicode.IsDigit(r) {
+            cleaned.WriteRune(unicode.ToLower(r))
+        }
+    }
+    
+    cleanStr := cleaned.String()
+    return isPalindromeSimple(cleanStr)
+}
+
+func main() {
+    testCases := []string{
+        "racecar",
+        "A man a plan a canal Panama",
+        "race a car",
+        "hello",
+        "Madam",
+        "Was it a car or a cat I saw?",
+    }
+    
+    for _, test := range testCases {
+        simple := isPalindromeSimple(test)
+        advanced := isPalindromeAdvanced(test)
+        fmt.Printf("'%s' -> Simple: %t, Advanced: %t\n", test, simple, advanced)
+    }
+}
+```
+
+### String Pattern Matching
+
+Implementation of both naive and KMP (Knuth-Morris-Pratt) pattern matching algorithms:
+
+```go
+package main
+
+import (
+    "fmt"
+)
+
+// Naive pattern matching - O(n*m) time complexity
+func naiveSearch(text, pattern string) []int {
+    var positions []int
+    n, m := len(text), len(pattern)
+    
+    for i := 0; i <= n-m; i++ {
+        match := true
+        for j := 0; j < m; j++ {
+            if text[i+j] != pattern[j] {
+                match = false
+                break
+            }
+        }
+        if match {
+            positions = append(positions, i)
+        }
+    }
+    return positions
+}
+
+// KMP (Knuth-Morris-Pratt) pattern matching - O(n+m) time complexity
+func computeLPS(pattern string) []int {
+    m := len(pattern)
+    lps := make([]int, m)
+    length := 0
+    i := 1
+    
+    for i < m {
+        if pattern[i] == pattern[length] {
+            length++
+            lps[i] = length
+            i++
+        } else {
+            if length != 0 {
+                length = lps[length-1]
+            } else {
+                lps[i] = 0
+                i++
+            }
+        }
+    }
+    return lps
+}
+
+func kmpSearch(text, pattern string) []int {
+    var positions []int
+    n, m := len(text), len(pattern)
+    
+    if m == 0 {
+        return positions
+    }
+    
+    lps := computeLPS(pattern)
+    i, j := 0, 0 // i for text, j for pattern
+    
+    for i < n {
+        if pattern[j] == text[i] {
+            i++
+            j++
+        }
+        
+        if j == m {
+            positions = append(positions, i-j)
+            j = lps[j-1]
+        } else if i < n && pattern[j] != text[i] {
+            if j != 0 {
+                j = lps[j-1]
+            } else {
+                i++
+            }
+        }
+    }
+    return positions
+}
+
+func main() {
+    text := "ABABDABACDABABCABCABCABCABC"
+    pattern := "ABABC"
+    
+    // Naive search
+    naiveResult := naiveSearch(text, pattern)
+    fmt.Printf("Naive search found pattern at positions: %v\n", naiveResult)
+    
+    // KMP search
+    kmpResult := kmpSearch(text, pattern)
+    fmt.Printf("KMP search found pattern at positions: %v\n", kmpResult)
+    
+    // Verify results
+    fmt.Printf("Results match: %t\n", fmt.Sprintf("%v", naiveResult) == fmt.Sprintf("%v", kmpResult))
+}
+```
+
+## Interview Common Problems
+
+### Anagram Detection
+
+Two different approaches to detect if strings are anagrams:
+
+```go
+package main
+
+import (
+    "fmt"
+    "sort"
+    "strings"
+)
+
+// Method 1: Using sorting - O(n log n) time complexity
+func isAnagramSort(s1, s2 string) bool {
+    if len(s1) != len(s2) {
+        return false
+    }
+    
+    // Convert to lowercase and sort
+    s1 = strings.ToLower(s1)
+    s2 = strings.ToLower(s2)
+    
+    chars1 := strings.Split(s1, "")
+    chars2 := strings.Split(s2, "")
+    
+    sort.Strings(chars1)
+    sort.Strings(chars2)
+    
+    return strings.Join(chars1, "") == strings.Join(chars2, "")
+}
+
+// Method 2: Using character frequency map - O(n) time complexity
+func isAnagramMap(s1, s2 string) bool {
+    if len(s1) != len(s2) {
+        return false
+    }
+    
+    s1 = strings.ToLower(s1)
+    s2 = strings.ToLower(s2)
+    
+    charCount := make(map[rune]int)
+    
+    // Count characters in first string
+    for _, char := range s1 {
+        charCount[char]++
+    }
+    
+    // Subtract characters from second string
+    for _, char := range s2 {
+        charCount[char]--
+        if charCount[char] < 0 {
+            return false
+        }
+    }
+    
+    // Check if all counts are zero
+    for _, count := range charCount {
+        if count != 0 {
+            return false
+        }
+    }
+    
+    return true
+}
+
+func main() {
+    testPairs := [][2]string{
+        {"listen", "silent"},
+        {"evil", "vile"},
+        {"hello", "bello"},
+        {"anagram", "nagaram"},
+        {"rat", "car"},
+    }
+    
+    for _, pair := range testPairs {
+        s1, s2 := pair[0], pair[1]
+        sortResult := isAnagramSort(s1, s2)
+        mapResult := isAnagramMap(s1, s2)
+        fmt.Printf("'%s' & '%s' -> Sort: %t, Map: %t\n", s1, s2, sortResult, mapResult)
+    }
+}
+```
+
+### Longest Common Subsequence
+
+Dynamic programming solution for finding the longest common subsequence:
+
+```go
+package main
+
+import (
+    "fmt"
+    "strings"
+)
+
+// Longest Common Subsequence using Dynamic Programming
+func longestCommonSubsequence(text1, text2 string) int {
+    m, n := len(text1), len(text2)
+    
+    // Create DP table
+    dp := make([][]int, m+1)
+    for i := range dp {
+        dp[i] = make([]int, n+1)
+    }
+    
+    // Fill DP table
+    for i := 1; i <= m; i++ {
+        for j := 1; j <= n; j++ {
+            if text1[i-1] == text2[j-1] {
+                dp[i][j] = dp[i-1][j-1] + 1
+            } else {
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+            }
+        }
+    }
+    
+    return dp[m][n]
+}
+
+// Get the actual LCS string
+func getLCS(text1, text2 string) string {
+    m, n := len(text1), len(text2)
+    
+    dp := make([][]int, m+1)
+    for i := range dp {
+        dp[i] = make([]int, n+1)
+    }
+    
+    // Fill DP table
+    for i := 1; i <= m; i++ {
+        for j := 1; j <= n; j++ {
+            if text1[i-1] == text2[j-1] {
+                dp[i][j] = dp[i-1][j-1] + 1
+            } else {
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+            }
+        }
+    }
+    
+    // Reconstruct LCS
+    var lcs strings.Builder
+    i, j := m, n
+    
+    for i > 0 && j > 0 {
+        if text1[i-1] == text2[j-1] {
+            lcs.WriteByte(text1[i-1])
+            i--
+            j--
+        } else if dp[i-1][j] > dp[i][j-1] {
+            i--
+        } else {
+            j--
+        }
+    }
+    
+    // Reverse the result
+    result := lcs.String()
+    runes := []rune(result)
+    for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+        runes[i], runes[j] = runes[j], runes[i]
+    }
+    
+    return string(runes)
+}
+
+func max(a, b int) int {
+    if a > b {
+        return a
+    }
+    return b
+}
+
+func main() {
+    text1 := "abcde"
+    text2 := "ace"
+    
+    lcsLength := longestCommonSubsequence(text1, text2)
+    lcsString := getLCS(text1, text2)
+    
+    fmt.Printf("Text1: %s\n", text1)
+    fmt.Printf("Text2: %s\n", text2)
+    fmt.Printf("LCS Length: %d\n", lcsLength)
+    fmt.Printf("LCS String: %s\n", lcsString)
+    
+    // More examples
+    examples := [][2]string{
+        {"ABCDGH", "AEDFHR"},
+        {"AGGTAB", "GXTXAYB"},
+        {"programming", "program"},
+    }
+    
+    for _, example := range examples {
+        s1, s2 := example[0], example[1]
+        length := longestCommonSubsequence(s1, s2)
+        lcs := getLCS(s1, s2)
+        fmt.Printf("'%s' & '%s' -> LCS: '%s' (length: %d)\n", s1, s2, lcs, length)
+    }
+}
+```
+
+## Best Practices and Tips
+
+### Performance Guidelines
+
+1. **Use `strings.Builder`** for multiple concatenations
+2. **Pre-allocate capacity** when possible using `Builder.Grow()`
+3. **Use `strings.Join()`** for joining string slices
+4. **Avoid string concatenation in loops** with `+` operator
+5. **Use byte slices** for intensive byte-level operations
+6. **Consider memory implications** of substring operations
+
+### Common Pitfalls
+
+Understanding these common mistakes will help you write better Go code:
+
+```go
+package main
+
+import (
+    "fmt"
+    "unicode/utf8"
+)
+
+func demonstrateCommonPitfalls() {
+    // Pitfall 1: Assuming len() gives character count
+    text := "Hello, 世界"
+    fmt.Printf("len(): %d, actual chars: %d\n", len(text), utf8.RuneCountInString(text))
+    
+    // Pitfall 2: Direct byte indexing with Unicode
+    fmt.Printf("text[0]: %c, text[7]: %c\n", text[0], text[7]) // text[7] is not '世'
+    
+    // Correct way: use rune conversion or range
+    runes := []rune(text)
+    fmt.Printf("runes[7]: %c\n", runes[7])
+    
+    // Pitfall 3: Modifying strings in place (impossible)
+    // text[0] = 'h' // This would cause compilation error
+    
+    // Correct way: convert to rune slice, modify, convert back
+    runeSlice := []rune(text)
+    runeSlice[0] = 'h'
+    modified := string(runeSlice)
+    fmt.Printf("Modified: %s\n", modified)
+    
+    // Pitfall 4: Inefficient string building in loops
+    // Don't do this for many iterations:
+    result := ""
+    words := []string{"hello", "world", "from", "go"}
+    for _, word := range words {
+        result += word + " " // Creates new string each time
+    }
+    fmt.Printf("Inefficient result: %s\n", result)
+}
+
+func main() {
+    demonstrateCommonPitfalls()
+}
+```
+
+### Interview Preparation Tips
+
+1. **Understand UTF-8 encoding**: Know the difference between bytes and runes  
+    **Answer:** Go strings are UTF-8 encoded, so a character (rune) may be more than one byte. Use `[]rune` or `utf8.RuneCountInString` for character-level operations.
+
+2. **Master string algorithms**: Practice palindromes, anagrams, pattern matching  
+    **Answer:** Implement and understand algorithms for palindrome checking, anagram detection, and substring search (e.g., KMP). Practice writing both naive and optimized versions.
+
+3. **Know the `strings` package**: Familiarize yourself with common functions  
+    **Answer:** Functions like `strings.Split`, `Join`, `Contains`, `Replace`, `ToUpper`, `TrimSpace`, and `Fields` are frequently used. Review their signatures and typical use cases.
+
+4. **Understand performance implications**: When to use `strings.Builder` vs other methods  
+    **Answer:** Use `strings.Builder` for repeated concatenation (especially in loops) to avoid unnecessary allocations. For joining slices, prefer `strings.Join`.
+
+5. **Practice with edge cases**: Empty strings, Unicode characters, very long strings  
+    **Answer:** Always test your code with empty strings, strings containing multi-byte Unicode characters, and very long strings to ensure correctness and efficiency.
+
+## Conclusion
+
+Mastering strings in Go is essential for effective programming and technical interviews. Key takeaways:
+
+1. **Understand immutability** - strings cannot be modified in place
+2. **Use appropriate tools** - `strings.Builder` for concatenation, `strings` package for manipulation
+3. **Handle Unicode properly** - use runes for character-level operations
+4. **Optimize performance** - avoid string concatenation in loops, pre-allocate when possible
+5. **Know common algorithms** - palindromes, anagrams, pattern matching, LCS
+
+Practice these concepts and algorithms to build confidence with string manipulation in Go. The examples provided cover both fundamental operations and advanced techniques commonly encountered in technical interviews.
+
+Remember: strings in Go are UTF-8 encoded byte sequences, and understanding this fundamental concept will help you write more robust and efficient string-handling code.
