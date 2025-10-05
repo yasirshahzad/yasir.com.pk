@@ -1,0 +1,447 @@
+---
+title: Complete Solutions to Classic Searching Algorithm Problems
+date: '2025-10-05'
+tags: ['leetcode', 'searching-algorithms', 'binary-search', 'interview-prep', 'golang', 'problem-solving']
+draft: false
+layout: PostSimple
+authors: ['default']
+images: []
+summary: Comprehensive solutions to 9 classic searching algorithm problems with detailed explanations, Go implementations, and complexity analysis. From easy to hard difficulty levels for technical interview preparation.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# Complete Solutions to Classic Searching Algorithm Problems
+
+This document provides comprehensive solutions to 9 fundamental searching algorithm problems commonly asked in technical interviews. Each solution includes detailed explanations, Go implementations, time/space complexity analysis, and key insights.
+
+## 🎯 Problem Categories
+- **Easy (3 problems)**: Basic binary search applications
+- **Medium (3 problems)**: Advanced binary search with modifications
+- **Hard (3 problems)**: Complex scenarios requiring deep understanding
+
+---
+
+## 🟢 Easy Problems
+
+These problems focus on fundamental binary search concepts and are great starting points for interview preparation.
+
+### 1. Search Insert Position (LeetCode 35)
+
+**Problem**: Given a sorted array and a target value, return the index where the target should be inserted to maintain sorted order.
+
+**Key Insight**: Use binary search but return `left` pointer when not found - this gives the insertion position.
+
+**Algorithm**:
+1. Standard binary search with modification
+2. When loop ends, `left` points to insertion position
+3. Works for duplicates and edge cases
+
+```go
+func searchInsert(nums []int, target int) int {
+    left, right := 0, len(nums)-1
+    for left <= right {
+        mid := left + (right-left)/2
+        if nums[mid] == target {
+            return mid
+        } else if nums[mid] < target {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+    return left // Insertion position
+}
+```
+
+**Time Complexity**: O(log n)  
+**Space Complexity**: O(1)  
+**Example**: `[1,3,5,6], target=5` → return `2`
+
+---
+
+### 2. First Bad Version (LeetCode 278)
+
+**Problem**: Find the first bad version in a sequence where all versions after the first bad one are also bad.
+
+**Key Insight**: This is a "find first occurrence" binary search variant. We need to find the leftmost `true` in a sequence of `false...false,true...true`.
+
+**Algorithm**:
+1. Use `left < right` (not `<=`) to avoid infinite loop
+2. When `isBadVersion(mid)` is true, search left half (including mid)
+3. When false, search right half (excluding mid)
+
+```go
+func firstBadVersion(n int, isBadVersion func(int) bool) int {
+    left, right := 1, n
+    for left < right {
+        mid := left + (right-left)/2
+        if isBadVersion(mid) {
+            right = mid
+        } else {
+            left = mid + 1
+        }
+    }
+    return left // First bad version
+}
+```
+
+**Time Complexity**: O(log n)  
+**Space Complexity**: O(1)  
+**Example**: `n=5, bad starts at 4` → return `4`
+
+---
+
+### 3. Square Root using Binary Search (LeetCode 69)
+
+**Problem**: Compute and return the integer part of the square root of a non-negative integer x.
+
+**Key Insight**: Binary search on the answer space [1, x/2]. We want the largest number whose square ≤ x.
+
+**Algorithm**:
+1. Handle edge cases: x < 2
+2. Search space is [1, x/2] since sqrt(x) ≤ x/2 for x ≥ 4
+3. Return `right` (last valid answer) when loop ends
+
+```go
+func mySqrt(x int) int {
+    if x < 2 {
+        return x
+    }
+    left, right := 1, x/2
+    for left <= right {
+        mid := left + (right-left)/2
+        if mid*mid == x {
+            return mid
+        } else if mid*mid < x {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+    return right // Largest integer whose square ≤ x
+}
+```
+
+**Time Complexity**: O(log x)  
+**Space Complexity**: O(1)  
+**Example**: `x=8` → return `2` (since 2² = 4 ≤ 8 < 9 = 3²)
+
+---
+
+## 🟡 Medium Problems
+
+These problems require modifications to standard binary search and handling of special cases.
+
+### 1. Search in Rotated Sorted Array (LeetCode 33)
+
+**Problem**: Search for a target in a rotated sorted array with distinct elements.
+
+**What is a Rotated Sorted Array?**  
+A rotated sorted array is an array that was originally sorted in ascending order, but then some leading elements were moved to the end. For example, `[0,1,2,4,5,6,7]` rotated at index 3 becomes `[4,5,6,7,0,1,2]`. The array remains sorted except for a "pivot" point where the rotation happened. This property allows us to use a modified binary search to efficiently find elements.
+
+**Key Insight**: At least one half is always sorted. Determine which half is sorted, then check if target lies in that half.
+
+**Algorithm**:
+1. Compare `nums[left]` with `nums[mid]` to find sorted half
+2. If left half sorted: check if target in range [nums[left], nums[mid])
+3. If right half sorted: check if target in range (nums[mid], nums[right]]
+4. Search the appropriate half
+
+```go
+func search(nums []int, target int) int {
+    left, right := 0, len(nums)-1
+    for left <= right {
+        mid := left + (right-left)/2
+        if nums[mid] == target {
+            return mid
+        }
+        if nums[left] <= nums[mid] {
+            if nums[left] <= target && target < nums[mid] {
+                right = mid - 1
+            } else {
+                left = mid + 1
+            }
+        } else {
+            if nums[mid] < target && target <= nums[right] {
+                left = mid + 1
+            } else {
+                right = mid - 1
+            }
+        }
+    }
+    return -1 // Target not found
+}
+```
+
+**Time Complexity**: O(log n)  
+**Space Complexity**: O(1)  
+**Example**: `[4,5,6,7,0,1,2], target=0` → return `4`
+
+---
+
+### 2. Find First and Last Position of Element (LeetCode 34)
+
+**Problem**: Find the starting and ending position of a target value in a sorted array.
+
+**Key Insight**: Use two separate binary searches - one for first occurrence, one for last occurrence.
+
+**Algorithm**:
+1. `findFirst`: When target found, continue searching left (right = mid - 1)
+2. `findLast`: When target found, continue searching right (left = mid + 1)
+3. Return [-1, -1] if target not found
+
+```go
+func searchRange(nums []int, target int) []int {
+    return []int{findFirst(nums, target), findLast(nums, target)}
+}
+
+func findFirst(nums []int, target int) int {
+    res, left, right := -1, 0, len(nums)-1
+    for left <= right {
+        mid := left + (right-left)/2
+        if nums[mid] == target {
+            res = mid
+            right = mid - 1 // Continue searching left
+        } else if nums[mid] < target {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+    return res
+}
+
+func findLast(nums []int, target int) int {
+    res, left, right := -1, 0, len(nums)-1
+    for left <= right {
+        mid := left + (right-left)/2
+        if nums[mid] == target {
+            res = mid
+            left = mid + 1 // Continue searching right
+        } else if nums[mid] < target {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+    return res
+}
+```
+
+**Time Complexity**: O(log n) - two binary searches  
+**Space Complexity**: O(1)  
+**Example**: `[5,7,7,8,8,10], target=8` → return `[3,4]`
+
+---
+
+### 3. Search a 2D Matrix (LeetCode 74)
+
+**Problem**: Search for a target in an m×n matrix where each row is sorted and the first element of each row is greater than the last element of the previous row.
+
+**Key Insight**: Treat the 2D matrix as a 1D sorted array. Use index mapping: `matrix[mid/n][mid%n]`.
+
+**Algorithm**:
+1. Convert 2D coordinates to 1D: `index = row * n + col`
+2. Convert 1D back to 2D: `row = index / n, col = index % n`
+3. Apply standard binary search on virtual 1D array
+
+```go
+func searchMatrix(matrix [][]int, target int) bool {
+    if len(matrix) == 0 || len(matrix[0]) == 0 {
+        return false
+    }
+    m, n := len(matrix), len(matrix[0])
+    left, right := 0, m*n-1
+    for left <= right {
+        mid := left + (right-left)/2
+        val := matrix[mid/n][mid%n]
+        if val == target {
+            return true
+        } else if val < target {
+            left = mid + 1
+        } else {
+            right = mid - 1
+        }
+    }
+    return false // Target not found
+}
+```
+
+**Time Complexity**: O(log(m×n))  
+**Space Complexity**: O(1)  
+**Example**: `[[1,4,7],[2,5,8],[3,6,9]], target=5` → return `true`
+
+---
+
+## 🔴 Hard Problems
+
+These problems require advanced techniques and deep understanding of binary search principles.
+
+### 1. Median of Two Sorted Arrays (LeetCode 4)
+
+**Problem**: Find the median of two sorted arrays in O(log(min(m,n))) time.
+
+**Key Insight**: Use binary search to partition both arrays such that all elements on the left are ≤ all elements on the right.
+
+**Algorithm**:
+1. Ensure nums1 is smaller array for optimization
+2. Binary search on nums1 to find correct partition
+3. Partition condition: `nums1[i-1] ≤ nums2[j]` and `nums2[j-1] ≤ nums1[i]`
+4. Calculate median from max(left) and min(right)
+
+```go
+func findMedianSortedArrays(nums1 []int, nums2 []int) float64 {
+    if len(nums1) > len(nums2) {
+        return findMedianSortedArrays(nums2, nums1)
+    }
+    m, n := len(nums1), len(nums2)
+    imin, imax, halfLen := 0, m, (m+n+1)/2
+    for imin <= imax {
+        i := (imin + imax) / 2
+        j := halfLen - i
+        if i < m && nums2[j-1] > nums1[i] {
+            imin = i + 1
+        } else if i > 0 && nums1[i-1] > nums2[j] {
+            imax = i - 1
+        } else {
+            var maxLeft int
+            if i == 0 {
+                maxLeft = nums2[j-1]
+            } else if j == 0 {
+                maxLeft = nums1[i-1]
+            } else if nums1[i-1] > nums2[j-1] {
+                maxLeft = nums1[i-1]
+            } else {
+                maxLeft = nums2[j-1]
+            }
+            if (m+n)%2 == 1 {
+                return float64(maxLeft)
+            }
+            var minRight int
+            if i == m {
+                minRight = nums2[j]
+            } else if j == n {
+                minRight = nums1[i]
+            } else if nums1[i] < nums2[j] {
+                minRight = nums1[i]
+            } else {
+                minRight = nums2[j]
+            }
+            return float64(maxLeft+minRight) / 2.0
+        }
+    }
+    return 0.0
+}
+```
+
+**Time Complexity**: O(log(min(m,n)))  
+**Space Complexity**: O(1)  
+**Example**: `[1,3], [2]` → return `2.0` (median of [1,2,3])
+
+---
+
+### 2. Find Minimum in Rotated Sorted Array II (LeetCode 154)
+
+**Problem**: Find the minimum element in a rotated sorted array that may contain duplicates.
+
+**Key Insight**: Handle duplicates by shrinking search space when `nums[mid] == nums[right]`. This is the key difference from version I.
+
+**Algorithm**:
+1. If `nums[mid] > nums[right]`: minimum is in right half
+2. If `nums[mid] < nums[right]`: minimum is in left half (including mid)
+3. If `nums[mid] == nums[right]`: can't determine, shrink right boundary
+
+```go
+func findMin(nums []int) int {
+    left, right := 0, len(nums)-1
+    for left < right {
+        mid := left + (right-left)/2
+        if nums[mid] > nums[right] {
+            left = mid + 1
+        } else if nums[mid] < nums[right] {
+            right = mid
+        } else {
+            right-- // Handle duplicates
+        }
+    }
+    return nums[left] // Minimum element
+}
+```
+
+**Time Complexity**: O(log n) average, O(n) worst case (all duplicates)  
+**Space Complexity**: O(1)  
+**Example**: `[2,2,2,0,1]` → return `0`
+
+---
+
+### 3. Search in Rotated Sorted Array II (LeetCode 81)
+
+**Problem**: Search for a target in a rotated sorted array that may contain duplicates.
+
+**Key Insight**: Handle the case where `nums[left] == nums[mid] == nums[right]` by shrinking both boundaries, as we can't determine which half is sorted.
+
+**Algorithm**:
+1. Handle duplicates: if all three equal, shrink both boundaries
+2. Determine sorted half (similar to version I)
+3. Check if target is in the sorted half's range
+4. Search appropriate half
+
+```go
+func search(nums []int, target int) bool {
+    left, right := 0, len(nums)-1
+    for left <= right {
+        mid := left + (right-left)/2
+        if nums[mid] == target {
+            return true
+        }
+        if nums[left] == nums[mid] && nums[mid] == nums[right] {
+            left++
+            right--
+        } else if nums[left] <= nums[mid] {
+            if nums[left] <= target && target < nums[mid] {
+                right = mid - 1
+            } else {
+                left = mid + 1
+            }
+        } else {
+            if nums[mid] < target && target <= nums[right] {
+                left = mid + 1
+            } else {
+                right = mid - 1
+            }
+        }
+    }
+    return false // Target not found
+}
+```
+
+**Time Complexity**: O(log n) average, O(n) worst case (all duplicates)  
+**Space Complexity**: O(1)  
+**Example**: `[2,5,6,0,0,1,2], target=0` → return `true`
+
+---
+
+## 📚 Summary
+
+These 9 problems cover the essential patterns in searching algorithms:
+
+**Key Patterns Learned**:
+1. **Standard Binary Search** - Search Insert Position, Square Root
+2. **Find Boundary** - First Bad Version, Find First/Last Position
+3. **Modified Arrays** - Rotated arrays, 2D matrix
+4. **Advanced Techniques** - Partitioning, duplicate handling
+
+**Interview Tips**:
+- Always clarify array properties (sorted, duplicates, etc.)
+- Handle edge cases (empty arrays, single elements)
+- Watch for integer overflow in mid calculation
+- Practice drawing the search space and elimination process
+
+**Time Complexity Summary**:
+- Most problems: O(log n)
+- With duplicates: O(n) worst case
+- 2D matrix: O(log(m×n))
+- Median of two arrays: O(log(min(m,n)))
+
+Master these patterns and you'll be well-prepared for any searching algorithm interview question! 🚀

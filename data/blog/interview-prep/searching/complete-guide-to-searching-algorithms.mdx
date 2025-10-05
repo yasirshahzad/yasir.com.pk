@@ -11,8 +11,6 @@ summary: Master all essential searching algorithms with detailed explanations, i
 
 <TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
 
-# Complete Guide to Searching Algorithms
-
 Searching algorithms are fundamental to computer science and essential for technical interviews. This comprehensive guide covers all major searching techniques with detailed explanations, implementations, and analysis.
 
 ## Overview of Searching Algorithms
@@ -199,7 +197,12 @@ func FindFirstOccurrence(arr []int, target int) int {
     return result
 }
 
-// FindLastOccurrence finds the last occurrence of target
+
+// Dry run for arr = [2, 4, 4, 4, 5, 6], target = 4
+// Step 1: low=0, high=5, mid=2, arr[2]=4 == 4 → result=2, low=3
+// Step 2: low=3, high=5, mid=4, arr[4]=5 > 4 → high=3
+// Step 3: low=3, high=3, mid=3, arr[3]=4 == 4 → result=3, low=4
+// End: low=4, high=3, loop ends, return result=3 (last occurrence)
 func FindLastOccurrence(arr []int, target int) int {
     result := -1
     low, high := 0, len(arr)-1
@@ -383,32 +386,32 @@ import (
 // JumpSearch - Jump Search Implementation
 func JumpSearch(arr []int, target int) int {
     n := len(arr)
-    jumpSize := int(math.Sqrt(float64(n)))
-    prev := 0
     
-    // Jump ahead to find the block
-    for arr[min(jumpSize, n)-1] < target {
-        prev = jumpSize
-        jumpSize += int(math.Sqrt(float64(n)))
-        if prev >= n {
-            return -1 // Element not present
+    if n == 0 {
+        return -1
+    }
+
+    blockSize := int(math.Sqrt(float64(n)))
+    start := 0
+    next := blockSize
+
+    // Find the block where target may be present
+    for start < n && arr[min(next, n)-1] < target {
+        start = next
+        next += blockSize
+        if start >= n {
+            return -1
+        }
+    }
+
+    // Linear search in the found block
+    for i := start; i < min(next, n); i++ {
+        if arr[i] == target {
+            return i
         }
     }
     
-    // Linear search in the identified block
-    for arr[prev] < target {
-        prev++
-        if prev == min(jumpSize, n) {
-            return -1 // Element not present
-        }
-    }
-    
-    // Check if element is found
-    if arr[prev] == target {
-        return prev
-    }
-    
-    return -1 // Element not present
+    return -1
 }
 
 func min(a, b int) int {
@@ -423,41 +426,6 @@ func main() {
     arr := []int{0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610}
     result := JumpSearch(arr, 55)
     fmt.Printf("Element found at index: %d\n", result) // Output: 10
-}
-```
-
-### **Optimal Jump Size Analysis**
-```go
-// Why √n is optimal?
-// Let jump size = m
-// Time complexity = O(n/m) + O(m)
-// To minimize: d/dm(n/m + m) = 0
-// This gives m = √n
-
-// JumpSearchWithCustomStep - Jump Search with custom step size
-func JumpSearchWithCustomStep(arr []int, target, stepSize int) int {
-    n := len(arr)
-    prev := 0
-    
-    for arr[min(stepSize, n)-1] < target {
-        prev = stepSize
-        stepSize += stepSize
-        if prev >= n {
-            return -1
-        }
-    }
-    
-    for arr[prev] < target {
-        prev++
-        if prev == min(stepSize, n) {
-            return -1
-        }
-    }
-    
-    if arr[prev] == target {
-        return prev
-    }
-    return -1
 }
 ```
 
@@ -594,15 +562,6 @@ func main() {
 - **Time Complexity**: O(log n)
 - **Space Complexity**: O(1)
 
-### **Comparison with Other Algorithms**
-
-| Algorithm | Time Complexity | Space | Requirements |
-|-----------|----------------|--------|--------------|
-| Linear | O(n) | O(1) | None |
-| Binary | O(log n) | O(1) | Sorted array |
-| Ternary | O(log n) | O(1) | Sorted array |
-| Jump | O(√n) | O(1) | Sorted array |
-| Exponential | O(log n) | O(1) | Sorted array |
 
 ### **Advantages & Disadvantages**
 
@@ -634,25 +593,16 @@ func main() {
 
 ## 📊 Algorithm Comparison Summary
 
-### **Performance Comparison**
-
-| Algorithm | Best Case | Average Case | Worst Case | Space | Sorted Required |
-|-----------|-----------|--------------|------------|-------|-----------------|
-| **Linear** | O(1) | O(n) | O(n) | O(1) | No |
-| **Binary** | O(1) | O(log n) | O(log n) | O(1) | Yes |
-| **Ternary** | O(1) | O(log n) | O(log n) | O(1) | Yes |
-| **Jump** | O(1) | O(√n) | O(√n) | O(1) | Yes |
-| **Exponential** | O(1) | O(log n) | O(log n) | O(1) | Yes |
 
 ### **Detailed Use Case Comparison**
 
 | Algorithm | Ideal Use Cases | Avoid When | Real-World Examples |
 |-----------|----------------|------------|--------------------|
-| **Linear Search** | • Unsorted data<br/>• Small arrays (< 100 elements)<br/>• One-time searches<br/>• Memory-constrained systems<br/>• Simple implementation needed | • Large datasets<br/>• Frequent searches<br/>• Already sorted data<br/>• Performance critical apps | • Config file parsing<br/>• Small lookup tables<br/>• Debug/logging searches<br/>• Embedded systems |
-| **Binary Search** | • Large sorted arrays<br/>• Frequent searches<br/>• General-purpose searching<br/>• Interview problems<br/>• Database indexing | • Unsorted data<br/>• Frequent insertions/deletions<br/>• Very small datasets<br/>• Memory-sensitive applications | • Database indexes<br/>• Dictionary lookups<br/>• Library search systems<br/>• Algorithm competitions |
-| **Ternary Search** | • Academic research<br/>• Finding peaks/valleys<br/>• Unimodal functions<br/>• Theoretical analysis<br/>• Educational purposes | • General searching<br/>• Production systems<br/>• Performance-critical apps<br/>• Simple implementations | • Mathematical optimization<br/>• Signal processing<br/>• Research algorithms<br/>• Academic exercises |
-| **Jump Search** | • Large sorted arrays<br/>• Cache-sensitive systems<br/>• Block-based storage<br/>• Limited random access<br/>• Hybrid approaches | • Small datasets<br/>• Frequent searches<br/>• Unbounded arrays<br/>• Simple requirements | • File system searches<br/>• Disk-based databases<br/>• Memory hierarchies<br/>• Embedded databases |
-| **Exponential Search** | • Unbounded/infinite arrays<br/>• Unknown array sizes<br/>• Network/distributed systems<br/>• Stream processing<br/>• Dynamic data structures | • Known small arrays<br/>• Memory-constrained systems<br/>• Simple implementations<br/>• Static datasets | • Network routing<br/>• Stream processing<br/>• Dynamic arrays<br/>• Distributed systems |
+| **Linear Search** | Unsorted, small data; simple code | Large or sorted data | Config files, small lookups |
+| **Binary Search** | Large, sorted data; frequent search | Unsorted or tiny data | Database indexes, dictionaries |
+| **Ternary Search** | Unimodal/peak finding; research | General search tasks | Math optimization, research |
+| **Jump Search** | Large, sorted, cache-sensitive data | Small or unsorted data | File systems, embedded DBs |
+| **Exponential Search** | Unbounded/unknown size, sorted | Small, known-size data | Streams, network routing |
 
 ### **Decision Matrix by Scenario**
 
@@ -667,61 +617,8 @@ func main() {
 | **Log File Analysis** | Large (1M+) | Partially | Low | Linear Search | Data not fully sorted |
 | **Scientific Computing** | Large (100K+) | Yes | Research | Ternary Search | Academic/research context |
 
-### **Performance vs Use Case Matrix**
 
-```
-Data Size →
-           Small    Medium    Large     Very Large
-          (< 100)   (100-10K) (10K-1M)   (1M+)
-Sorted ↓
-No      │ Linear   Linear    Linear     Linear
-        │          (sort?)   (sort?)    (sort?)
-Yes     │ Linear   Binary    Binary     Binary
-        │ Binary   Jump      Jump       Exponential
-        │          Ternary   Exponential (unbounded)
-```
 
-### **When to Use Each Algorithm**
-
-```go
-package main
-
-import "fmt"
-
-// ChooseSearchAlgorithm helps select the right search algorithm
-func ChooseSearchAlgorithm(dataSize int, isSorted bool, searchFreq, dataType string) string {
-    if !isSorted {
-        return "Linear Search - Only option for unsorted data"
-    }
-    
-    if dataSize < 100 {
-        return "Linear Search - Simple and efficient for small data"
-    }
-    
-    if searchFreq == "frequent" && dataSize > 1000 {
-        return "Binary Search - Best for frequent searches on large sorted data"
-    }
-    
-    if dataType == "unbounded" || dataType == "infinite" {
-        return "Exponential Search - Designed for unbounded arrays"
-    }
-    
-    if dataType == "cache_sensitive" {
-        return "Jump Search - Better cache performance"
-    }
-    
-    return "Binary Search - General purpose best choice"
-}
-
-// Example usage
-func main() {
-    recommendation := ChooseSearchAlgorithm(10000, true, "frequent", "normal")
-    fmt.Println(recommendation)
-    // Output: Binary Search - Best for frequent searches on large sorted data
-}
-```
-
----
 
 ## 🎯 Interview Preparation Tips
 
@@ -798,15 +695,6 @@ func FindLast(arr []int, target int) int {
 }
 ```
 
-### **Memory Aids**
-
-**🧠 Remember the "BLEEP" Framework:**
-- **B**inary - O(log n), requires sorted array
-- **L**inear - O(n), works on any array
-- **E**xponential - O(log n), great for unbounded arrays
-- **E**xponential doubling pattern: 1, 2, 4, 8, 16...
-- **P**erformance order: Binary = Exponential > Jump > Linear
-
 ### **Quick Decision Tree**
 ```
 Is array sorted?
@@ -860,4 +748,17 @@ Is array sorted?
 1. Median of two sorted arrays
 2. Find minimum in rotated sorted array II
 3. Search in rotated sorted array II
+
+---
+
+## Dry Run: FindFirstOccurrence
+
+| Step | low | high | mid | arr[mid] | result | Action |
+|------|-----|------|-----|----------|--------|--------|
+| 1    | 0   | 5    | 2   | 4        | 2      | Found target, move left (high=1) |
+| 2    | 0   | 1    | 0   | 2        | 2      | arr[mid]<target, move right (low=1) |
+| 3    | 1   | 1    | 1   | 4        | 1      | Found target, move left (high=0) |
+| End  | 1   | 0    | -   | -        | 1      | Loop ends, return result |
+
+**Result:** First occurrence of 4 is at index 1.
 
