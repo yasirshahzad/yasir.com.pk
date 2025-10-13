@@ -1,0 +1,425 @@
+---
+title: Master Arrays and Slices in Go - From TypeScript to Go
+date: '2025-10-13'
+tags: ['golang', 'arrays', 'slices', 'programming', 'typescript', 'data-structures']
+draft: false
+layout: PostSimple
+authors: ['default']
+images: []
+summary: Master Go arrays and slices for TypeScript developers. Learn key differences, when to use each, and all essential operations from basic to advanced with practical examples.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# Master Arrays and Slices in Go (TypeScript Developer's Guide)
+
+Coming from TypeScript, Go's arrays and slices might feel different. This guide will help you master both from basic to advanced operations, with clear comparisons to TypeScript patterns you already know.
+
+## TypeScript vs Go: Quick Comparison
+
+| Feature | TypeScript Array | Go Array | Go Slice |
+|---------|------------------|----------|----------|
+| **Size** | Dynamic | Fixed at compile time | Dynamic |
+| **Type** | Reference | Value (copied) | Reference |
+| **Memory** | Heap | Stack | Heap |
+| **Use Case** | General purpose | Rare, specific sizes | **General purpose** |
+
+**Bottom line:** Use **slices** 99% of the time. They're Go's equivalent to TypeScript arrays.
+
+## Arrays in Go (Rarely Used)
+
+Arrays are fixed-size and value types:
+
+```go
+// TypeScript: const arr = [1, 2, 3]; (always dynamic)
+// Go Array: [3]int{1, 2, 3} (fixed size of 3)
+
+var arr1 [5]int                    // [0 0 0 0 0] - must specify size
+arr2 := [3]int{1, 2, 3}           // [1 2 3]
+arr3 := [...]int{10, 20, 30}      // Size inferred from values
+
+// Arrays are COPIED when passed to functions (unlike TS)
+func processArray(arr [3]int) {
+    arr[0] = 999 // Won't affect original!
+}
+```
+
+**When to use arrays:**
+- Fixed coordinates: `[2]float64{x, y}`
+- Performance-critical stack allocation
+- C interop
+
+## Slices in Go (Use These!)
+
+Slices are dynamic like TypeScript arrays:
+
+```go
+// TypeScript: const nums = [1, 2, 3];
+// Go: nums := []int{1, 2, 3}
+
+// Declaration methods
+var slice1 []int                   // nil slice (like undefined)
+slice2 := []int{1, 2, 3}          // Literal initialization
+slice3 := make([]int, 3)          // [0 0 0] - length 3
+slice4 := make([]int, 3, 5)       // Length 3, capacity 5
+
+// Properties
+len(slice2)    // 3 (like arr.length in TS)
+cap(slice4)    // 5 (capacity - unique to Go)
+```
+
+## Basic Operations (TS vs Go)
+
+### Creating and Initializing
+
+```go
+// TypeScript
+const numbers = [1, 2, 3, 4, 5];
+const empty = [];
+const zeros = new Array(5).fill(0);
+
+// Go
+numbers := []int{1, 2, 3, 4, 5}
+var empty []int
+zeros := make([]int, 5)  // [0 0 0 0 0]
+```
+
+### Access and Modify
+
+```go
+// Both TS and Go use same syntax
+slice := []int{10, 20, 30}
+fmt.Println(slice[0])    // 10
+slice[1] = 99            // Modify
+fmt.Println(slice)       // [10 99 30]
+```
+
+### Length and Capacity
+
+```go
+// TypeScript: only length
+arr.length
+
+// Go: length AND capacity
+slice := make([]int, 3, 5)
+len(slice)    // 3 (current elements)
+cap(slice)    // 5 (total space allocated)
+```
+
+## Essential Slice Operations
+
+### 1. Adding Elements (Like TS push, unshift)
+
+```go
+slice := []int{1, 2, 3}
+
+// TypeScript: arr.push(4, 5)
+// Go: append (returns new slice!)
+slice = append(slice, 4, 5)        // [1 2 3 4 5]
+
+// TypeScript: arr.unshift(0)
+// Go: prepend
+slice = append([]int{0}, slice...)  // [0 1 2 3 4 5]
+
+// Add multiple at start
+slice = append([]int{-2, -1}, slice...)  // [-2 -1 0 1 2 3 4 5]
+```
+
+### 2. Removing Elements
+
+```go
+slice := []int{1, 2, 3, 4, 5}
+
+// Remove first element (like TS shift)
+slice = slice[1:]                   // [2 3 4 5]
+
+// Remove last element (like TS pop)
+slice = slice[:len(slice)-1]        // [2 3 4]
+
+// Remove at specific index
+index := 1
+slice = append(slice[:index], slice[index+1:]...)  // [2 4]
+```
+
+### 3. Slicing (Like TS slice)
+
+```go
+// TypeScript: arr.slice(start, end)
+// Go: slice[start:end]
+
+slice := []int{0, 1, 2, 3, 4, 5}
+
+slice[1:4]      // [1 2 3] (like arr.slice(1, 4))
+slice[:3]       // [0 1 2] (like arr.slice(0, 3))
+slice[2:]       // [2 3 4 5] (like arr.slice(2))
+slice[:]        // [0 1 2 3 4 5] (copy all)
+```
+
+## TypeScript Methods in Go
+
+### 1. find() and findIndex()
+
+```go
+// TypeScript: arr.find(x => x > 3)
+func find(slice []int, predicate func(int) bool) (int, bool) {
+    for _, v := range slice {
+        if predicate(v) {
+            return v, true
+        }
+    }
+    return 0, false
+}
+
+// TypeScript: arr.findIndex(x => x > 3)
+func findIndex(slice []int, predicate func(int) bool) int {
+    for i, v := range slice {
+        if predicate(v) {
+            return i
+        }
+    }
+    return -1
+}
+
+// Usage
+numbers := []int{1, 2, 3, 4, 5}
+value, found := find(numbers, func(x int) bool { return x > 3 })  // 4, true
+index := findIndex(numbers, func(x int) bool { return x > 3 })    // 3
+```
+
+### 2. map()
+
+```go
+// TypeScript: arr.map(x => x * 2)
+func mapInt(slice []int, fn func(int) int) []int {
+    result := make([]int, len(slice))
+    for i, v := range slice {
+        result[i] = fn(v)
+    }
+    return result
+}
+
+// Usage
+numbers := []int{1, 2, 3, 4, 5}
+doubled := mapInt(numbers, func(x int) int { return x * 2 })  // [2 4 6 8 10]
+```
+
+### 3. filter()
+
+```go
+// TypeScript: arr.filter(x => x > 3)
+func filter(slice []int, predicate func(int) bool) []int {
+    var result []int
+    for _, v := range slice {
+        if predicate(v) {
+            result = append(result, v)
+        }
+    }
+    return result
+}
+
+// Usage
+numbers := []int{1, 2, 3, 4, 5}
+filtered := filter(numbers, func(x int) bool { return x > 3 })  // [4 5]
+```
+
+### 4. reduce()
+
+```go
+// TypeScript: arr.reduce((acc, x) => acc + x, 0)
+func reduce(slice []int, fn func(int, int) int, initial int) int {
+    result := initial
+    for _, v := range slice {
+        result = fn(result, v)
+    }
+    return result
+}
+
+// Usage
+numbers := []int{1, 2, 3, 4, 5}
+sum := reduce(numbers, func(acc, x int) int { return acc + x }, 0)  // 15
+```
+
+### 5. includes() and indexOf()
+
+```go
+// TypeScript: arr.includes(3)
+func includes(slice []int, target int) bool {
+    for _, v := range slice {
+        if v == target {
+            return true
+        }
+    }
+    return false
+}
+
+// TypeScript: arr.indexOf(3)
+func indexOf(slice []int, target int) int {
+    for i, v := range slice {
+        if v == target {
+            return i
+        }
+    }
+    return -1
+}
+```
+
+## Advanced Operations
+
+### 1. Sorting
+
+```go
+import "sort"
+
+// TypeScript: arr.sort((a, b) => a - b)
+// Go: sort package
+numbers := []int{3, 1, 4, 1, 5}
+sort.Ints(numbers)           // [1 1 3 4 5]
+
+// Custom sort
+sort.Slice(numbers, func(i, j int) bool {
+    return numbers[i] > numbers[j]  // Descending
+})
+```
+
+### 2. Reversing
+
+```go
+// TypeScript: arr.reverse()
+// Go: manual reversal
+func reverse(slice []int) {
+    for i, j := 0, len(slice)-1; i < j; i, j = i+1, j-1 {
+        slice[i], slice[j] = slice[j], slice[i]
+    }
+}
+```
+
+### 3. Joining
+
+```go
+import "strings"
+import "strconv"
+
+// TypeScript: arr.join(", ")
+// Go: convert to strings first
+func joinInts(slice []int, sep string) string {
+    strs := make([]string, len(slice))
+    for i, v := range slice {
+        strs[i] = strconv.Itoa(v)
+    }
+    return strings.Join(strs, sep)
+}
+
+// Usage
+numbers := []int{1, 2, 3}
+result := joinInts(numbers, ", ")  // "1, 2, 3"
+```
+
+### 4. Chunking
+
+```go
+// Split slice into chunks
+func chunk(slice []int, size int) [][]int {
+    var chunks [][]int
+    for i := 0; i < len(slice); i += size {
+        end := i + size
+        if end > len(slice) {
+            end = len(slice)
+        }
+        chunks = append(chunks, slice[i:end])
+    }
+    return chunks
+}
+
+// Usage
+numbers := []int{1, 2, 3, 4, 5, 6, 7}
+chunks := chunk(numbers, 3)  // [[1 2 3] [4 5 6] [7]]
+```
+
+## Performance Tips
+
+### 1. Pre-allocate Capacity
+
+```go
+// Inefficient: frequent reallocations
+var result []int
+for i := 0; i < 1000; i++ {
+    result = append(result, i)
+}
+
+// Efficient: pre-allocate
+result := make([]int, 0, 1000)  // length 0, capacity 1000
+for i := 0; i < 1000; i++ {
+    result = append(result, i)
+}
+```
+
+### 2. Copy vs Slice Reference
+
+```go
+original := []int{1, 2, 3, 4, 5}
+
+// This shares underlying array (like TS)
+subset := original[1:3]  // [2 3]
+subset[0] = 999         // Changes original!
+
+// Make independent copy
+subset := make([]int, 2)
+copy(subset, original[1:3])  // Safe copy
+subset[0] = 999             // Won't affect original
+```
+
+## Common Patterns for TS Developers
+
+### 1. Array Destructuring Alternative
+
+```go
+// TypeScript: const [first, ...rest] = arr;
+// Go: manual extraction
+slice := []int{1, 2, 3, 4, 5}
+first := slice[0]
+rest := slice[1:]
+```
+
+### 2. Spread Operator Alternative
+
+```go
+// TypeScript: [...arr1, ...arr2]
+// Go: append
+arr1 := []int{1, 2, 3}
+arr2 := []int{4, 5, 6}
+combined := append(append([]int(nil), arr1...), arr2...)  // [1 2 3 4 5 6]
+```
+
+### 3. Array.from() Alternative
+
+```go
+// TypeScript: Array.from({length: 5}, (_, i) => i)
+// Go: make + loop
+func makeRange(n int) []int {
+    result := make([]int, n)
+    for i := range result {
+        result[i] = i
+    }
+    return result
+}
+```
+
+## Key Differences to Remember
+
+1. **append() returns new slice** - always assign back: `slice = append(slice, item)`
+2. **Slices share underlying arrays** - use `copy()` for independence
+3. **No built-in methods** - implement or use helper functions
+4. **Zero values**: `nil` for slices, zero-filled for arrays
+5. **Capacity management** - understand `len()` vs `cap()`
+
+## Summary
+
+**For TypeScript developers learning Go:**
+
+- **Use slices**, not arrays (99% of cases)
+- **Always assign append results**: `slice = append(slice, item)`
+- **Implement TS array methods** as helper functions
+- **Pre-allocate capacity** for performance
+- **Use copy()** to avoid reference issues
+
+With these patterns, you'll handle slices in Go just as effectively as arrays in TypeScript!
