@@ -1,0 +1,243 @@
+---
+title: "Key Characteristics of Distributed Systems - FAANG Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "distributed-systems"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master the five key characteristics of distributed systems — scalability, reliability, availability, efficiency, and manageability — with FAANG-level interview scripts, cheat sheets, and trade-off insights.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# 🔷 Key Characteristics of Distributed Systems
+
+## 🧠 Big Picture
+
+> "These are the qualities that decide whether your system survives real-world scale."
+
+---
+
+# 🟢 1. Scalability = "Can system grow?"
+
+### Simple
+
+👉 Handle more users/data without breaking
+
+### Types
+
+#### Horizontal (BEST 🔥)
+
+* Add more machines
+* Example: adding more servers to handle traffic
+
+#### Vertical
+
+* Increase power of one machine (CPU/RAM)
+* Limited + expensive
+
+### Key Insight
+
+> "Real systems scale horizontally"
+
+---
+
+## 🔵 2. Reliability = "Does it work correctly over time?"
+
+### Simple
+
+👉 No data loss, correct results
+
+### Example
+
+* Add to cart → should NEVER disappear
+
+### How achieved
+
+* Replication
+* Redundancy
+
+### Key Insight
+
+> "System can fail internally, but user should not feel it"
+
+---
+
+## ⚡ Fault Tolerance (Closely Related)
+
+### Simple
+
+👉 System continues EVEN IF parts fail
+
+### Example
+
+* One server crashes → another takes over
+
+### 🔥 Difference (Important)
+
+* Reliability → correct results over time
+* Fault tolerance → survives failures
+
+---
+
+## 🟡 3. Availability = "Is system UP?"
+
+### Simple
+
+👉 % of time system is working
+
+* 99.9% → ~8 hours downtime/year
+* 99.99% → ~1 hour
+
+### Example
+
+* Website loads vs doesn't load
+
+### ⚠️ Important Insight
+
+> "System can be available but still wrong"
+
+Example:
+
+* Wrong data but site is working → available ❌ reliable
+
+---
+
+## 🔴 Reliability vs Availability (SUPER IMPORTANT)
+
+| Concept      | Meaning     |
+| ------------ | ----------- |
+| Reliability  | Correctness |
+| Availability | Uptime      |
+
+### Example
+
+💳 Banking:
+
+* Must be reliable + available
+
+📱 Social media:
+
+* Availability > strict correctness
+
+---
+
+## 🟣 4. Efficiency = "How fast + how much?"
+
+### Two Metrics
+
+#### Latency
+
+👉 Time to respond
+
+* Example: API response = 100ms
+
+#### Throughput
+
+👉 Work per second
+
+* Example: 10K requests/sec
+
+### Analogy
+
+🚗 Road:
+
+* Latency → travel time
+* Throughput → cars per hour
+
+### Key Insight
+
+> "Low latency + high throughput = good system"
+
+---
+
+## 🟤 5. Manageability = "Can we operate it easily?"
+
+### Simple
+
+👉 Easy to monitor, fix, update
+
+### Example
+
+* Logs, alerts, dashboards
+* Auto-restart on failure
+
+### Analogy
+
+🏥 Hospital:
+
+* Easy diagnosis = faster treatment
+
+### Key Insight
+
+> "If you can't debug it, you can't scale it"
+
+---
+
+# ⚡ Real Interview Insight (Most Important)
+
+> "These characteristics conflict with each other → trade-offs"
+
+### Examples:
+
+* High availability → weaker consistency (CAP theorem)
+* High reliability → more cost (replication)
+* High scalability → more complexity
+
+---
+
+# 🎤 Interview Script (Memorize This)
+
+## Start
+
+> "I'll define key system characteristics like scalability, availability, and reliability."
+
+---
+
+## While explaining
+
+### Scalability
+
+> "System should scale horizontally to handle millions of users."
+
+### Reliability
+
+> "Data should remain correct even in case of failures."
+
+### Availability
+
+> "We target around 99.9% uptime."
+
+### Efficiency
+
+> "We aim for low latency and high throughput."
+
+### Manageability
+
+> "System should be easy to monitor, debug, and maintain."
+
+---
+
+## Trade-off line (VERY POWERFUL)
+
+> "We'll need to balance these properties based on system requirements."
+
+---
+
+# 🧠 Final Cheat Sheet
+
+| Property      | Meaning          | Example      |
+| ------------- | ---------------- | ------------ |
+| Scalability   | Handle growth    | Add servers  |
+| Reliability   | Correct results  | No data loss |
+| Availability  | System uptime    | 99.9% uptime |
+| Efficiency    | Fast + high load | Low latency  |
+| Manageability | Easy ops         | Monitoring   |
+
+---
+
+## 💡 Golden Line
+
+> "A good distributed system is not perfect in all aspects — it balances scalability, reliability, and availability based on use case."
+

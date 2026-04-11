@@ -1,0 +1,257 @@
+---
+title: "Things to Avoid in System Design Interviews - FAANG Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "interview-prep"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Avoid the top 10 mistakes that kill system design interviews. Includes FAANG-level fixes, scripts, and a cheat sheet for every mistake — from ignoring requirements to missing estimation.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# 🔷 Things to AVOID in System Design Interviews
+
+## 🧠 Core Truth
+
+> "Interview is NOT about perfect design — it's about HOW you think."
+
+---
+
+## ❌ 1. Ignoring Requirements
+
+### Mistake
+
+* Jumping into design without understanding problem
+
+### Fix (What to say)
+
+> "Before designing, I'd like to clarify requirements."
+
+### Example
+
+Design Uber:
+
+* ❌ Assume ride-sharing only
+* ✅ Ask → pooling? payments? real-time tracking?
+
+👉 **Insight:** Wrong assumptions = wrong system
+
+---
+
+## ❌ 2. Going Too Deep Too Early
+
+### Mistake
+
+* Starting with DB schema, APIs immediately
+
+### Fix
+
+> "I'll first define high-level architecture."
+
+### Analogy
+
+🏗️ Building house:
+
+* You don't start with wiring
+* You start with structure
+
+---
+
+## ❌ 3. Being Rigid (Big Red Flag 🚨)
+
+### Mistake
+
+* Sticking to one idea no matter what
+
+### Fix
+
+> "We can also consider an alternative approach…"
+
+### Example
+
+* You choose SQL
+* Interviewer hints scale issue
+* You should switch → NoSQL
+
+👉 **Insight:** Flexibility = senior engineer signal
+
+---
+
+## ❌ 4. Ignoring Trade-offs
+
+### Mistake
+
+* Saying "this is best" without reasoning
+
+### Fix
+
+> "This approach improves X but compromises Y."
+
+### Example
+
+* Cache → fast reads ✅
+* But → stale data ❌
+
+👉 **Golden Rule:**
+
+> "Every decision has a cost"
+
+---
+
+## ❌ 5. Ignoring Non-Functional Requirements
+
+### Mistake
+
+* Only talking about features
+
+### Fix
+
+> "Let's define scale, latency, and availability."
+
+### Example
+
+* 10 users vs 10M users → completely different design
+
+👉 **Insight:**
+
+> "Scale decides architecture"
+
+---
+
+## ❌ 6. Poor Communication
+
+### Mistake
+
+* Thinking silently / jumping steps
+
+### Fix
+
+> "Let me walk you through my thought process."
+
+### Example
+
+* Don't just draw diagram
+* Explain WHY each component exists
+
+👉 Interviewer evaluates:
+
+* clarity > correctness
+
+---
+
+## ❌ 7. Not Engaging Interviewer
+
+### Mistake
+
+* Treating it like a lecture
+
+### Fix
+
+> "Does this assumption sound reasonable?"
+
+👉 Makes it collaborative
+
+---
+
+## ❌ 8. Overconfidence / Bluffing
+
+### Mistake
+
+* Acting like you know everything
+
+### Fix
+
+> "I'm not fully sure here, but one approach could be…"
+
+👉 **This is GOOD, not bad**
+
+---
+
+## ⚡ 9. Missing Estimation (Advanced Mistake)
+
+### Mistake
+
+* Designing without numbers
+
+### Fix
+
+> "Let me estimate scale to guide design."
+
+👉 Without this:
+
+* You don't know if system will break
+
+---
+
+## ⚡ 10. No Bottleneck Thinking
+
+### Mistake
+
+* Happy path only
+
+### Fix
+
+Ask:
+
+> "What will break first?"
+
+### Example
+
+* DB overload
+* Network bottleneck
+* Cache miss storm
+
+---
+
+# 🎤 Interview Script (Memorize This)
+
+## Start
+
+> "Before jumping into design, I'll clarify requirements and define scale."
+
+---
+
+## While Designing
+
+> "I'll start with a high-level design and refine it step by step."
+
+---
+
+## Decisions
+
+> "This approach improves X but comes with trade-off Y."
+
+---
+
+## Engage
+
+> "Does this direction align with expectations?"
+
+---
+
+## If stuck
+
+> "I'll make a reasonable assumption and proceed."
+
+---
+
+# 🧠 Final Cheat Sheet
+
+| Mistake          | Fix               |
+| ---------------- | ----------------- |
+| No clarification | Ask questions     |
+| Early deep dive  | Start high-level  |
+| Rigid thinking   | Show alternatives |
+| No trade-offs    | Always justify    |
+| Ignore scale     | Define NFRs       |
+| Silent thinking  | Speak thoughts    |
+| No estimation    | Do quick math     |
+
+---
+
+## 💡 Golden Line
+
+> "A strong candidate doesn't just design — they justify, adapt, and communicate."
+

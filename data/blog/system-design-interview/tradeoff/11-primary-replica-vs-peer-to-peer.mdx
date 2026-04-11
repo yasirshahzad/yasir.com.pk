@@ -1,0 +1,269 @@
+---
+title: "Primary-Replica vs Peer-to-Peer Replication - System Design Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "interview-prep"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master Primary-Replica vs Peer-to-Peer Replication - System Design Guide for system design interviews with FAANG-level scripts and trade-off analysis.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+# ?? 1. Core Idea (1-line difference)
+
+* **Primary-Replica ? Centralized writes (one leader)**
+* **Peer-to-Peer ? Distributed writes (no leader)**
+
+?? **Script**
+
+> “Primary-Replica has one writer for consistency. Peer-to-Peer allows all nodes to write for availability and scale.”
+
+---
+
+# ?? 2. Primary–Replica (Leader-Based)
+
+## ? What it does
+
+* One **Primary (Leader)** handles all writes
+* Replicas follow and sync data
+* Reads ? replicas, Writes ? primary
+
+---
+
+## ?? Key Insight
+
+?? Prioritizes **consistency + simplicity**
+
+---
+
+## ??? Architecture Signals (Use this when)
+
+* Need **strong consistency**
+* System is **read-heavy (80–90% reads)**
+* Want **simple conflict-free design**
+* Example: **databases, banking, user systems**
+
+---
+
+## ? Problems
+
+* **Single point of failure (primary)**
+* **Replication lag ? stale reads**
+* Write scaling is limited
+
+---
+
+## ?? FAANG Q&A
+
+**Q1: How to fix primary failure?**
+?? Leader election (e.g., failover using ZooKeeper/Raft)
+
+**Q2: Sync vs Async replication?**
+
+* Sync ? strong consistency, slower
+* Async ? faster, eventual consistency
+
+**Q3: Bottleneck?**
+?? Writes (only one node)
+
+---
+
+## ?? Script
+
+> “I use primary-replica when I need strong consistency and predictable behavior. Writes go to a single leader, and replicas scale reads.”
+
+---
+
+# ?? 3. Peer-to-Peer (Leaderless / Multi-Leader)
+
+## ? What it does
+
+* All nodes can **read + write**
+* Data replicated across peers
+* No central authority
+
+---
+
+## ?? Key Insight
+
+?? Prioritizes **availability + scalability**
+
+---
+
+## ??? Architecture Signals (Use this when)
+
+* Need **high availability (no downtime)**
+* **Global systems (multi-region writes)**
+* Massive scale (billions of users)
+* Can tolerate **eventual consistency**
+
+---
+
+## ? Problems
+
+* **Conflict resolution required**
+* Complex (versioning, vector clocks)
+* Hard to debug
+
+---
+
+## ?? FAANG Q&A
+
+**Q1: What happens on write conflict?**
+?? Use:
+
+* Last Write Wins (LWW)
+* Vector clocks
+* CRDTs
+
+**Q2: Why used in Cassandra/Dynamo?**
+?? No single failure point + global scale.
+
+**Q3: Tradeoff?**
+?? Data may be temporarily inconsistent.
+
+---
+
+## ?? Script
+
+> “I use peer-to-peer when I need high availability and global scalability. Multiple nodes can accept writes, and conflicts are resolved asynchronously.”
+
+---
+
+# ?? 4. Key Differences (Interview Table)
+
+| Aspect            | Primary-Replica | Peer-to-Peer  |
+| ----------------- | --------------- | ------------- |
+| Writes            | One node        | All nodes     |
+| Reads             | Replicas        | Any node      |
+| Architecture      | Centralized     | Decentralized |
+| Consistency       | Strong          | Eventual      |
+| Availability      | Lower           | High          |
+| Complexity        | Simple          | Complex       |
+| Conflict handling | ? Not needed    | ? Required    |
+
+---
+
+## ?? Script
+
+> “Primary-replica simplifies consistency by centralizing writes, while peer-to-peer distributes writes for scalability but introduces conflicts.”
+
+---
+
+# ?? 5. Real Architecture Decision (FAANG Level)
+
+## ? Hybrid is common
+
+```text id="replication-arch"
+User DB ? Primary-Replica (strong consistency)
+Analytics / Logs ? Peer-to-Peer (high scale)
+```
+
+---
+
+## ?? Why?
+
+* Critical data ? **Primary-Replica**
+* High-scale data ? **Peer-to-Peer**
+
+---
+
+## ?? FAANG Q&A
+
+**Q: Why not use peer-to-peer everywhere?**
+?? Conflict resolution overhead + complexity.
+
+**Q: Why not only primary-replica?**
+?? Doesn’t scale writes globally.
+
+---
+
+## ?? Script
+
+> “In real systems, I combine both. Critical data uses primary-replica for consistency, while large-scale distributed systems use peer-to-peer for availability.”
+
+---
+
+# ?? 6. Strong Signals vs Weak Signals
+
+## ?? Choose Primary-Replica (Strong Signals)
+
+* “Banking / payments”
+* “Strong consistency required”
+* “Read-heavy workload”
+* “Simple system design”
+
+---
+
+## ?? Choose Peer-to-Peer (Strong Signals)
+
+* “Global users”
+* “High availability required”
+* “Multi-region writes”
+* “Eventual consistency acceptable”
+
+---
+
+## ?? Weak Signals
+
+* “Distributed system ? use peer-to-peer” ?
+* “Scaling ? always peer-to-peer” ?
+
+---
+
+# ?? 7. CAP Theorem Mapping (IMPORTANT)
+
+* **Primary-Replica ? CP (Consistency + Partition tolerance)**
+* **Peer-to-Peer ? AP (Availability + Partition tolerance)**
+
+---
+
+## ?? FAANG Q&A
+
+**Q: Why peer-to-peer is AP?**
+?? Keeps system running even during network partitions.
+
+**Q: Example issue?**
+?? Same user updates profile in two regions ? conflict.
+
+---
+
+## ?? Script
+
+> “Primary-replica favors consistency, while peer-to-peer favors availability under partition.”
+
+---
+
+# ?? 8. Extra FAANG Insights (Added)
+
+## ?? 1. Leader Election (Primary systems)
+
+* Raft / Paxos
+
+## ?? 2. Quorum Reads/Writes (Peer systems)
+
+* R + W > N ensures consistency
+
+## ?? 3. Eventual Consistency Models
+
+* Read repair
+* Anti-entropy
+
+## ?? 4. Multi-Leader (Hybrid)
+
+* Between both models (used in global DBs)
+
+---
+
+# ?? Final Ultra-Short Summary
+
+?? **Golden Line**
+
+> “Primary-Replica gives consistency through a single writer. Peer-to-Peer gives scalability by allowing everyone to write.”
+
+---
+
+If you want, I can next **connect this with SQL vs NoSQL + API Gateway decisions into one complete system design cheat sheet (FAANG-ready).**
+
+

@@ -1,0 +1,282 @@
+---
+title: "Proxy Servers - Forward vs Reverse Proxy - FAANG System Design Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "networking"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master proxy server concepts for system design interviews. Covers forward vs reverse proxy, collapsed forwarding, SSL termination, API gateways, L4 vs L7 proxies, and FAANG interview scripts.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# 🔷 Proxy Server (FAANG Level)
+
+## 🧠 1. Core Idea (Strong Opening)
+
+> "A proxy is an intermediary that sits between client and server to control, optimize, or secure requests."
+
+---
+
+## ⚡ 2. Why Proxies Exist (REAL Insight)
+
+* Hide identity (client/server)
+* Improve performance (caching)
+* Control traffic (security, filtering)
+* Enable scaling (routing, load balancing)
+
+---
+
+### Analogy
+
+📞 Receptionist:
+
+* You don't talk directly to manager
+* Receptionist routes/filters requests
+
+---
+
+# 🟢 3. Forward Proxy (Client-side Proxy)
+
+## 🧠 Definition
+
+> "Acts on behalf of the client and hides client identity from the server."
+
+---
+
+## 🔧 Flow
+
+```
+Client → Forward Proxy → Server
+```
+
+---
+
+## ✅ Use Cases
+
+* Anonymity (hide client IP)
+* Content filtering (corporate firewall)
+* Caching (reduce repeated requests)
+
+---
+
+## 🔥 Advanced Concept: Collapsed Forwarding
+
+👉 Multiple same requests → 1 backend request
+
+### Example
+
+* 100 users request same file
+  → Proxy sends 1 request → shares result
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** When would you use a forward proxy?
+**A:**
+
+> "When we want to control or anonymize outgoing client traffic, such as in enterprise networks."
+
+---
+
+# 🔵 4. Reverse Proxy (Server-side Proxy) ⭐ IMPORTANT
+
+## 🧠 Definition
+
+> "Acts on behalf of servers and hides backend infrastructure from clients."
+
+---
+
+## 🔧 Flow
+
+```
+Client → Reverse Proxy → Backend Servers
+```
+
+---
+
+## ✅ Use Cases (VERY IMPORTANT)
+
+* Load balancing
+* SSL termination
+* Caching
+* Routing (API gateway)
+
+---
+
+## 🔥 Insight
+
+> "Almost every large-scale system uses reverse proxy"
+
+Examples:
+
+* Nginx
+* AWS ELB
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** Why use reverse proxy instead of direct server access?
+**A:**
+
+> "To abstract backend, enable load balancing, improve security, and centralize control."
+
+---
+
+# ⚖️ 5. Forward vs Reverse Proxy (Clear Difference)
+
+| Feature | Forward Proxy            | Reverse Proxy           |
+| ------- | ------------------------ | ----------------------- |
+| Hides   | Client                   | Server                  |
+| Used by | Client-side              | Server-side             |
+| Purpose | Control outgoing traffic | Manage incoming traffic |
+
+---
+
+# 🚀 6. What Reverse Proxy Enables (FAANG Thinking)
+
+---
+
+## 🔥 A. Load Balancing
+
+👉 Distribute traffic across servers
+
+---
+
+## 🔥 B. Caching
+
+👉 Reduce backend load
+
+---
+
+## 🔥 C. SSL Termination
+
+👉 Proxy handles HTTPS → backend stays HTTP
+
+---
+
+## 🔥 D. Routing
+
+👉 `/api` → service A
+👉 `/images` → CDN
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** What responsibilities can a reverse proxy handle?
+**A:**
+
+> "Load balancing, caching, SSL termination, request routing, and rate limiting."
+
+---
+
+# 🚨 7. Missing but CRITICAL Concepts
+
+---
+
+## 🧠 A. API Gateway (VERY IMPORTANT)
+
+👉 Specialized reverse proxy
+
+* Auth
+* Rate limiting
+* Routing
+
+---
+
+## 🧠 B. Layer 7 vs Layer 4 Proxy
+
+### L7 (Application Layer)
+
+* Smart routing (URL, headers)
+
+### L4 (Transport Layer)
+
+* IP + port based
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** L4 vs L7 proxy?
+**A:**
+
+> "L4 routes based on network info, L7 routes based on application data like URLs."
+
+---
+
+## 🧠 C. Security
+
+* DDoS protection
+* Rate limiting
+* IP blocking
+
+---
+
+# ⚠️ 8. Trade-offs
+
+| Benefit         | Cost             |
+| --------------- | ---------------- |
+| Central control | Extra latency    |
+| Security        | Complexity       |
+| Scalability     | Additional infra |
+
+---
+
+# ⚡ 9. Real System Example (FAANG Thinking)
+
+## Example: Facebook / Netflix
+
+* Client → Reverse Proxy
+* Proxy → routes to microservices
+* Cache responses
+* Load balances traffic
+
+---
+
+# 🎤 10. FAANG Interview Script
+
+## Start
+
+> "I'll introduce a reverse proxy in front of backend servers to handle incoming traffic."
+
+---
+
+## Explain
+
+> "The proxy will handle load balancing, caching, and request routing."
+
+---
+
+## Add Depth
+
+> "It can also perform SSL termination and rate limiting."
+
+---
+
+## Contrast
+
+> "Unlike forward proxy, this hides backend servers from clients."
+
+---
+
+## Close Strong
+
+> "This improves scalability, security, and system flexibility."
+
+---
+
+# 🧠 Final One-Line (Must Memorize)
+
+> "A proxy abstracts communication between client and server to improve security, scalability, and performance."
+
+---
+
+# 💡 FAANG-Level Insight (DIFFERENTIATOR)
+
+> "Forward proxy protects clients. Reverse proxy protects and scales servers."
+

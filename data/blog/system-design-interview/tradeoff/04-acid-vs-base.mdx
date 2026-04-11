@@ -1,0 +1,300 @@
+---
+title: "ACID vs BASE - Database Trade-offs - System Design Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "interview-prep"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master ACID vs BASE - Database Trade-offs - System Design Interview Guide for system design interviews with FAANG-level scripts and trade-off analysis.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+Here’s your **FAANG-level, concise, no-miss summary** with:
+
+* ? All key points
+* ? Trade-offs
+* ? Architecture decisions
+* ? Signals (WHEN to choose)
+* ? FAANG Q&A
+* ? Memorization scripts
+
+---
+
+# ?? ACID vs BASE (Interview Mastery)
+
+---
+
+# ?? 1. Core Idea (1-liner clarity)
+
+* **ACID** ? Correctness + Reliability (strict transactions)
+* **BASE** ? Availability + Scalability (eventual correctness)
+
+---
+
+### ?? Script
+
+> “ACID ensures strict correctness of transactions, while BASE sacrifices immediate consistency for high availability and scalability.”
+
+---
+
+### ?? FAANG Q
+
+**Q:** Why do we need BASE if ACID is perfect?
+**A:** Because ACID doesn’t scale well in distributed systems ? BASE handles large-scale systems better.
+
+---
+
+# ?? 2. ACID (Strict & Reliable)
+
+### ? Properties
+
+* **Atomicity** ? All or nothing
+* **Consistency** ? Valid state always
+* **Isolation** ? No interference
+* **Durability** ? Data never lost
+
+---
+
+### ??? Architecture Decisions
+
+* Single leader / primary DB
+* Strong consistency (sync replication)
+* Transactions + locks
+* Vertical scaling (mostly)
+
+---
+
+### ?? Trade-offs
+
+* ? Hard to scale horizontally
+* ? Higher latency
+* ? Lower availability (during failures)
+* ? Strong correctness
+
+---
+
+### ?? Signals (When to use ACID)
+
+Use ACID when:
+
+* Money involved ??
+* Inventory critical
+* No data loss allowed
+* Multi-step transactions
+
+---
+
+### ?? Script
+
+> “I’ll use ACID for critical transactions like payments or bookings where correctness and atomicity are mandatory.”
+
+---
+
+### ?? FAANG Q
+
+**Q:** What happens if Atomicity fails?
+**A:** Partial data ? inconsistent state (e.g., money deducted but not credited)
+
+---
+
+### ?? Examples
+
+* MySQL
+* PostgreSQL
+
+---
+
+# ?? 3. BASE (Scalable & Available)
+
+### ? Properties
+
+* **Basically Available** ? Always responds
+* **Soft State** ? Data may change over time
+* **Eventual Consistency** ? Becomes consistent later
+
+---
+
+### ??? Architecture Decisions
+
+* Distributed systems (multi-node)
+* Async replication
+* No strict transactions
+* Conflict resolution needed
+
+---
+
+### ?? Trade-offs
+
+* ? High availability
+* ? Massive scalability
+* ? Temporary inconsistency
+* ? App-level complexity
+
+---
+
+### ?? Signals (When to use BASE)
+
+Use BASE when:
+
+* High traffic ??
+* Global system
+* Slight inconsistency acceptable
+* Read-heavy systems
+
+---
+
+### ?? Script
+
+> “I’ll use BASE for large-scale distributed systems where availability and scalability are more important than immediate consistency.”
+
+---
+
+### ?? FAANG Q
+
+**Q:** How do BASE systems handle conflicts?
+**A:**
+
+* Last-write-wins
+* Versioning
+* Application-level merge
+
+---
+
+### ?? Examples
+
+* Apache Cassandra
+* Amazon DynamoDB
+
+---
+
+# ?? 4. ACID vs BASE (Comparison Shortcut)
+
+| Factor       | ACID    | BASE         |
+| ------------ | ------- | ------------ |
+| Consistency  | Strong  | Eventual     |
+| Availability | Lower   | High         |
+| Scalability  | Limited | High         |
+| Transactions | Strict  | Relaxed      |
+| Use case     | Banking | Social media |
+
+---
+
+### ?? Script
+
+> “ACID prioritizes consistency, BASE prioritizes availability and scalability.”
+
+---
+
+# ?? 5. CAP Theorem Mapping (VERY IMPORTANT ??)
+
+* **ACID ? CP (Consistency + Partition tolerance)**
+* **BASE ? AP (Availability + Partition tolerance)**
+
+---
+
+### ?? Script
+
+> “ACID systems favor consistency over availability, while BASE systems favor availability over consistency under partition.”
+
+---
+
+# ?? 6. Architecture Decision Framework
+
+### ?? Ask these in interview:
+
+#### 1. Is data critical?
+
+* ? YES ? ACID
+
+#### 2. Can system tolerate stale data?
+
+* ? YES ? BASE
+
+#### 3. Global scale required?
+
+* ? YES ? BASE
+
+#### 4. Multi-step transactions?
+
+* ? YES ? ACID
+
+---
+
+### ?? Script
+
+> “If correctness is critical I choose ACID, otherwise I choose BASE for scalability and availability.”
+
+---
+
+# ?? 7. Real-World Mapping
+
+### ACID Systems
+
+* Banking systems
+* Payment systems
+* Booking systems
+
+---
+
+### BASE Systems
+
+* Social media feeds
+* Caching systems
+* Analytics pipelines
+
+---
+
+# ?? 8. Hybrid Approach (Senior-level ??)
+
+### Best Practice ? Use BOTH
+
+| Component            | Model |
+| -------------------- | ----- |
+| Payments             | ACID  |
+| Inventory            | ACID  |
+| Feed/Recommendations | BASE  |
+| Analytics            | BASE  |
+
+---
+
+### ?? Script
+
+> “In real systems, I use ACID for critical paths and BASE for scalable, non-critical components.”
+
+---
+
+### ?? FAANG Q
+
+**Q:** How would you design an e-commerce DB?
+**A:**
+
+* Orders/Payments ? ACID
+* Product views/recommendations ? BASE
+
+---
+
+# ?? 9. Hidden Advanced Points (Add in interview ??)
+
+* ACID = easier dev (DB handles consistency)
+* BASE = harder dev (app handles conflicts)
+* BASE enables:
+
+  * Horizontal scaling
+  * Fault tolerance
+
+---
+
+### ?? Script
+
+> “ACID simplifies correctness, BASE shifts complexity to application logic for scalability.”
+
+---
+
+# ?? ?? Perfect Closing (Use this)
+
+> “ACID ensures correctness and reliability, while BASE enables scalability and availability. The right choice depends on business requirements, and most real-world systems use a hybrid approach.”
+
+
+
+

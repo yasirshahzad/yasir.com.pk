@@ -1,0 +1,262 @@
+---
+title: "Read-Through vs Write-Through Caching - System Design Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "interview-prep"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master Read-Through vs Write-Through Caching - System Design Interview Guide for system design interviews with FAANG-level scripts and trade-off analysis.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+Here’s your **FAANG-level, short + complete + memorization-friendly summary** of
+**Strong vs Eventual Consistency** — with **architecture decisions, signals, Q&A, and scripts**.
+
+---
+
+# ? Strong vs Eventual Consistency (Interview Master Sheet)
+
+---
+
+# 1?? Core Idea (1-liner difference)
+
+* **Strong Consistency** ? *Every read sees latest write (no stale data)*
+* **Eventual Consistency** ? *Reads may be stale, but converge over time*
+
+?? **Script to say:**
+
+> “Consistency defines whether all users see the same data. Strong gives immediate correctness, eventual gives delayed correctness with better performance.”
+
+---
+
+# 2?? How They Work (Architecture Level)
+
+## ?? Strong Consistency (Architecture)
+
+**Key Design:**
+
+* Leader-based system
+* Synchronous replication
+* Writes ? Leader ? All replicas (or quorum) ? ACK
+
+**Flow:**
+
+1. Client ? Leader
+2. Leader ? Replicas (sync)
+3. Wait for quorum (e.g., W=2/3)
+4. Commit ? Respond
+
+**Used With:**
+
+* Quorum (R + W > N)
+* Consensus: Raft / Paxos
+
+?? **Script:**
+
+> “Strong consistency uses synchronous replication and quorum. Writes are committed only after multiple nodes confirm, ensuring no stale reads.”
+
+---
+
+## ?? Eventual Consistency (Architecture)
+
+**Key Design:**
+
+* Leaderless OR async leader
+* Asynchronous replication
+* Local write ? background sync
+
+**Flow:**
+
+1. Client writes to one node
+2. Immediate success
+3. Replication happens later
+
+**Extras:**
+
+* Conflict resolution (LWW, vector clocks)
+* Read repair, anti-entropy
+
+?? **Script:**
+
+> “Eventual consistency prioritizes availability by acknowledging writes early and syncing replicas asynchronously.”
+
+---
+
+# 3?? Key Trade-offs (Must Say in Interview)
+
+| Factor              | Strong             | Eventual           |
+| ------------------- | ------------------ | ------------------ |
+| Consistency         | ? Always latest    | ? Temporary stale  |
+| Latency             | ? High             | ? Low              |
+| Availability        | ? Lower            | ? High             |
+| Partition Tolerance | ? Limited          | ? Strong           |
+| Complexity          | ? Simple reasoning | ? Complex handling |
+
+?? **Script:**
+
+> “Strong consistency trades latency and availability for correctness, while eventual consistency trades correctness for availability and performance.”
+
+---
+
+# 4?? CAP Theorem Mapping (Very Important)
+
+* **Strong Consistency ? CP system**
+* **Eventual Consistency ? AP system**
+
+?? **Script:**
+
+> “Under CAP theorem, strong consistency sacrifices availability, while eventual consistency sacrifices immediate consistency.”
+
+---
+
+# 5?? Signals / Hints (Interviewer Gold ?)
+
+?? Use these to decide quickly:
+
+## ?? Choose Strong Consistency if:
+
+* Money involved ??
+* Inventory critical
+* No stale reads allowed
+* Transactions required
+* “Cannot tolerate inconsistency” mentioned
+
+?? Examples:
+
+* Banking
+* Payments
+* Booking systems
+
+?? **Script:**
+
+> “If stale data causes financial loss or correctness issues, I will use strong consistency.”
+
+---
+
+## ?? Choose Eventual Consistency if:
+
+* High scale (millions users)
+* Global system
+* Read-heavy
+* Slight delay acceptable
+* System must never go down
+
+?? Examples:
+
+* Social media feeds
+* Likes, comments
+* Analytics
+* CDN
+
+?? **Script:**
+
+> “If the system prioritizes availability and can tolerate slight staleness, I will use eventual consistency.”
+
+---
+
+# 6?? Real System Design Decisions
+
+## ?? Strong Consistency Design Choices:
+
+* Leader-follower DB
+* Synchronous replication
+* Quorum: (N=3, W=2, R=2)
+* Use:
+
+  * Google Spanner
+  * etcd
+
+---
+
+## ?? Eventual Consistency Design Choices:
+
+* Leaderless / multi-leader
+* Async replication
+* Conflict resolution
+* Use:
+
+  * Apache Cassandra
+  * Amazon DynamoDB
+
+---
+
+# 7?? Hybrid Approach (Very Important ??)
+
+?? Real FAANG systems use BOTH:
+
+Example:
+
+* Payments ? Strong
+* Product views ? Eventual
+* Notifications ? Eventual
+
+?? **Script:**
+
+> “In real systems, I use strong consistency for critical data and eventual consistency for scalable, non-critical data.”
+
+---
+
+# 8?? Common Interview Questions + Answers
+
+---
+
+## ? Q1: Why not always use strong consistency?
+
+? Answer:
+
+> “Because it increases latency and reduces availability. In global systems, waiting for all replicas is slow and fragile.”
+
+---
+
+## ? Q2: How does eventual consistency handle conflicts?
+
+? Answer:
+
+> “Using techniques like last-write-wins, vector clocks, or merging strategies.”
+
+---
+
+## ? Q3: How to reduce stale reads in eventual consistency?
+
+? Answer:
+
+* Read repair
+* Quorum reads
+* Cache invalidation
+* Versioning
+
+---
+
+## ? Q4: Can we tune consistency?
+
+? Answer:
+
+> “Yes, using quorum (R + W > N). For example, N=3, W=2, R=2 ensures strong consistency.”
+
+---
+
+## ? Q5: Give real-world analogy
+
+? Answer:
+
+* Strong ? Bank balance
+* Eventual ? Instagram likes
+
+---
+
+# 9?? Super Short Revision (30 sec)
+
+?? **Script:**
+
+> “Strong consistency ensures every read gets the latest write using synchronous replication and quorum, but increases latency and reduces availability. Eventual consistency allows temporary stale reads using asynchronous replication but improves scalability and availability. In practice, systems use a hybrid approach based on data criticality.”
+
+---
+
+# ?? Final FAANG Tip
+
+?? Always say this line:
+
+> “I will choose consistency model based on business criticality, not technology preference.”
+
+

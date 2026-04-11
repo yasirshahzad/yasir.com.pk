@@ -1,0 +1,259 @@
+---
+title: "Server-Side vs Client-Side Caching - System Design Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "interview-prep"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master Server-Side vs Client-Side Caching - System Design Interview Guide for system design interviews with FAANG-level scripts and trade-off analysis.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+# ?? 1. Core Idea (1-line difference)
+
+* **Server Cache ? Speeds up backend (shared for all users)**
+* **Client Cache ? Speeds up user experience (per user device)**
+
+?? **Script**
+
+> “Server-side caching reduces backend load, while client-side caching reduces network calls and improves user experience.”
+
+---
+
+# ?? 2. Server-Side Caching (High Signal)
+
+## ? What it does
+
+* Stores data on **server (RAM / cache layer)**
+* Serves cached response instead of recomputing
+* Types:
+
+  * DB query cache
+  * Object cache (e.g., Redis)
+  * Full page cache
+
+---
+
+## ?? Key Insight
+
+?? Optimizes **backend performance + scalability**
+
+---
+
+## ??? Architecture Signals (Use this when)
+
+* **High traffic system**
+* Expensive DB queries
+* Same data requested by many users
+* Need **central control over freshness**
+
+---
+
+## ? Problems
+
+* Cache invalidation is hard ?
+* Uses server memory
+* Cache stampede risk
+
+---
+
+## ?? FAANG Q&A
+
+**Q1: What is cache hit vs miss?**
+?? Hit ? served from cache, Miss ? fetch from DB.
+
+**Q2: How to avoid stale data?**
+?? TTL, write-through, cache invalidation.
+
+**Q3: What is cache stampede?**
+?? Many requests hit DB when cache expires.
+
+---
+
+## ?? Script
+
+> “I use server-side caching to reduce database load and improve response time for frequently accessed data shared across users.”
+
+---
+
+# ?? 3. Client-Side Caching (High Signal)
+
+## ? What it does
+
+* Stores data on **browser / mobile device**
+* Examples:
+
+  * Browser cache (JS, CSS, images)
+  * LocalStorage / IndexedDB
+  * Mobile app cache
+
+---
+
+## ?? Key Insight
+
+?? Optimizes **latency + bandwidth + offline access**
+
+---
+
+## ??? Architecture Signals (Use this when)
+
+* Static assets (JS, CSS, images)
+* Repeated user visits
+* Need **offline capability**
+* Reduce API calls
+
+---
+
+## ? Problems
+
+* Stale data risk
+* Limited storage
+* Harder to control (client-managed)
+
+---
+
+## ?? FAANG Q&A
+
+**Q1: How browser knows when to refresh?**
+?? Cache-Control headers, ETag, Last-Modified.
+
+**Q2: What is hard refresh?**
+?? Forces bypassing cache.
+
+**Q3: Risk?**
+?? User sees outdated data.
+
+---
+
+## ?? Script
+
+> “I use client-side caching to reduce latency and network usage by storing static assets and user-specific data on the device.”
+
+---
+
+# ?? 4. Key Differences (Interview Table)
+
+| Aspect      | Server-Side Cache    | Client-Side Cache  |
+| ----------- | -------------------- | ------------------ |
+| Location    | Server               | User device        |
+| Scope       | Shared (all users)   | Per user           |
+| Control     | Full control         | Limited control    |
+| Use Case    | DB queries, APIs     | Static assets      |
+| Freshness   | Easier to manage     | Risk of stale data |
+| Performance | Reduces backend load | Reduces latency    |
+
+---
+
+## ?? Script
+
+> “Server cache benefits all users and reduces backend load, while client cache improves individual user experience and reduces network calls.”
+
+---
+
+# ?? 5. Real Architecture (FAANG Level)
+
+## ? Use BOTH (Critical Insight)
+
+```text id="cache-arch"
+Client (Browser Cache)
+   ?
+CDN (Edge Cache)
+   ?
+Server Cache (Redis / Memcached)
+   ?
+Database
+```
+
+---
+
+## ?? Why?
+
+* Client cache ? **fastest (no network)**
+* CDN ? **global low latency**
+* Server cache ? **protect DB**
+
+---
+
+## ?? FAANG Q&A
+
+**Q: Why multiple cache layers?**
+?? Reduce latency at every level.
+
+**Q: Which is fastest?**
+?? Client cache (no network call).
+
+---
+
+## ?? Script
+
+> “In production, I use multi-layer caching: client cache, CDN, and server cache to optimize latency and reduce backend load.”
+
+---
+
+# ?? 6. Strong Signals vs Weak Signals
+
+## ?? Choose Server Cache (Strong Signals)
+
+* “High DB load”
+* “Expensive queries”
+* “Shared data”
+* “Scalability issue”
+
+---
+
+## ?? Choose Client Cache (Strong Signals)
+
+* “Static assets”
+* “Repeat visits”
+* “Offline support”
+* “Reduce API calls”
+
+---
+
+## ?? Weak Signals
+
+* “Use client cache for dynamic data” ?
+* “Use server cache for everything” ?
+
+---
+
+# ?? 7. FAANG-Level Insights (Added)
+
+## ?? 1. Cache Invalidation (Hardest Problem)
+
+* TTL (time-based)
+* Write-through / write-back
+* Event-based invalidation
+
+---
+
+## ?? 2. CDN (Very Important)
+
+* Global **server-side cache at edge**
+* Reduces latency worldwide
+
+---
+
+## ?? 3. Cache Patterns
+
+* Cache-aside (lazy loading) ? most common
+* Write-through
+* Write-back
+
+---
+
+## ?? 4. ETag / Versioning
+
+* Prevents stale client cache
+
+---
+
+# ?? Final Ultra-Short Summary
+
+?? **Golden Line**
+
+> “Server caching scales the backend. Client caching speeds up the user.”
+
+
+

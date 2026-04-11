@@ -1,0 +1,245 @@
+---
+title: "Checksum - Data Integrity in Distributed Systems - FAANG Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "distributed-systems"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master checksum data integrity concepts for system design interviews. Covers MD5/SHA algorithms, write/read paths, corruption detection and recovery, and real-world usage in Cassandra, HDFS, and S3.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# 🔷 1. Why Checksums?
+
+### ❗ Problem
+
+* Data can get **corrupted** during:
+
+  * Network transfer
+  * Disk/storage issues
+  * Software bugs
+
+---
+
+### ✅ Solution
+
+* Use **checksum (hash)** to verify data integrity
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why do we need checksums in distributed systems?
+**A:**
+To **detect data corruption** and avoid serving bad data
+
+---
+
+### 🧠 Script
+
+"Checksums ensure that corrupted data is detected before being served to clients."
+
+---
+
+# 🔷 2. What is a Checksum?
+
+### ✅ Definition
+
+* A **fixed-length hash** generated from data
+
+---
+
+### ✅ Common Algorithms
+
+* **MD5**
+* **SHA-1**
+* **SHA-256**
+* **SHA-512**
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** What is the role of a checksum?
+**A:**
+To create a **fingerprint of data** for integrity verification
+
+---
+
+### 🧠 Script
+
+"A checksum is a hash that uniquely represents data for integrity checks."
+
+---
+
+# 🔷 3. How It Works
+
+### ✅ Flow
+
+#### ➤ Write Path
+
+1. Data generated
+2. Compute checksum
+3. Store **data + checksum**
+
+---
+
+#### ➤ Read Path
+
+1. Fetch data
+2. Recompute checksum
+3. Compare with stored checksum
+
+---
+
+### ❗ Result
+
+* Match → ✅ valid data
+* Mismatch → ❌ corrupted
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** How does checksum detect corruption?
+**A:**
+By comparing stored hash with recomputed hash
+
+---
+
+### 🧠 Script
+
+"On read, recompute checksum and compare to detect corruption."
+
+---
+
+# 🔷 4. What Happens on Failure?
+
+### ✅ Recovery
+
+* Fetch data from **another replica**
+* Retry operation
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** What happens if checksum fails?
+**A:**
+System retries from another replica or returns error
+
+---
+
+### 🧠 Script
+
+"If checksum mismatch occurs, the system fetches data from another replica."
+
+---
+
+# 🔷 5. Properties of Good Hash Functions
+
+### ✅ Must Have
+
+* Deterministic
+* Fast computation
+* Low collision probability
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why use cryptographic hash functions?
+**A:**
+Because they minimize collisions and ensure reliable detection
+
+---
+
+### 🧠 Script
+
+"Cryptographic hashes provide reliable and low-collision integrity checks."
+
+---
+
+# 🔷 6. Limitations
+
+### ❌ Cannot fix corruption
+
+* Only detects it
+
+### ❌ Collisions (rare)
+
+* Two different inputs → same hash
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Can checksums guarantee data correctness?
+**A:**
+No, they only detect corruption (not fix it)
+
+---
+
+### 🧠 Script
+
+"Checksums detect corruption but rely on replicas for recovery."
+
+---
+
+# 🔷 7. Real-World Use Cases
+
+### ✅ Used In
+
+* Distributed storage systems
+* Databases → **Apache Cassandra**
+* File systems (HDFS, S3)
+* Network protocols
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Where are checksums commonly used?
+**A:**
+Storage systems, databases, and network communication
+
+---
+
+### 🧠 Script
+
+"Checksums are widely used to ensure data integrity in storage and transmission."
+
+---
+
+# 🔷 8. Interview Gold Points (Often Missed)
+
+### ⭐ Important
+
+* Used in **data replication pipelines**
+* Helps detect **silent data corruption**
+* Combined with **quorum + replication**
+* Lightweight vs full validation
+* Used in **chunk-level validation (e.g., files split into blocks)**
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why use checksums with replication?
+**A:**
+To detect corruption and fetch correct data from replicas
+
+---
+
+### 🧠 Script
+
+"Checksums combined with replication ensure both detection and recovery of corrupted data."
+
+---
+
+# 🚀 Final 15-sec Interview Answer
+
+"Checksums are used to ensure data integrity in distributed systems. A hash of the data is stored along with it, and during reads, the system recomputes and compares the checksum to detect corruption. If a mismatch occurs, the system retrieves data from another replica. While checksums cannot fix corruption, they are essential for detecting errors in storage and transmission."
+

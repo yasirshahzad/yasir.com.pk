@@ -1,0 +1,289 @@
+---
+title: "Leader and Follower Pattern - FAANG System Design Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "distributed-systems"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master the leader-follower replication pattern for system design interviews. Covers write coordination, sync vs async replication, follower reads, leader election with Raft/Paxos, and FAANG interview scripts.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# 🔷 1. Why Leader–Follower?
+
+### ❗ Problem with Quorum Alone
+
+* Needs **majority alive** → lower availability
+* Still can have **inconsistent reads** in edge cases
+
+---
+
+### ✅ Solution
+
+* Elect **one Leader**
+* Others = **Followers**
+
+👉 Leader = source of truth
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why is quorum not enough for consistency?
+**A:**
+Because concurrent writes or failures can still lead to **inconsistent reads**
+
+---
+
+### 🧠 Script
+
+"Quorum ensures agreement but doesn't fully solve coordination; leader-based systems centralize control."
+
+---
+
+# 🔷 2. Core Idea (Leader–Follower Model)
+
+### ✅ Roles
+
+#### 👑 Leader
+
+* Handles **all writes**
+* Replicates data to followers
+* Coordinates system
+
+#### 👥 Followers
+
+* Store replicated data
+* Serve **reads (optional)**
+* Backup for failover
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why allow only leader to handle writes?
+**A:**
+To avoid **conflicts and ensure strong consistency**
+
+---
+
+### 🧠 Script
+
+"Leader handles writes to avoid conflicts, while followers replicate data for reliability."
+
+---
+
+# 🔷 3. How It Works
+
+### ✅ Flow
+
+1. Client → Leader (write)
+2. Leader → Followers (replicate)
+3. Followers → ACK
+4. Leader → confirms success
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** When is a write considered successful?
+**A:**
+After replication to required followers (sync or async)
+
+---
+
+### 🧠 Script
+
+"Leader writes data and replicates to followers before confirming success."
+
+---
+
+# 🔷 4. Replication Types
+
+### ✅ Synchronous Replication
+
+* Wait for followers
+* ✅ Strong consistency
+* ❌ Higher latency
+
+---
+
+### ✅ Asynchronous Replication
+
+* No waiting
+* ✅ Fast
+* ❌ Possible data loss
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Sync vs Async replication trade-off?
+**A:**
+Sync = consistency, Async = performance
+
+---
+
+### 🧠 Script
+
+"Synchronous replication ensures consistency; asynchronous improves performance."
+
+---
+
+# 🔷 5. Read Strategy
+
+### ✅ Options
+
+* Read from **Leader** → strong consistency
+* Read from **Followers** → faster but may be stale
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why can follower reads be stale?
+**A:**
+Due to replication lag
+
+---
+
+### 🧠 Script
+
+"Follower reads improve performance but may return stale data due to lag."
+
+---
+
+# 🔷 6. Leader Election (Failure Handling)
+
+### ✅ What happens if Leader fails?
+
+* Followers elect new leader
+* System resumes
+
+---
+
+### ✅ Common Algorithms
+
+* **Raft**
+* **Paxos**
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** What is leader election?
+**A:**
+Process of selecting a new leader after failure
+
+---
+
+### 🧠 Script
+
+"When the leader fails, followers elect a new leader to maintain system availability."
+
+---
+
+# 🔷 7. Advantages
+
+### ✅ Benefits
+
+* Strong consistency (single writer)
+* Simpler design
+* Easier conflict resolution
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why is leader-based replication simpler?
+**A:**
+Because only one node handles writes → no conflicts
+
+---
+
+### 🧠 Script
+
+"Single-writer design simplifies consistency and conflict handling."
+
+---
+
+# 🔷 8. Challenges
+
+### ❌ Issues
+
+* Leader = **single point of failure** (until failover)
+* Write bottleneck
+* Replication lag
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** What is the biggest drawback?
+**A:**
+Leader bottleneck + failover complexity
+
+---
+
+### 🧠 Script
+
+"Leader can become a bottleneck and must be handled carefully for failures."
+
+---
+
+# 🔷 9. Real-World Systems
+
+### ✅ Examples
+
+* Databases → **PostgreSQL**
+* Distributed DB → **Apache Cassandra** (hybrid)
+* Coordination → ZooKeeper
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Where is leader-follower used?
+**A:**
+Databases, distributed systems, consensus protocols
+
+---
+
+### 🧠 Script
+
+"Leader-follower is widely used in databases and distributed coordination systems."
+
+---
+
+# 🔷 10. Interview Gold Points (Often Missed)
+
+### ⭐ Important
+
+* Works well with **quorum (W, R tuning)**
+* Used in **strong consistency systems**
+* Combine with **read replicas for scaling**
+* Write throughput limited by leader
+* Failover requires **consensus**
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** How do you scale reads in leader-based systems?
+**A:**
+By using follower replicas for read traffic
+
+---
+
+### 🧠 Script
+
+"Reads are scaled using followers while writes go through the leader."
+
+---
+
+# 🚀 Final 20-sec Interview Answer
+
+"Leader-follower replication uses a single leader to handle all writes and replicate data to followers. This ensures strong consistency by avoiding write conflicts. Followers can serve read requests for scalability but may return stale data due to replication lag. In case of leader failure, a new leader is elected using consensus algorithms like Raft. This model is widely used in distributed databases for simplicity and consistency."
+

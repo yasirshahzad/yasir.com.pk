@@ -1,0 +1,262 @@
+---
+title: "Load Balancer vs API Gateway - System Design Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "interview-prep"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master Load Balancer vs API Gateway - System Design Interview Guide for system design interviews with FAANG-level scripts and trade-off analysis.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+Here’s your **FAANG-level, concise + complete + memorization-ready summary** of
+**Load Balancer vs API Gateway** — with **architecture decisions, signals, trade-offs, Q&A, and scripts**.
+
+---
+
+# ? Load Balancer vs API Gateway (Interview Master Sheet)
+
+---
+
+# 1?? Core Idea (1-liner difference)
+
+* **Load Balancer** ? *Distributes traffic across servers*
+* **API Gateway** ? *Manages, secures, and routes APIs*
+
+?? **Script:**
+
+> “Load balancer handles traffic distribution for scalability, while API Gateway handles API management, security, and orchestration.”
+
+---
+
+# 2?? How They Work (Architecture Level)
+
+## ?? Load Balancer (Architecture)
+
+**Flow:**
+
+1. Client ? Load Balancer
+2. LB ? Chooses backend (round-robin, least connections)
+3. Server ? Response
+
+**Types:**
+
+* L4 (TCP/UDP)
+* L7 (HTTP)
+
+**Key Responsibilities:**
+
+* Traffic distribution
+* Health checks
+* Failover
+* High availability
+
+**Examples:**
+
+* NGINX
+* HAProxy
+
+?? **Script:**
+
+> “Load balancer ensures no single server is overloaded and improves availability via health checks and failover.”
+
+---
+
+## ?? API Gateway (Architecture)
+
+**Flow:**
+
+1. Client ? API Gateway
+2. Gateway:
+
+   * Authenticates
+   * Routes
+   * Aggregates
+3. Calls multiple services
+4. Returns unified response
+
+**Key Responsibilities:**
+
+* Authentication & Authorization
+* Rate limiting
+* Request/response transformation
+* API aggregation
+
+**Examples:**
+
+* Kong
+* Amazon API Gateway
+
+?? **Script:**
+
+> “API Gateway acts as a smart entry point that handles security, routing, and aggregation for microservices.”
+
+---
+
+# 3?? Key Trade-offs (Must Say)
+
+| Factor     | Load Balancer        | API Gateway             |
+| ---------- | -------------------- | ----------------------- |
+| Purpose    | Traffic distribution | API management          |
+| Complexity | ? Simple             | ? Complex               |
+| Features   | Limited              | Rich (auth, rate limit) |
+| Latency    | ? Low                | ? Slight overhead       |
+| Scope      | Infrastructure       | Application layer       |
+
+?? **Script:**
+
+> “Load balancer is lightweight and fast, while API Gateway adds intelligence but also latency and complexity.”
+
+---
+
+# 4?? Signals / Hints (Interviewer Gold ?)
+
+## ?? Choose Load Balancer if:
+
+* Scaling servers
+* High traffic distribution
+* Need high availability
+* No API logic required
+
+?? Example:
+
+* Serving web traffic
+
+?? **Script:**
+
+> “If the problem is about scaling servers and distributing traffic, I will use a load balancer.”
+
+---
+
+## ?? Choose API Gateway if:
+
+* Microservices architecture
+* Multiple backend services
+* Need auth, rate limiting
+* Need API aggregation
+
+?? Example:
+
+* Mobile app backend
+
+?? **Script:**
+
+> “If I need a unified API layer with security and orchestration, I will use an API Gateway.”
+
+---
+
+# 5?? Can We Use Both? (VERY IMPORTANT ??)
+
+## ? YES — Standard FAANG Architecture
+
+### ?? Typical Setup:
+
+```
+Client
+   ?
+Load Balancer
+   ?
+API Gateway (multiple instances)
+   ?
+Microservices
+```
+
+### Why?
+
+* LB ? Scalability + availability
+* Gateway ? Logic + security
+
+?? **Script:**
+
+> “In production, I use load balancer before API Gateway to scale gateway instances and avoid bottlenecks.”
+
+---
+
+# 6?? Advanced Architectures
+
+## ?? Pattern 1: LB ? API Gateway (Most Common)
+
+* Distribute traffic across gateway instances
+
+## ?? Pattern 2: API Gateway ? LB
+
+* Gateway routes ? internal LB ? services
+
+## ?? Pattern 3: LB ? Gateway ? LB
+
+* External LB + internal service-level LB
+
+?? **Script:**
+
+> “Large systems often use load balancers at multiple layers for both gateway scaling and service-level distribution.”
+
+---
+
+# 7?? FAANG-Level Interview Questions + Answers
+
+---
+
+## ? Q1: Why not use only API Gateway?
+
+? Answer:
+
+> “API Gateway is not optimized for traffic distribution at scale. Load balancer is needed for efficient traffic handling and failover.”
+
+---
+
+## ? Q2: Can Load Balancer do routing like API Gateway?
+
+? Answer:
+
+> “Yes at L7 level, but it lacks advanced features like authentication, rate limiting, and aggregation.”
+
+---
+
+## ? Q3: Where to place authentication?
+
+? Answer:
+
+> “At API Gateway, since it’s the centralized entry point.”
+
+---
+
+## ? Q4: What is bottleneck risk?
+
+? Answer:
+
+> “API Gateway can become a bottleneck, so we scale it behind a load balancer.”
+
+---
+
+## ? Q5: API Gateway vs Reverse Proxy?
+
+? Answer:
+
+> “API Gateway is an advanced reverse proxy with added features like security, rate limiting, and orchestration.”
+
+---
+
+# 8?? Quick Examples (Must Remember)
+
+* **Load Balancer** ? Distribute traffic across servers
+* **API Gateway** ? Handle login, route APIs, combine responses
+
+---
+
+# 9?? 30-Second Revision (Final Script)
+
+?? **Script:**
+
+> “Load balancer distributes traffic across servers to improve scalability and availability, while API Gateway provides a centralized API layer handling authentication, routing, and aggregation. In real systems, both are used together—load balancer in front of API Gateway to scale and avoid bottlenecks.”
+
+---
+
+# ?? Final FAANG Tip
+
+?? Always say:
+
+> “Load balancer solves scaling, API Gateway solves complexity.”
+
+
+

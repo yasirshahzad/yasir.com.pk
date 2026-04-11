@@ -1,0 +1,376 @@
+---
+title: "Data Partitioning (Sharding) - FAANG System Design Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "database"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master data partitioning and sharding for system design interviews. Covers horizontal vs vertical partitioning, sharding strategies, hotspots, cross-shard queries, and FAANG scripts.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# 🔷 Data Partitioning (Sharding) — FAANG Level
+
+## 🧠 1. Core Idea (Strong Opening)
+
+> "Data partitioning splits a large database into smaller shards so each shard handles a subset of data and traffic, enabling horizontal scalability."
+
+---
+
+## ⚡ 2. Why Partitioning (REAL Insight)
+
+### Without it:
+
+* Single DB → CPU / memory / IOPS bottleneck ❌
+
+### With it:
+
+* Parallel reads/writes ✅
+* Scale to millions of users ✅
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** When do you decide to shard?
+**A:**
+
+> "When a single database cannot handle throughput or storage even after vertical scaling and caching."
+
+---
+
+# 🧩 3. Partitioning Types
+
+---
+
+## 🟢 A. Horizontal Partitioning (Sharding) ⭐ MOST IMPORTANT
+
+👉 Split **rows**
+
+Example:
+
+* `userId 1–1M → shard A`
+* `userId 1M–2M → shard B`
+
+### ✅ Use:
+
+* User-based systems (Instagram, Twitter)
+
+### ❌ Problem:
+
+* Uneven distribution → hot shards
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** Why is horizontal partitioning preferred?
+**A:**
+
+> "Because it enables true horizontal scaling by distributing both data and traffic across nodes."
+
+---
+
+## 🔵 B. Vertical Partitioning
+
+👉 Split **columns / services**
+
+Example:
+
+* Profile service
+* Order service
+
+### Insight
+
+> "This is basically microservices"
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** Vertical vs microservices?
+**A:**
+
+> "Vertical partitioning at DB level often evolves into microservices at system level."
+
+---
+
+## 🟣 C. Hybrid (REAL WORLD)
+
+👉 Combine both
+
+Example:
+
+* First shard users
+* Then split heavy columns
+
+---
+
+# ⚙️ 4. Partitioning Strategies (CRITICAL)
+
+---
+
+## 🔥 1. Hash-Based
+
+👉 `shard = hash(userId) % N`
+
+### ✅ Pros
+
+* Even distribution
+
+### ❌ Problem
+
+* Adding node → rehash ALL data
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** How do you fix rehashing problem?
+**A:**
+
+> "Use consistent hashing to minimize data movement."
+
+---
+
+## 🚀 2. Consistent Hashing (MUST KNOW)
+
+👉 Map data + servers on a ring
+
+### ✅ Pros
+
+* Only small % data moves
+* Supports dynamic scaling
+
+---
+
+## ⚠️ 3. Range-Based
+
+👉 A–M, N–Z
+
+### ❌ Problem
+
+* Hotspot (e.g., popular users)
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** Why is range partitioning risky?
+**A:**
+
+> "Because real-world data is skewed, leading to uneven load."
+
+---
+
+## ⚖️ 4. Directory-Based
+
+👉 Lookup service → tells shard
+
+### ✅ Flexible
+
+### ❌ Risk:
+
+* Extra hop
+* Possible SPOF
+
+---
+
+# 🚨 5. HARD PROBLEMS (FAANG SIGNAL 🔥)
+
+---
+
+## ❌ 1. Hotspotting
+
+👉 Some shards overloaded
+
+### Fix:
+
+* Better key (userId instead of country)
+* Hashing
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** How do you detect hotspot?
+**A:**
+
+> "By monitoring per-shard QPS, latency, and CPU usage."
+
+---
+
+## ❌ 2. Cross-Shard Joins
+
+👉 Very slow
+
+### Fix:
+
+* Denormalization
+* Precompute data
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** How do you avoid joins?
+**A:**
+
+> "By storing related data together or duplicating data."
+
+---
+
+## ❌ 3. Transactions (BIG ONE)
+
+👉 ACID across shards = hard
+
+### Fix:
+
+* Avoid distributed transactions
+* Use eventual consistency
+* Saga pattern
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** Why avoid distributed transactions?
+**A:**
+
+> "They are slow, complex, and reduce system availability."
+
+---
+
+## ❌ 4. Rebalancing (VERY HARD)
+
+👉 Add/remove nodes
+
+### Problem:
+
+* Move TBs of data
+
+### Fix:
+
+* Consistent hashing
+* Background migration
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** How to rebalance without downtime?
+**A:**
+
+> "Gradually move data and use dual reads/writes during migration."
+
+---
+
+## ❌ 5. Secondary Indexes (Often Missed 🔥)
+
+👉 Hard globally
+
+### Fix:
+
+* Local indexes
+* External search systems
+
+---
+
+# ⚡ 6. Missing but VERY IMPORTANT (Most candidates miss)
+
+---
+
+## 🔥 A. Shard Key Selection (CRITICAL)
+
+> "Bad shard key = system failure"
+
+### Good key:
+
+* High cardinality
+* Even distribution
+* Frequently used in queries
+
+---
+
+### 🎤 FAANG Question
+
+**Q:** What makes a good shard key?
+**A:**
+
+> "High cardinality, uniform distribution, and aligns with query patterns."
+
+---
+
+## 🔥 B. Read vs Write Pattern
+
+* Read-heavy → caching important
+* Write-heavy → careful sharding
+
+---
+
+## 🔥 C. Routing Layer (IMPORTANT)
+
+👉 How request finds shard?
+
+### Options:
+
+* App logic
+* Proxy layer
+* Directory service
+
+---
+
+# ⚖️ 7. Trade-offs (Must Say)
+
+| Benefit         | Cost         |
+| --------------- | ------------ |
+| Scalability     | Complexity   |
+| Parallelism     | Hard queries |
+| High throughput | Rebalancing  |
+
+---
+
+# 🎤 8. FAANG Interview Script (Perfect Answer)
+
+## Start
+
+> "To scale beyond a single database, I'll use horizontal partitioning to distribute data across shards."
+
+---
+
+## Strategy
+
+> "I'll use hash-based partitioning for even distribution."
+
+---
+
+## Upgrade (IMPORTANT)
+
+> "To support dynamic scaling, I'll use consistent hashing."
+
+---
+
+## Depth
+
+> "This introduces challenges like cross-shard queries, rebalancing, and maintaining consistency."
+
+---
+
+## Close Strong
+
+> "We can mitigate these using denormalization, caching, and avoiding distributed transactions."
+
+---
+
+# 🧠 Final One-Line (Must Memorize)
+
+> "Sharding enables horizontal scalability, but requires careful shard key design and introduces complexity in queries, consistency, and operations."
+
+---
+
+# 💡 FAANG-Level Insight (DIFFERENTIATOR)
+
+> "Good engineers shard data. Great engineers choose the right shard key and plan for rebalancing from day one."
+

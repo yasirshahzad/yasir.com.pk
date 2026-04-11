@@ -1,0 +1,500 @@
+---
+title: "CAP Theorem and PACELC - FAANG System Design Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "distributed-systems"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master CAP theorem and PACELC for system design interviews. Covers consistency, availability, partition tolerance, latency trade-offs, database classifications, and 20 FAANG interview questions.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# 🚀 CAP THEOREM (INTERVIEW CORE)
+
+---
+
+## 1. 🧠 What is CAP (REAL MEANING)
+
+👉 You **CANNOT guarantee all 3**:
+
+* **Consistency (C)** → same data everywhere
+* **Availability (A)** → always respond
+* **Partition Tolerance (P)** → survive network failures
+
+---
+
+🧠 **Analogy:**
+
+* 2 WhatsApp servers (US + EU)
+* Network breaks ❌
+  Now you must choose:
+* Show **latest data** (C) ❌ OR
+* Always respond (A) ❌
+
+👉 You can't do both.
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Can a system guarantee C + A + P?
+
+**Answer:**
+👉 No
+👉 In partition → must choose **Consistency OR Availability**
+
+---
+
+### ⚠️ Missing Insight (VERY IMPORTANT)
+
+👉 **P is NOT optional**
+
+* In real world → network failures ALWAYS happen
+  👉 So real choice is:
+
+> **C vs A (WHEN partition happens)**
+
+---
+
+## 2. ⚖️ Consistency (C)
+
+👉 All nodes return **same latest data**
+
+🧠 Example:
+
+* Bank balance = always correct
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** What does strong consistency mean?
+
+**Answer:**
+👉 After write → all reads return updated value
+
+---
+
+### ⚠️ Missing Insight
+
+* Includes:
+  * linearizability
+  * read-after-write consistency
+
+---
+
+## 3. ⚡ Availability (A)
+
+👉 System **always responds**
+
+🧠 Example:
+
+* Instagram loads even if slightly outdated
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Is stale data acceptable?
+
+**Answer:**
+👉 Depends:
+* Social media → YES
+* Banking → NO
+
+---
+
+### ⚠️ Missing Insight
+
+* Availability ≠ correctness
+* It only guarantees **response**
+
+---
+
+## 4. 🌐 Partition Tolerance (P)
+
+👉 System continues despite **network failure**
+
+🧠 Example:
+
+* Data centers can't talk but system still runs
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Can we ignore partition tolerance?
+
+**Answer:**
+👉 No.
+👉 Distributed systems MUST handle partitions.
+
+---
+
+# 🚀 CAP COMBINATIONS (IMPORTANT)
+
+---
+
+## 5. 🔵 CP Systems (Consistency + Partition)
+
+👉 Sacrifice availability
+
+🧠 Example:
+
+* Bank system refuses request if unsure
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** When choose CP?
+
+**Answer:**
+👉 When correctness > uptime
+👉 e.g., payments, inventory
+
+---
+
+## 6. 🟢 AP Systems (Availability + Partition)
+
+👉 Sacrifice consistency
+
+🧠 Example:
+
+* Social media feed
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** When choose AP?
+
+**Answer:**
+👉 When uptime > correctness
+👉 e.g., likes, comments
+
+---
+
+## 7. ❌ CA (Myth)
+
+👉 Not practical
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Why CA doesn't exist?
+
+**Answer:**
+👉 Because partition will happen.
+👉 System forced into C or A.
+
+---
+
+# 🚀 REAL DATABASE MAPPING
+
+---
+
+## SQL → CP
+
+* Strong consistency
+* May reject requests
+
+---
+
+## NoSQL → AP
+
+* High availability
+* Eventual consistency
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Why NoSQL is AP?
+
+**Answer:**
+👉 Prioritizes uptime + scaling.
+👉 Accepts temporary inconsistency.
+
+---
+
+# 🚀 PACELC THEOREM (ADVANCED 🔥)
+
+---
+
+## 8. 🧠 Why CAP is incomplete?
+
+👉 CAP only talks about **failure case**
+
+👉 But:
+
+> What happens when system is NORMAL?
+
+---
+
+## 9. ⚡ PACELC Definition
+
+👉 Two decisions:
+
+### When Partition (P):
+
+* Choose **A or C**
+
+### Else (E) (No partition):
+
+* Choose **Latency (L) or Consistency (C)**
+
+---
+
+🧠 **Analogy:**
+Even when network is fine:
+
+* Wait for all replicas (slow but consistent)
+* OR respond fast (may be slightly stale)
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** What does PACELC add over CAP?
+
+**Answer:**
+👉 Adds **latency vs consistency tradeoff** in normal state.
+
+---
+
+## 10. ⚖️ Latency vs Consistency
+
+### Low Latency
+
+* Fast response
+* May read stale data
+
+### High Consistency
+
+* Slower (sync replication)
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Why consistency increases latency?
+
+**Answer:**
+👉 Need coordination across nodes.
+👉 More network round trips.
+
+---
+
+# 🚀 REAL SYSTEM CLASSIFICATION
+
+---
+
+## 11. 🟢 PA/EL Systems
+
+👉 Choose:
+
+* Partition → Availability
+* Normal → Low latency
+
+Examples:
+
+* Apache Cassandra
+* Amazon DynamoDB
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Why Cassandra is PA/EL?
+
+**Answer:**
+👉 Always available.
+👉 Fast reads/writes.
+👉 Accepts eventual consistency.
+
+---
+
+## 12. 🔵 PC/EC Systems
+
+👉 Choose:
+
+* Partition → Consistency
+* Normal → Consistency over latency
+
+Examples:
+
+* HBase
+* Bigtable
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Why choose PC/EC?
+
+**Answer:**
+👉 Critical correctness systems.
+👉 Accept slower responses.
+
+---
+
+## 13. 🟡 Hybrid (Configurable)
+
+Example:
+
+* MongoDB
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** How MongoDB behaves?
+
+**Answer:**
+
+* Default → PA/EC
+* With majority writes → PC/EC
+
+---
+
+### ⚠️ Missing Insight
+
+👉 Many modern DBs are **tunable**
+
+* You can adjust consistency level
+
+---
+
+# 🚀 MOST IMPORTANT INTERVIEW INSIGHTS
+
+---
+
+## 14. 🔥 CAP IS ABOUT TRADE-OFFS
+
+👉 Not about what system "is"
+👉 About **what system chooses**
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Is a system always CP or AP?
+
+**Answer:**
+👉 No.
+👉 Behavior depends on configuration & situation.
+
+---
+
+## 15. 🧠 Eventual Consistency Reality
+
+👉 System becomes consistent **over time**
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Is eventual consistency safe?
+
+**Answer:**
+👉 Yes for: Social apps.
+👉 No for: Financial systems.
+
+---
+
+## 16. ⚡ Hidden Concept: Read/Write Quorum
+
+👉 Helps balance C vs A
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** How to improve consistency in AP system?
+
+**Answer:**
+👉 Use quorum:
+* Read from majority
+* Write to majority
+
+---
+
+## 17. 🔁 Replication Impact
+
+👉 More replicas = more availability
+👉 But:
+👉 More coordination = more latency
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Why replication increases latency?
+
+**Answer:**
+👉 Writes must sync across nodes
+
+---
+
+## 18. 🚀 Real-World Design Thinking
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Design WhatsApp messages consistency?
+
+**Answer:**
+
+* Sent → must be durable (C)
+* Seen status → can be eventual (A)
+
+👉 Mix of CAP choices
+
+---
+
+## 19. 🧩 Common Mistake
+
+👉 "NoSQL = always eventual consistency" ❌
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Can NoSQL be strongly consistent?
+
+**Answer:**
+👉 Yes (configurable)
+
+---
+
+## 20. 🔥 Ultimate Interview Answer
+
+---
+
+### 🎯 FAANG Question
+
+**Q:** Explain CAP in one line
+
+**Answer:**
+👉 "In a distributed system, during network partition, you must choose between consistency and availability."
+
+---
+
+# 🚀 FINAL MEMORY HOOK
+
+👉 CAP = **Failure tradeoff (C vs A)**
+👉 PACELC = **Always tradeoff (Latency vs Consistency)**
+
+---
+
+# 🔥 ULTRA-SHORT SUMMARY
+
+* CAP → happens during failure
+* PACELC → happens ALWAYS
+* Real systems → configurable + hybrid
+

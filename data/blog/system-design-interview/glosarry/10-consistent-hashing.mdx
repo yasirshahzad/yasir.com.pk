@@ -1,0 +1,304 @@
+---
+title: "Consistent Hashing - FAANG System Design Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "distributed-systems"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master consistent hashing for system design interviews. Covers partitioning vs replication, naive hashing problems, virtual nodes, replication on ring, real-world usage in Cassandra and DynamoDB.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# 🔷 1. Core Concepts (Partitioning vs Replication)
+
+### ✅ Key Idea
+
+* **Partitioning (Sharding)** → Split data across servers → improves **scalability + performance**
+* **Replication** → Copy data across servers → improves **availability + durability**
+
+👉 Analogy:
+
+* Partitioning = splitting books across shelves
+* Replication = keeping backup copies of books
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why do we need both partitioning and replication?
+**A:**
+
+* Partitioning → handles **scale (more users/data)**
+* Replication → handles **failures (node crashes)**
+  👉 Together = scalable + fault-tolerant system
+
+---
+
+### 🧠 Script to Memorize
+
+"Partitioning splits data for scale. Replication copies data for reliability. Both are required for a production distributed system."
+
+---
+
+# 🔷 2. Problem with Naive Hashing (mod N)
+
+### ✅ Approach
+
+```
+server = hash(key) % N
+```
+
+### ❌ Problems
+
+* When **N changes (node added/removed)** → ALL keys remapped
+* Causes **massive data movement**
+
+👉 Analogy:
+Changing number of buckets → all items reshuffled
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why is modulo-based sharding bad for scaling?
+**A:**
+Because adding/removing a node changes `N`, forcing **re-hashing of almost all keys (~100%)**
+
+---
+
+### 🧠 Script
+
+"Modulo hashing fails in dynamic systems because any node change causes full data reshuffling."
+
+---
+
+# 🔷 3. Consistent Hashing (Core Idea)
+
+### ✅ Key Idea
+
+* Map **nodes + keys** onto a **ring (0 → 2³²)**
+* Each key goes to **next clockwise node**
+
+### ✅ Benefits
+
+* Only **small portion of data moves** when nodes change
+
+👉 Analogy:
+Circular pizza → add/remove slice → only nearby slices affected
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** How does consistent hashing reduce rebalancing?
+**A:**
+Only keys belonging to affected node's range move (~1/N), not all keys
+
+---
+
+### 🧠 Script
+
+"Consistent hashing maps data on a ring and ensures minimal data movement during scaling."
+
+---
+
+# 🔷 4. How It Works (Tokens & Ranges)
+
+### ✅ Key Points
+
+* Each node has a **token (position on ring)**
+* Responsible for range:
+
+```
+[token, next_token)
+```
+
+* Key → hash → falls into a range → assigned node
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** How do you locate a node for a key?
+**A:**
+Hash the key → move clockwise → first node found
+
+---
+
+### 🧠 Script
+
+"Hash the key, move clockwise on the ring, and assign it to the first node."
+
+---
+
+# 🔷 5. Problem in Basic Consistent Hashing
+
+### ❌ Issues
+
+* Uneven data distribution
+* Hotspots (one node overloaded)
+* Hard to scale efficiently
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why does basic consistent hashing create hotspots?
+**A:**
+Because nodes own large uneven ranges → skewed data distribution
+
+---
+
+### 🧠 Script
+
+"Single token per node leads to uneven load and hotspots."
+
+---
+
+# 🔷 6. Virtual Nodes (Vnodes) — MOST IMPORTANT
+
+### ✅ Key Idea
+
+* Each physical node has **multiple small ranges (vnodes)**
+* Instead of 1 token → many tokens
+
+---
+
+### ✅ Benefits
+
+1. **Better load balancing**
+2. **Faster rebalancing**
+3. **No hotspots**
+4. Supports **heterogeneous machines**
+5. **Parallel node recovery**
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why do systems like Cassandra use virtual nodes?
+**A:**
+To evenly distribute load and minimize hotspots by splitting ranges into smaller chunks
+
+---
+
+### 🧠 Script
+
+"Virtual nodes divide data into smaller chunks, improving load balancing and scaling efficiency."
+
+---
+
+# 🔷 7. Replication in Consistent Hashing
+
+### ✅ Key Idea
+
+* Each key stored on **N nodes (Replication Factor)**
+* Coordinator = first node
+* Replicas = **next clockwise nodes**
+
+---
+
+### ✅ Types
+
+* **Synchronous** → strong consistency
+* **Asynchronous** → eventual consistency (common)
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** How is replication done in consistent hashing?
+**A:**
+Data is stored on primary node + replicated to next N-1 nodes clockwise
+
+---
+
+### 🧠 Script
+
+"Data is stored on the coordinator and replicated to successor nodes for fault tolerance."
+
+---
+
+# 🔷 8. Eventual Consistency
+
+### ✅ Key Idea
+
+* Data may be temporarily inconsistent
+* Eventually becomes consistent
+
+👉 Trade-off:
+
+* High availability > strict consistency
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why do systems choose eventual consistency?
+**A:**
+To maintain availability during failures (CAP theorem)
+
+---
+
+### 🧠 Script
+
+"Eventual consistency sacrifices immediate consistency for high availability."
+
+---
+
+# 🔷 9. Real-World Use Cases
+
+### ✅ Used in:
+
+* Distributed DBs → **Apache Cassandra**
+* Key-value stores → **Amazon DynamoDB**
+* Caching systems (Redis clusters, CDN)
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Where would you use consistent hashing?
+**A:**
+In systems needing dynamic scaling like caching, databases, and CDNs
+
+---
+
+### 🧠 Script
+
+"Consistent hashing is used in databases, caches, and CDNs for scalable data distribution."
+
+---
+
+# 🔷 10. Interview Gold Points (Often Missed)
+
+### ⭐ Add these to stand out:
+
+* Rebalancing cost = **O(K/N)** not O(K)
+* Supports **horizontal scaling**
+* Works with **replication + quorum (R/W)** systems
+* Helps avoid **single point of failure**
+* Used in **load balancers**
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** How much data moves when adding a node?
+**A:**
+Only ~**1/N data**, not entire dataset
+
+---
+
+### 🧠 Script
+
+"Consistent hashing ensures minimal data movement and supports efficient horizontal scaling."
+
+---
+
+# 🚀 Final 30-Second Summary (Perfect Interview Answer)
+
+"Consistent hashing is used to partition data across nodes using a ring structure. Unlike modulo hashing, it minimizes data movement when nodes are added or removed. Virtual nodes further improve load balancing and eliminate hotspots. Data is replicated across multiple nodes for fault tolerance, usually with eventual consistency. This approach is widely used in systems like Cassandra and DynamoDB for scalable and highly available architectures."
+

@@ -1,0 +1,240 @@
+---
+title: "Heartbeat - Failure Detection in Distributed Systems - FAANG Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "distributed-systems"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master heartbeat failure detection for system design interviews. Covers centralized vs decentralized models, heartbeat tuning, gossip protocols, false positives, real-world usage in Kubernetes and Cassandra.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# 🔷 1. Why Heartbeats?
+
+### ❗ Problem
+
+* Servers need to know:
+
+  * Who is **alive**
+  * Who has **failed**
+* Required for:
+
+  * Request routing
+  * Failover handling
+
+---
+
+### ✅ Solution
+
+* Servers send periodic **heartbeat signals** → "I am alive"
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why is failure detection critical in distributed systems?
+**A:**
+To **reroute traffic and recover quickly** from failures
+
+---
+
+### 🧠 Script
+
+"Heartbeats are used to detect failed nodes so the system can maintain availability."
+
+---
+
+# 🔷 2. What is a Heartbeat?
+
+### ✅ Definition
+
+* A **periodic signal/message** sent by a server to indicate it is alive
+
+---
+
+### 🔁 Two Models
+
+#### 🏢 Centralized
+
+* All servers → send heartbeat to **central monitor**
+
+#### 🌐 Decentralized (Gossip-style)
+
+* Servers → send heartbeats to **random peers**
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Centralized vs decentralized heartbeat?
+**A:**
+Centralized = simple but single point of failure.
+Decentralized = scalable but complex.
+
+---
+
+### 🧠 Script
+
+"Heartbeats can be centralized or distributed depending on system design."
+
+---
+
+# 🔷 3. How It Works
+
+### ✅ Flow
+
+1. Server sends heartbeat periodically
+2. Receiver tracks last heartbeat time
+3. If timeout exceeded → mark node as failed
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** How does a system detect failure using heartbeats?
+**A:**
+If no heartbeat is received within a timeout → node is considered dead
+
+---
+
+### 🧠 Script
+
+"If heartbeat stops beyond a timeout, the node is marked as failed."
+
+---
+
+# 🔷 4. After Failure Detection
+
+### ✅ Actions Taken
+
+* Stop sending traffic to failed node
+* Reassign data/work
+* Trigger recovery (failover)
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** What happens after a node failure is detected?
+**A:**
+Traffic is rerouted and data/work is redistributed
+
+---
+
+### 🧠 Script
+
+"After detecting failure, the system reroutes requests and recovers data."
+
+---
+
+# 🔷 5. Key Parameters
+
+### ⚙️ Important Settings
+
+* **Heartbeat interval** → how often signals are sent
+* **Timeout** → how long to wait before declaring failure
+
+---
+
+### ❗ Trade-off
+
+* Short interval → fast detection but high overhead
+* Long interval → slower detection but less overhead
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** How do you tune heartbeat systems?
+**A:**
+Balance between **detection speed and network overhead**
+
+---
+
+### 🧠 Script
+
+"Heartbeat tuning balances fast failure detection with system overhead."
+
+---
+
+# 🔷 6. Challenges
+
+### ❌ Issues
+
+* Network delays → false failure detection
+* Network partitions
+* Scaling overhead in large clusters
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** What is a false positive in heartbeat systems?
+**A:**
+When a node is alive but appears dead due to network delay
+
+---
+
+### 🧠 Script
+
+"Network issues can cause false failure detection in heartbeat systems."
+
+---
+
+# 🔷 7. Real-World Use Cases
+
+### ✅ Used In
+
+* Cluster management
+* Distributed DBs → **Apache Cassandra**
+* Container orchestration → **Kubernetes**
+* Load balancers
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Where are heartbeats used in real systems?
+**A:**
+In clusters, databases, and orchestration tools to monitor node health
+
+---
+
+### 🧠 Script
+
+"Heartbeats are widely used to monitor node health in distributed systems."
+
+---
+
+# 🔷 8. Interview Gold Points (Often Missed)
+
+### ⭐ Important
+
+* Used with **leader election**
+* Enables **auto-scaling & failover**
+* Often combined with **gossip protocols**
+* Not 100% accurate → probabilistic failure detection
+* Helps prevent cascading failures
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why are heartbeats not perfectly reliable?
+**A:**
+Because network delays can mimic failures
+
+---
+
+### 🧠 Script
+
+"Heartbeat-based detection is best-effort, not perfectly accurate."
+
+---
+
+# 🚀 Final 15-sec Interview Answer
+
+"Heartbeats are periodic signals sent by servers to indicate they are alive. If a heartbeat is not received within a timeout, the node is considered failed, and the system reroutes traffic and recovers data. Heartbeats can be centralized or decentralized and are widely used for failure detection in distributed systems, though they must be carefully tuned to balance detection speed and overhead."
+

@@ -1,0 +1,253 @@
+---
+title: "Stream vs Batch Processing - System Design Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "interview-prep"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master Stream vs Batch Processing - System Design Interview Guide for system design interviews with FAANG-level scripts and trade-off analysis.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+Here’s your **FAANG-level, concise + complete + memorization-ready summary** of
+**Batch Processing vs Stream Processing** — with **architecture, signals, trade-offs, Q&A, and scripts**.
+
+---
+
+# ? Batch vs Stream Processing (Interview Master Sheet)
+
+---
+
+# 1?? Core Idea (1-liner difference)
+
+* **Batch Processing** ? *Process data in large chunks (delayed)*
+* **Stream Processing** ? *Process data in real-time (continuous)*
+
+?? **Script:**
+
+> “Batch processes data in bulk with delay, while stream processes data continuously in real time.”
+
+---
+
+# 2?? How They Work (Architecture Level)
+
+## ?? Batch Processing (Architecture)
+
+**Flow:**
+
+1. Data collected (logs, events)
+2. Stored (data lake / DB)
+3. Scheduled job runs (hourly/daily)
+4. Process ? Output
+
+**Components:**
+
+* Storage (S3 / HDFS)
+* Scheduler (cron, Airflow)
+* Processing engine
+
+**Tools:**
+
+* Apache Hadoop
+* Apache Spark
+
+?? **Script:**
+
+> “Batch systems collect data over time and process it periodically using distributed processing frameworks.”
+
+---
+
+## ?? Stream Processing (Architecture)
+
+**Flow:**
+
+1. Event generated (click, payment)
+2. Sent to message queue
+3. Stream processor consumes instantly
+4. Output/Action (alert, DB update)
+
+**Components:**
+
+* Message broker
+* Stream processor
+* Real-time sink (DB, cache)
+
+**Tools:**
+
+* Apache Kafka
+* Apache Flink
+
+?? **Script:**
+
+> “Stream processing uses event-driven architecture where data is processed immediately as it arrives.”
+
+---
+
+# 3?? Key Trade-offs (Must Say)
+
+| Factor     | Batch                  | Stream             |
+| ---------- | ---------------------- | ------------------ |
+| Latency    | ? High (minutes–hours) | ? Low (ms–seconds) |
+| Throughput | ? Very High            | ?? Medium–High     |
+| Complexity | ? Simple               | ? Complex          |
+| Cost       | ? Cheaper              | ? Expensive        |
+| Use Case   | Offline analytics      | Real-time systems  |
+
+?? **Script:**
+
+> “Batch optimizes for throughput and cost, while stream optimizes for latency and real-time insights.”
+
+---
+
+# 4?? Signals / Hints (Interviewer Gold ?)
+
+## ?? Choose Batch Processing if:
+
+* No real-time requirement
+* Large historical data
+* Reports / analytics
+* Cost-sensitive system
+
+?? Examples:
+
+* Payroll
+* Daily reports
+* Data warehousing
+
+?? **Script:**
+
+> “If latency is not critical and we are dealing with large historical datasets, I will use batch processing.”
+
+---
+
+## ?? Choose Stream Processing if:
+
+* Real-time decisions needed
+* User-facing features
+* Continuous data flow
+* Low latency required
+
+?? Examples:
+
+* Fraud detection
+* Live dashboards
+* Notifications
+
+?? **Script:**
+
+> “If the system requires immediate action or real-time insights, I will use stream processing.”
+
+---
+
+# 5?? Real System Design Decisions
+
+## ?? Batch Design Choices:
+
+* ETL pipelines
+* Data lake + warehouse
+* Scheduled jobs
+
+?? Example:
+
+* Nightly analytics pipeline
+
+---
+
+## ?? Stream Design Choices:
+
+* Event-driven architecture
+* Pub/Sub model
+* Stateless/stateful processing
+
+?? Example:
+
+* Real-time fraud detection pipeline
+
+---
+
+# 6?? Hybrid Approach (Very Important ??)
+
+?? Modern systems use **Lambda / Kappa architecture**
+
+## Hybrid Example:
+
+* Stream ? real-time dashboard
+* Batch ? historical accuracy correction
+
+?? **Script:**
+
+> “I would combine both: stream for real-time insights and batch for accurate long-term computation.”
+
+---
+
+# 7?? FAANG-Level Interview Questions + Answers
+
+---
+
+## ? Q1: Why not always use stream processing?
+
+? Answer:
+
+> “Because it is complex, expensive, and harder to maintain. If real-time is not needed, batch is more efficient.”
+
+---
+
+## ? Q2: How do you handle failures in stream processing?
+
+? Answer:
+
+* Checkpointing
+* Replay from Kafka
+* Exactly-once semantics
+
+---
+
+## ? Q3: What is Lambda Architecture?
+
+? Answer:
+
+> “It combines batch and stream: batch layer for accuracy, speed layer for real-time processing.”
+
+---
+
+## ? Q4: How to ensure data consistency in streams?
+
+? Answer:
+
+* Idempotency
+* Windowing
+* Event ordering
+
+---
+
+## ? Q5: Batch vs Stream in big companies?
+
+? Answer:
+
+> “Companies use stream for user-facing features and batch for analytics and reporting.”
+
+---
+
+# 8?? Quick Examples (Must Remember)
+
+* **Batch** ? Salary processing
+* **Stream** ? Credit card fraud detection
+
+---
+
+# 9?? 30-Second Revision (Final Script)
+
+?? **Script:**
+
+> “Batch processing handles large volumes of data with high throughput but higher latency, making it ideal for offline analytics. Stream processing handles continuous data with low latency, enabling real-time decisions. In practice, I use stream for real-time features and batch for historical accuracy and cost optimization.”
+
+---
+
+# ?? Final FAANG Tip
+
+?? Always say:
+
+> “The choice depends on latency requirements — real-time vs offline.”
+
+

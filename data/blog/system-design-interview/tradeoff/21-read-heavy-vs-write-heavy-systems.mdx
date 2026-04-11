@@ -1,0 +1,295 @@
+---
+title: "Read-Heavy vs Write-Heavy Systems - System Design Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "interview-prep"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master Read-Heavy vs Write-Heavy Systems - System Design Interview Guide for system design interviews with FAANG-level scripts and trade-off analysis.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+# ?? Read-Heavy vs Write-Heavy (Query vs Ingest)
+
+---
+
+## ?? Read-Heavy Systems (Query Optimized)
+
+
+
+
+
+
+
+
+### ?? Core Idea
+
+**Reads dominate ? optimize data retrieval speed**
+
+?? “Serve fast, reduce DB hits”
+
+---
+
+### ?? Key Strategies (High Signal)
+
+#### 1. Caching (MOST IMPORTANT)
+
+* Redis / Memcached
+* Multi-layer cache (CDN ? App ? DB)
+
+#### 2. Read Replicas
+
+* Primary DB (writes)
+* Replicas handle reads
+* Eventual consistency
+
+#### 3. CDN
+
+* Cache static content near users
+
+#### 4. Load Balancing
+
+* Distribute reads across servers
+
+#### 5. Indexing & Query Optimization
+
+* Fast lookups
+* Avoid heavy joins
+
+#### 6. Sharding (Partitioning)
+
+* Split data ? parallel reads
+
+#### 7. Async Precomputation
+
+* Precompute reports (materialized views)
+
+---
+
+### ? Pros
+
+* Low latency
+* High throughput
+* Scales easily
+
+### ? Cons
+
+* Data staleness (eventual consistency)
+* Cache invalidation complexity
+
+---
+
+### ??? Architecture Decisions
+
+* Cache-first design (Cache ? DB fallback)
+* Read replicas behind load balancer
+* CDN for static assets
+* Denormalized data models
+
+---
+
+### ?? Signals / When to Use
+
+Use Read-Heavy when:
+
+* Reads >> Writes (e.g., 100:1)
+* Content platforms (news, Netflix)
+* Analytics dashboards
+
+---
+
+### ?? FAANG Interview Q&A
+
+**Q1: Biggest bottleneck in read-heavy systems?**
+?? Database read load ? solved via caching + replicas.
+
+**Q2: How to handle stale cache?**
+?? TTL, write-through, cache invalidation strategies.
+
+**Q3: Why replicas instead of scaling DB vertically?**
+?? Horizontal scaling is cheaper + more resilient.
+
+---
+
+### ?? Memory Script (Read-Heavy)
+
+?? “Read-heavy = Cache + Replicas + CDN = Fast reads”
+
+---
+
+---
+
+## ?? Write-Heavy Systems (Ingest Optimized)
+
+
+
+
+
+
+
+
+### ?? Core Idea
+
+**Writes dominate ? optimize ingestion throughput**
+
+?? “Accept fast, process later”
+
+---
+
+### ?? Key Strategies (High Signal)
+
+#### 1. Write-Optimized DB
+
+* NoSQL (Cassandra, DynamoDB)
+* High throughput, distributed
+
+#### 2. Batching & Buffering
+
+* Combine writes ? reduce overhead
+
+#### 3. Asynchronous Processing
+
+* Queue (Kafka, RabbitMQ)
+* Event-driven systems
+
+#### 4. CQRS
+
+* Separate read & write models
+
+#### 5. Sharding
+
+* Distribute writes across nodes
+
+#### 6. Write-Ahead Logging (WAL)
+
+* Log first ? durability
+
+#### 7. Event Sourcing
+
+* Store events, not state
+
+---
+
+### ? Pros
+
+* High ingestion rate
+* Scales horizontally
+* Fault-tolerant
+
+### ? Cons
+
+* Complex architecture
+* Eventual consistency
+* Hard debugging
+
+---
+
+### ??? Architecture Decisions
+
+* Use message queue (Kafka)
+* Async pipelines
+* Append-only logs
+* Denormalized write model
+
+---
+
+### ?? Signals / When to Use
+
+Use Write-Heavy when:
+
+* Writes >> Reads (logs, IoT, analytics)
+* Real-time ingestion systems
+* Event-driven systems
+
+---
+
+### ?? FAANG Interview Q&A
+
+**Q1: Why use queues in write-heavy systems?**
+?? Decouple producers from DB ? absorb spikes.
+
+**Q2: Why NoSQL for writes?**
+?? Better horizontal scaling + write throughput.
+
+**Q3: CQRS benefit?**
+?? Optimize reads and writes independently.
+
+---
+
+### ?? Memory Script (Write-Heavy)
+
+?? “Write-heavy = Queue + Batch + Async = Fast ingestion”
+
+---
+
+---
+
+# ?? Direct Comparison (High Signal)
+
+| Feature     | Read-Heavy (Query) | Write-Heavy (Ingest) |
+| ----------- | ------------------ | -------------------- |
+| Focus       | Fast reads         | Fast writes          |
+| DB Strategy | Replicas           | Sharding             |
+| Cache       | Critical           | Optional             |
+| Processing  | Sync               | Async                |
+| Consistency | Eventual           | Often eventual       |
+| Example     | Netflix, News      | Logs, IoT            |
+
+---
+
+# ?? Architecture Decision Rule (FAANG Shortcut)
+
+?? Ask:
+
+### 1. **Is traffic mostly reads or writes?**
+
+* Reads ? Read-heavy
+* Writes ? Write-heavy
+
+### 2. **Is latency critical for users?**
+
+* YES ? Read-heavy optimizations
+
+### 3. **Do you need to absorb spikes?**
+
+* YES ? Write-heavy (queue + async)
+
+---
+
+# ?? Advanced Insights (VERY IMPORTANT)
+
+### ?? Real systems are HYBRID
+
+* Write-heavy ingestion ? Read-heavy serving
+  ?? Example:
+* Kafka (writes) ? ElasticSearch (reads)
+
+---
+
+### ?? Strong Signal in Interviews
+
+* If you hear:
+
+  * “Dashboard / feed” ? Read-heavy
+  * “Logs / events / analytics” ? Write-heavy
+
+---
+
+### ?? Common Pattern
+
+?? **Lambda Architecture**
+
+* Batch layer (writes)
+* Speed layer (real-time)
+* Serving layer (reads)
+
+---
+
+# ?? Final 10-sec Brain Hack
+
+?? “Read-heavy = Cache everything
+?? Write-heavy = Queue everything”
+
+
+

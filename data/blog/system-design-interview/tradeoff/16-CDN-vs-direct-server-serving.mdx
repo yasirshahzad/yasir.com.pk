@@ -1,0 +1,250 @@
+---
+title: "CDN vs Direct Server Serving - System Design Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "interview-prep"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master CDN vs Direct Server Serving - System Design Interview Guide for system design interviews with FAANG-level scripts and trade-off analysis.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+Here’s your **FAANG-level, concise, no-miss summary** of
+**CDN vs Direct Server Serving** with **architecture signals, Q&A, and scripts**.
+
+---
+
+# ?? Core Idea (1-line difference)
+
+* **CDN ? Serve from nearest edge (global, cached)**
+* **Direct Server ? Serve from origin (single location)**
+
+?? **Script**
+
+> “CDN brings data closer to users, while direct serving delivers everything from a single origin.”
+
+---
+
+# ?? CDN (High Signal)
+
+## ? What it does
+
+* Distributed **edge servers globally**
+* Caches:
+
+  * Images, videos, JS, CSS
+  * Sometimes APIs (via edge caching)
+* Routes user to **nearest location**
+
+---
+
+## ?? Key Insight
+
+?? Optimizes **latency + scalability + bandwidth**
+
+---
+
+## ??? Architecture Signals (Use CDN when)
+
+* Global users ??
+* High traffic / spikes
+* Static content heavy (images, videos)
+* Need fast load times (&lt;100ms)
+
+---
+
+## ? Problems
+
+* Cache invalidation complexity ?
+* Extra cost
+* Not ideal for highly dynamic data
+
+---
+
+## ?? FAANG Q&A
+
+**Q1: Why CDN improves speed?**
+?? Data served from nearest edge ? lower latency.
+
+**Q2: What is cache hit ratio?**
+?? % of requests served from CDN cache.
+
+**Q3: How CDN reduces backend load?**
+?? Offloads traffic from origin server.
+
+---
+
+## ?? Script
+
+> “I use a CDN to cache and serve content from edge locations, reducing latency and offloading traffic from the origin server.”
+
+---
+
+# ?? 3. Direct Server Serving (High Signal)
+
+## ? What it does
+
+* All requests go to **single origin server**
+* No intermediate caching layer
+
+---
+
+## ?? Key Insight
+
+?? **Simple but limited scalability**
+
+---
+
+## ??? Architecture Signals (Use when)
+
+* Small/local application
+* Low traffic
+* Mostly dynamic data
+* Budget constraints
+
+---
+
+## ? Problems
+
+* High latency for distant users
+* Server overload risk
+* Poor scaling
+
+---
+
+## ?? FAANG Q&A
+
+**Q1: Why slow globally?**
+?? Users far from server ? high RTT.
+
+**Q2: Scaling issue?**
+?? All traffic hits one server.
+
+---
+
+## ?? Script
+
+> “Direct server serving is simple but doesn’t scale well for global users or high traffic.”
+
+---
+
+# ?? Key Differences (Interview Table)
+
+| Aspect      | CDN          | Direct Server            |
+| ----------- | ------------ | ------------------------ |
+| Location    | Global edges | Single origin            |
+| Latency     | Low          | High (for distant users) |
+| Scalability | High         | Limited                  |
+| Cost        | Higher       | Lower                    |
+| Use Case    | Global apps  | Small/local apps         |
+
+---
+
+## ?? Script
+
+> “CDN improves performance and scalability globally, while direct serving is simpler but limited.”
+
+---
+
+# ?? 5. Real Architecture (FAANG Level)
+
+## ? Standard Production Setup
+
+```text id="cdn-arch"
+Client
+  ?
+CDN (Edge Cache)
+  ?
+Origin Server (Backend)
+  ?
+Database
+```
+
+---
+
+## ?? Why?
+
+* CDN ? fast delivery
+* Origin ? source of truth
+
+---
+
+## ?? FAANG Q&A
+
+**Q: What happens on cache miss?**
+?? CDN fetches from origin ? caches ? serves.
+
+**Q: How to update content?**
+?? Cache invalidation / TTL expiry.
+
+---
+
+## ?? Script
+
+> “In production, CDN sits in front of the origin server, serving cached content and reducing backend load.”
+
+---
+
+# ?? 6. Strong Signals vs Weak Signals
+
+## ?? Choose CDN (Strong Signals)
+
+* “Global audience”
+* “High traffic”
+* “Media-heavy app”
+* “Low latency required”
+
+---
+
+## ?? Choose Direct Server (Strong Signals)
+
+* “Small app”
+* “Local users”
+* “Low traffic”
+* “Mostly dynamic content”
+
+---
+
+## ?? Weak Signals
+
+* “Startup ? no CDN” ?
+* “Dynamic app ? no CDN” ? (CDN still helps static parts)
+
+---
+
+# ?? 7. FAANG-Level Insights (Added)
+
+## ?? Cache-Control Headers
+
+* `max-age`, `public`, `private`
+
+---
+
+## ?? 2. CDN Types
+
+* Push CDN (upload content)
+* Pull CDN (fetch on demand)
+
+---
+
+## ?? 3. Edge Computing
+
+* Run logic at CDN edge (Cloudflare Workers)
+
+---
+
+## ?? 4. Dynamic Content Acceleration
+
+* CDN optimizes even non-cacheable requests
+
+---
+
+# ?? Final Ultra-Short Summary
+
+?? **Golden Line**
+
+> “CDN brings content closer to users; direct serving makes users come to the content.”
+
+
+

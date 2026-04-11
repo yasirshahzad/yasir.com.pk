@@ -1,0 +1,450 @@
+---
+title: "The Steps to Solve System Design Interviews - Complete FAANG Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "interview-prep"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: A complete step-by-step guide to solving system design interviews at FAANG level — covering scope clarification, requirements, estimation, API design, high-level architecture, detailed components, caching, sharding, fault tolerance, and more.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# 🔷 PHASE 1: UNDERSTAND, SCOPE & CONSTRAINTS
+
+## **1. Clarify Ambiguity + Define Scope**
+
+* What EXACT system?
+* What to exclude?
+* Who are users?
+
+### 💬 Say:
+
+> "Before jumping into design, I'd like to clarify scope to avoid assumptions.
+> Are we focusing on core features like feed, posting, and interactions, or should we include messaging, ads, and notifications as well?
+> For this discussion, I'll focus on News Feed, posts, likes, and follows, and exclude messaging and ads to keep scope manageable."
+
+---
+
+## **2. Functional Requirements**
+
+* Core user actions only (5–7)
+
+### 💬 Say:
+
+> "Let me list the core functional requirements — the key actions users perform in the system."
+
+### 💬 Example:
+
+* Create post
+* Follow/unfollow users
+* View news feed
+* Like/comment
+* View profile
+
+### 💬 Add:
+
+> "I'm focusing only on the most critical flows to keep the design focused."
+
+---
+
+## **3. Non-Functional Requirements**
+
+#### Core:
+
+* Scale (users, QPS)
+* Latency (p95/p99)
+* Availability (SLA)
+* Consistency (strong vs eventual)
+* Read vs write ratio
+
+#### Advanced (often missed):
+
+* Durability
+* Fault tolerance
+* Reliability
+* Cost constraints
+
+---
+
+### 💬 Say:
+
+> "Now I'll define non-functional requirements — these drive most design decisions."
+
+### 💬 Example:
+
+> "System should support ~100M DAU.
+> Expected read-heavy workload with ~10:1 read/write ratio.
+> p99 latency should be under 200ms for feed reads.
+> Availability target is 99.99%.
+> Feed can be eventually consistent, but post creation must be strongly consistent.
+> System must be fault-tolerant, durable, and cost-efficient."
+
+---
+
+## **4. Constraints & Assumptions**
+
+* Unknowns → make assumptions explicit
+
+### 💬 Say:
+
+> "Since some details are unspecified, I'll make a few reasonable assumptions and call them out."
+
+### 💬 Example:
+
+> "I'll assume average user follows 200 people and opens feed 10 times/day.
+> I'll refine these if needed."
+
+---
+
+# 🔷 PHASE 2: ESTIMATION & INTERFACE
+
+## **5. Capacity Estimation**
+
+#### Traffic:
+
+* DAU
+* Requests per user
+* Actions per user
+* Peak vs avg QPS
+
+#### Data:
+
+* Payload size
+* Storage/day/year
+
+#### Bandwidth:
+
+* Ingress/egress
+
+#### Growth:
+
+* 2–3 year projection
+
+---
+
+### 💬 Say:
+
+> "Now I'll do back-of-the-envelope calculations to estimate scale."
+
+### 💬 Example:
+
+> "100M DAU × 10 feed loads = 1B requests/day
+> That's ~10⁹ requests/day ≈ 100K peak QPS.
+>
+> 200M posts/day × 1KB = 200 × 10⁹ bytes ≈ 200 GB/day.
+>
+> Over 1 year:
+> 200 GB × 365 ≈ 73 TB/year.
+>
+> Media is much larger, so we store it in object storage and serve via CDN."
+
+---
+
+## 🔢 Numbers Everyone Should Know (Latency)
+
+### 💬 Say (VERY IMPORTANT):
+
+> "I'll use standard latency numbers to justify caching and storage decisions."
+
+* L1 cache: **0.5 ns**
+* RAM: **100 ns**
+* SSD (1MB read): **1 ms**
+* Network (1MB): **10 ms**
+* Cross-region RTT: **150 ms**
+
+### 💬 Add Insight:
+
+> "Since network calls are orders of magnitude slower than memory, caching is critical to reduce latency."
+
+---
+
+## **Conversions (MEMORIZE THESE)**
+
+| Name     | Power | Value |
+| -------- | ----- | ----- |
+| Thousand | 10³   | 1K    |
+| Million  | 10⁶   | 1M    |
+| Billion  | 10⁹   | 1B    |
+| Trillion | 10¹²  | 1T    |
+
+### 💬 Say:
+
+> "I'll use powers of 10 for quick estimation."
+
+---
+
+## **6. API Design**
+
+* REST/gRPC/GraphQL
+* Pagination
+* Idempotency
+* Versioning
+
+---
+
+### 💬 Say:
+
+> "Next, I'll define API contracts between client and backend."
+
+### 💬 Example:
+
+```http
+POST /v1/posts
+GET /v1/feed?cursor=abc&limit=20
+POST /v1/like
+```
+
+---
+
+### 💬 Add (IMPORTANT):
+
+> "APIs are versioned for backward compatibility and designed to be idempotent where needed."
+
+### 💬 Explain (interviewer loves this):
+
+> "Idempotency ensures retries don't create duplicate actions.
+> For example, POST requests can use an idempotency key to prevent duplicate writes."
+
+---
+
+# 🔷 PHASE 3: HIGH-LEVEL DESIGN
+
+## **7. High-Level Architecture**
+
+* End-to-end flow
+* Service separation
+
+---
+
+### 💬 Say:
+
+> "Now I'll walk through the high-level architecture."
+
+> "Client → CDN → Load Balancer → API Gateway → Microservices → Cache → Database → Queue"
+
+---
+
+### 💬 Add:
+
+> "Services are stateless and horizontally scalable."
+
+---
+
+## **8. Data Model & Access Patterns**
+
+* Entities
+* Query patterns (CRITICAL)
+
+---
+
+### 💬 Say:
+
+> "Before choosing databases, I'll define data model and access patterns."
+
+### 💬 Example:
+
+> "The most critical query is:
+> 'Fetch latest posts from followed users sorted by time.'"
+
+---
+
+### 💬 Add Insight:
+
+> "Access patterns drive database choice — not the other way around."
+
+---
+
+## **9. Database Selection**
+
+---
+
+### 💬 Say:
+
+> "Based on access patterns, I'll choose appropriate databases."
+
+### 💬 Example:
+
+> "Cassandra for feed (high write throughput, time-series data).
+> Relational DB for user relationships.
+> This is a polyglot persistence approach."
+
+---
+
+# 🔷 PHASE 4: DETAILED DESIGN (CORE OF INTERVIEW)
+
+## **10. Core Component Deep Dive**
+
+### 💬 Say:
+
+> "Now I'll deep dive into the most complex component — the feed system."
+
+---
+
+### 💬 Example:
+
+> "I'll use a hybrid fan-out approach:
+> Fan-out on write for normal users and fan-out on read for celebrities."
+
+---
+
+## **11. Caching Strategy (DEEPER)**
+
+---
+
+### 💬 Say:
+
+> "Caching is critical to reduce latency and database load."
+
+### 💬 Example:
+
+> "Redis stores precomputed feeds.
+> Cache-aside pattern is used.
+> TTL ensures freshness.
+> Hot users may have shorter TTL."
+
+---
+
+### 💬 Add Insight:
+
+> "Cache helps avoid expensive DB and network calls."
+
+---
+
+## **12. Partitioning & Sharding**
+
+---
+
+### 💬 Say:
+
+> "To handle scale, data must be partitioned."
+
+### 💬 Example:
+
+> "Shard by user_id using consistent hashing.
+> Handle hotspots by splitting heavy users."
+
+---
+
+## **13. Async Processing & Messaging**
+
+---
+
+### 💬 Say:
+
+> "Heavy operations are handled asynchronously."
+
+### 💬 Example:
+
+> "Kafka handles fan-out, notifications, and background jobs."
+
+---
+
+## **14. Load Balancing & Service Scaling**
+
+---
+
+### 💬 Say:
+
+> "To avoid single points of failure, I'll use load balancing."
+
+### 💬 Example:
+
+> "Multiple load balancers with health checks.
+> Stateless services auto-scale horizontally."
+
+---
+
+## **15. Fault Tolerance & Failure Handling**
+
+---
+
+### 💬 Say:
+
+> "Now I'll discuss failure scenarios."
+
+### 💬 Example:
+
+> "If cache fails → fallback to DB.
+> If DB fails → replicas take over.
+> If queue fails → retries ensure eventual completion."
+
+---
+
+## **16. Multi-Region & Geo Distribution**
+
+---
+
+### 💬 Say:
+
+> "Since users are global, we need geo-distribution."
+
+### 💬 Example:
+
+> "Deploy across regions.
+> Use geo-routing.
+> Replicate data asynchronously."
+
+---
+
+## **17. Security & Privacy**
+
+---
+
+### 💬 Say:
+
+> "Security is critical in production systems."
+
+### 💬 Example:
+
+> "Use JWT/OAuth for authentication.
+> Encrypt data in transit (HTTPS) and at rest.
+> Apply RBAC for access control."
+
+---
+
+## **18. Monitoring & Observability**
+
+---
+
+### 💬 Say:
+
+> "We need visibility into system health."
+
+### 💬 Example:
+
+> "Track latency, QPS, error rates.
+> Centralized logging and alerting."
+
+---
+
+# 🔷 PHASE 5: EVALUATION
+
+## **19. Trade-offs Analysis**
+---
+
+### 💬 Say:
+
+> "Every design decision has trade-offs."
+
+### 💬 Example:
+
+> "Fan-out on write improves read latency but increases write cost.
+> Hybrid approach balances both."
+
+---
+
+## **20. Bottlenecks & Future Improvements**
+
+---
+
+### 💬 Say:
+
+> "Finally, I'll discuss bottlenecks and improvements."
+
+### 💬 Example:
+
+> "Hot users can cause load imbalance.
+> Future improvements: ML-based ranking, smarter caching."
+

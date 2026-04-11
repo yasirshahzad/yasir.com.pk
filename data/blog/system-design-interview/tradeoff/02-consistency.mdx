@@ -1,0 +1,291 @@
+---
+title: "Strong vs Eventual Consistency - System Design Interview Mastery"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "distributed-systems"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master strong vs eventual consistency for system design interviews. Covers CAP theorem mapping, synchronous vs async replication, quorum tuning, hybrid approaches, and real-world database examples.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# ⚔️ Strong vs Eventual Consistency (Interview Mastery)
+
+---
+
+# 🔷 1. Core Idea (1-liner clarity)
+
+* **Strong Consistency** → Always latest data (no stale reads)
+* **Eventual Consistency** → Fast, but may return stale data temporarily
+
+---
+
+### 🧠 Script
+
+> "Consistency defines whether all replicas return the same latest value. Strong gives correctness, eventual gives performance."
+
+---
+
+### 💡 FAANG Q
+
+**Q:** Why can't we always use strong consistency?
+**A:** Because of **CAP theorem** → during network partition, we must choose between **Consistency vs Availability**.
+
+---
+
+# 🔷 2. Strong Consistency (Deep but crisp)
+
+### ✅ Key Points
+
+* Guarantees **latest write visibility**
+* Uses **synchronous replication**
+* Writes succeed only after **all/majority nodes updated**
+* Often uses:
+
+  * Leader-based replication
+  * Quorum (W ≥ majority)
+
+---
+
+### 🏗️ Architecture Decision
+
+* Leader → handles all writes
+* Replicas → updated synchronously
+* Reads:
+
+  * From leader OR
+  * From replicas after sync
+
+---
+
+### ⚠️ Trade-offs
+
+* ❌ High latency (cross-region sync)
+* ❌ Lower availability (fails if nodes down)
+* ✅ No stale reads (strict correctness)
+
+---
+
+### 📌 Signals (When to use)
+
+Use Strong Consistency when:
+
+* Money involved 💰
+* Inventory critical
+* No duplication allowed
+* User expects instant correctness
+
+---
+
+### 🧠 Script
+
+> "I'll use strong consistency for critical data like payments or inventory. I'll use synchronous replication and quorum to ensure all reads return the latest value."
+
+---
+
+### 💡 FAANG Q
+
+**Q:** How do you implement strong consistency globally?
+**A:**
+
+* Leader-based replication
+* Synchronous writes
+* Quorum (W + R > N)
+* Example: Google Spanner uses TrueTime for global consistency
+
+---
+
+# 🔷 3. Eventual Consistency
+
+### ✅ Key Points
+
+* Data becomes consistent **over time**
+* Uses **asynchronous replication**
+* Writes succeed immediately
+* Temporary stale reads possible
+
+---
+
+### 🏗️ Architecture Decision
+
+* Multi-leader OR leaderless (Dynamo-style)
+* Background replication
+* Conflict resolution:
+
+  * Last write wins
+  * Vector clocks
+
+---
+
+### ⚠️ Trade-offs
+
+* ✅ Very fast (low latency)
+* ✅ Highly available
+* ❌ Temporary inconsistency
+
+---
+
+### 📌 Signals (When to use)
+
+Use Eventual Consistency when:
+
+* High traffic systems
+* Global users 🌍
+* Slight delay acceptable
+* Reads >> Writes
+
+---
+
+### 🧠 Script
+
+> "I'll use eventual consistency where latency and availability matter more than perfect accuracy, using async replication and conflict resolution."
+
+---
+
+### 💡 FAANG Q
+
+**Q:** How do you handle conflicts in eventual consistency?
+**A:**
+
+* Last-write-wins
+* Versioning (vector clocks)
+* Application-level merge
+
+---
+
+# 🔷 4. Strong vs Eventual (Comparison Shortcut)
+
+| Factor       | Strong        | Eventual       |
+| ------------ | ------------- | -------------- |
+| Data         | Always latest | Might be stale |
+| Latency      | High          | Low            |
+| Availability | Lower         | High           |
+| Replication  | Sync          | Async          |
+| Use case     | Banking       | Social media   |
+
+---
+
+### 🧠 Script
+
+> "Strong consistency sacrifices availability and latency for correctness, while eventual consistency sacrifices correctness temporarily for performance and availability."
+
+---
+
+# 🔷 5. Architecture Decision Framework (VERY IMPORTANT 🔥)
+
+### 🎯 Ask these in interview:
+
+#### 1. Can system tolerate stale data?
+
+* ❌ NO → Strong
+* ✅ YES → Eventual
+
+#### 2. Is system global?
+
+* ✅ YES → Eventual preferred
+
+#### 3. Is data critical?
+
+* ✅ YES → Strong
+
+#### 4. Read-heavy system?
+
+* ✅ YES → Eventual
+
+#### 5. Partition tolerance needed?
+
+* ✅ YES → Eventual
+
+---
+
+### 🧠 Script
+
+> "I'll decide based on business needs: if correctness is critical I'll choose strong, otherwise I'll optimize for availability using eventual consistency."
+
+---
+
+# 🔷 6. Real-World Mapping (Interviewer loves this)
+
+### Strong Consistency
+
+* Banking systems
+* Payment processing
+* Booking systems
+
+---
+
+### Eventual Consistency
+
+* Social feeds
+* Chat systems
+* CDN caching
+* Analytics
+
+Examples:
+
+* Amazon DynamoDB → eventual (default)
+* Apache Cassandra → eventual
+
+---
+
+# 🔷 7. Hybrid Approach (Senior-level answer 🚀)
+
+### 🔥 Best Answer Strategy
+
+Use BOTH:
+
+| Component       | Consistency |
+| --------------- | ----------- |
+| Payments        | Strong      |
+| Inventory       | Strong      |
+| Recommendations | Eventual    |
+| Likes/Views     | Eventual    |
+
+---
+
+### 🧠 Script
+
+> "In real systems, I use hybrid consistency—strong for critical paths and eventual for derived or high-scale components."
+
+---
+
+### 💡 FAANG Q
+
+**Q:** How would you design an e-commerce system consistency?
+**A:**
+
+* Payments → Strong
+* Inventory → Strong
+* Recommendations → Eventual
+* Analytics → Eventual
+
+---
+
+# 🔷 8. Hidden Advanced Points (Add in interview 🔥)
+
+* CAP Theorem:
+
+  * Strong → CP
+  * Eventual → AP
+
+* Quorum tuning:
+
+  * Strong: W + R > N
+  * Eventual: W = 1, R = 1
+
+* Read-your-writes consistency (middle ground)
+
+---
+
+### 🧠 Script
+
+> "This is a CAP trade-off: strong consistency favors consistency over availability, while eventual consistency favors availability and partition tolerance."
+
+---
+
+# 🔷 9. One-line Closing (Perfect Ending)
+
+> "There is no one-size-fits-all—strong consistency for correctness-critical paths, eventual consistency for scalable and highly available systems."
+

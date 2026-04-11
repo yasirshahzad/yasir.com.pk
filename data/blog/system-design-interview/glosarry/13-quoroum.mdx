@@ -1,0 +1,311 @@
+---
+title: "Quorum in Distributed Systems - FAANG System Design Interview Guide"
+date: '2026-04-11'
+tags: ["system-design-interview", "system-design", "distributed-systems"]
+draft: false
+authors: ['default']
+layout: PostSimple
+images: ['/static/images/solid/solid.jpg']
+summary: Master quorum concepts for system design interviews. Covers read/write quorum, R+W>N formula, odd node preference, fault tolerance configurations, split-brain prevention, and FAANG interview scripts.
+---
+
+<TOCInline toc={props.toc} exclude="Overview" toHeading={3} />
+
+# 🔷 1. What is Quorum?
+
+### ✅ Key Idea
+
+* **Minimum number of nodes required** to agree before an operation is successful
+
+👉 Example:
+
+* 5 nodes → quorum = **3 (majority)**
+
+---
+
+### 🎯 Purpose
+
+* Ensure **consistency across replicas**
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why do we need quorum in distributed systems?
+**A:**
+To ensure **consistent and correct decisions** across replicated nodes
+
+---
+
+### 🧠 Script
+
+"Quorum ensures that a majority of nodes agree before committing an operation, maintaining consistency."
+
+---
+
+# 🔷 2. Why Quorum is Needed (Problem)
+
+### ❗ Problem
+
+* Data is replicated → nodes can be **out of sync**
+
+👉 Example:
+
+* Write goes to R1
+* Read from R2 → stale data ❌
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** What problem does quorum solve?
+**A:**
+It prevents **stale reads and inconsistent views**
+
+---
+
+### 🧠 Script
+
+"Without quorum, different replicas may return inconsistent data."
+
+---
+
+# 🔷 3. Majority Rule (Core Rule)
+
+### ✅ Formula
+
+```
+Quorum = ⌈N/2⌉ + 1
+```
+
+---
+
+### ✅ Examples
+
+* N=5 → 3 nodes → tolerate 2 failures
+* N=4 → 3 nodes → tolerate 1 failure ❌
+
+👉 Hence:
+
+* Always prefer **odd number of nodes**
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why prefer odd number of nodes?
+**A:**
+Maximizes fault tolerance with same quorum size
+
+---
+
+### 🧠 Script
+
+"Using odd nodes improves fault tolerance while keeping quorum minimal."
+
+---
+
+# 🔷 4. Read & Write Quorum (MOST IMPORTANT)
+
+### ✅ Definitions
+
+* **N** = total replicas
+* **W** = write quorum
+* **R** = read quorum
+
+---
+
+### ✅ Rule for Consistency
+
+```
+R + W > N
+```
+
+👉 Guarantees:
+
+* Read always sees latest write
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why must R + W > N?
+**A:**
+Ensures overlap → at least one node has latest data
+
+---
+
+### 🧠 Script
+
+"R + W greater than N ensures reads intersect with latest writes."
+
+---
+
+# 🔷 5. Configurations Trade-offs
+
+### ✅ Example Setups
+
+#### ⚡ Fast Write
+
+* (N=3, W=1, R=3)
+* Pros: fast writes
+* Cons: weak durability
+
+---
+
+#### ⚡ Fast Read
+
+* (N=3, W=3, R=1)
+* Pros: fast reads
+* Cons: slow writes
+
+---
+
+#### ⚖️ Balanced (Common)
+
+* (N=3, W=2, R=2)
+* Strong consistency ✅
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Which quorum config gives strong consistency?
+**A:**
+Any config where **R + W > N** (e.g., 2 + 2 > 3)
+
+---
+
+### 🧠 Script
+
+"Balanced quorum ensures both consistency and reasonable performance."
+
+---
+
+# 🔷 6. How Quorum Works
+
+### ✅ Steps
+
+1. Client sends request
+2. Operation sent to multiple nodes
+3. Wait until quorum reached
+4. Commit decision
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** What happens if quorum is not reached?
+**A:**
+Operation fails or retries
+
+---
+
+### 🧠 Script
+
+"Operations succeed only after reaching the required quorum."
+
+---
+
+# 🔷 7. Use Cases
+
+### ✅ Common Systems
+
+* Distributed DBs → **Apache Cassandra**
+* Consensus → Paxos / Raft
+* Cluster management (avoid split-brain)
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Where is quorum used in real systems?
+**A:**
+Databases, consensus protocols, and cluster coordination
+
+---
+
+### 🧠 Script
+
+"Quorum is widely used in databases and consensus systems to ensure correctness."
+
+---
+
+# 🔷 8. Advantages
+
+### ✅ Benefits
+
+* Fault tolerance ✅
+* Strong consistency ✅
+* High availability (within limits) ✅
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** How does quorum improve fault tolerance?
+**A:**
+System works as long as quorum nodes are alive
+
+---
+
+### 🧠 Script
+
+"Quorum allows systems to tolerate failures while maintaining consistency."
+
+---
+
+# 🔷 9. Challenges
+
+### ❌ Issues
+
+* Network partition → quorum may fail
+* Latency → waiting for multiple nodes
+* Complexity → harder to implement
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** What is the impact of network partition on quorum?
+**A:**
+System may become unavailable if quorum cannot be formed
+
+---
+
+### 🧠 Script
+
+"Quorum systems may sacrifice availability during partitions to preserve consistency."
+
+---
+
+# 🔷 10. Interview Gold Points (Often Missed)
+
+### ⭐ Important
+
+* Based on **CAP theorem**
+* Trade-off: consistency vs availability
+* Used with **replication + consistent hashing**
+* Avoid **split-brain problem**
+* Reads are more frequent → optimize for **R < W**
+
+---
+
+### 🔥 FAANG Question
+
+**Q:** Why is R usually smaller than W?
+**A:**
+Because reads are more frequent → optimize latency
+
+---
+
+### 🧠 Script
+
+"Systems optimize quorum by making reads faster than writes."
+
+---
+
+# 🚀 Final 20-sec Interview Answer
+
+"Quorum is the minimum number of nodes required to agree on an operation in a distributed system. It ensures consistency across replicated data. Typically, a majority quorum is used, and the condition R + W > N guarantees that reads always see the latest writes. By tuning read and write quorum sizes, systems balance consistency, availability, and performance. Quorum is widely used in distributed databases and consensus protocols."
+
