@@ -105,9 +105,17 @@
     & :where(code):not(pre code) {
       color: var(--color-indigo-500);
     }
+    
+    /* Enhanced Typography Spacing */
+    & p, & li {
+      line-height: 1.85;
+      margin-bottom: 1.2em;
+    }
   }
 
   .prose-invert {
+    color: var(--color-gray-300); /* Softer base gray */
+
     & a {
       color: var(--color-primary-500);
 
@@ -120,8 +128,9 @@
       }
     }
 
+    /* Soften headers to prevent harsh contrast in dark mode */
     & :where(h1, h2, h3, h4, h5, h6) {
-      color: var(--color-gray-100);
+      color: var(--color-gray-200); 
     }
   }
 }

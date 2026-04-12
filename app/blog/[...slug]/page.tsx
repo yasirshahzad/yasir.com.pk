@@ -120,8 +120,13 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
   
   const contentHtml = processedContent.toString()
 
+  // Calculate reading time
+  const words = (post.content || '').trim().split(/\s+/).length;
+  const readingTime = Math.ceil(words / 200);
+
   const mainContent = {
     ...mapPost(post),
+    readingTime: readingTime > 0 ? readingTime : 1,
     toc,
   }
 

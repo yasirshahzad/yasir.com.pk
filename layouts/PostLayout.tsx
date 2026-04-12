@@ -8,6 +8,7 @@ import Image from '@/components/Image'
 import Tag from '@/components/Tag'
 import siteMetadata from '@/data/siteMetadata'
 import ScrollTopAndComment from '@/components/ScrollTopAndComment'
+import ReadingProgressBar from '@/components/ReadingProgressBar'
 
 const editUrl = (path) => `${siteMetadata.siteRepo}/blob/main/data/${path}`
 const discussUrl = (path) =>
@@ -29,12 +30,14 @@ interface LayoutProps {
 }
 
 export default function PostLayout({ content, authorDetails, next, prev, children }: LayoutProps) {
-  const { filePath, path, slug, date, title, tags } = content
+  // @ts-ignore
+  const { filePath, path, slug, date, title, tags, readingTime } = content
   const basePath = path.split('/')[0]
 
   return (
     <SectionContainer>
       <ScrollTopAndComment />
+      <ReadingProgressBar />
       <article>
         <div className="xl:divide-y xl:divide-gray-200 xl:dark:divide-gray-700">
           <header className="pt-6 xl:pb-6">
@@ -42,10 +45,16 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
               <dl className="space-y-10">
                 <div>
                   <dt className="sr-only">Published on</dt>
-                  <dd className="text-base leading-6 font-medium text-gray-500 dark:text-gray-400">
+                  <dd className="text-base leading-6 font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 pb-2 xl:border-b-0 xl:pb-0 dark:border-gray-700">
                     <time dateTime={date || new Date().toISOString()}>
                       {new Date(date || new Date().toISOString()).toLocaleDateString(siteMetadata.locale, postDateTemplate)}
                     </time>
+                    {readingTime && (
+                      <>
+                        <span className="mx-2 text-gray-400 dark:text-gray-500">•</span>
+                        <span className="whitespace-nowrap">⏳ {readingTime} min read</span>
+                      </>
+                    )}
                   </dd>
                 </div>
               </dl>
@@ -93,7 +102,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
               </dd>
             </dl>
             <div className="divide-y divide-gray-200 xl:col-span-3 xl:row-span-2 xl:pb-0 dark:divide-gray-700">
-              <div className="prose dark:prose-invert max-w-none pt-10 pb-8">{children}</div>
+              <div className="prose prose-lg dark:prose-invert max-w-none pt-10 pb-8">{children}</div>
               <div className="pt-6 pb-6 text-sm text-gray-700 dark:text-gray-300">
                 <Link href={discussUrl(path)} rel="nofollow">
                   Discuss on Twitter
