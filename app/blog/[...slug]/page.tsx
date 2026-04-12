@@ -1,138 +1,138 @@
 import 'css/prism.css'
 import 'katex/dist/katex.css'
-
-import PageTitle from '@/components/PageTitle'
-import { components } from '@/components/MDXComponents'
-import { MDXLayoutRenderer } from 'pliny/mdx-components'
-import { sortPosts, coreContent, allCoreContent } from 'pliny/utils/contentlayer'
-import { allBlogs, allAuthors } from 'contentlayer/generated'
-import type { Authors, Blog } from 'contentlayer/generated'
+import { getPostBySlug, getAllPosts, mapPost } from 'lib/db/posts'
+import { getAuthorBySlug } from 'lib/db/authors'
 import PostSimple from '@/layouts/PostSimple'
 import PostLayout from '@/layouts/PostLayout'
 import PostBanner from '@/layouts/PostBanner'
-import { Metadata } from 'next'
-import siteMetadata from '@/data/siteMetadata'
 import { notFound } from 'next/navigation'
-
-const defaultLayout = 'PostLayout'
+import { remark } from 'remark'
+import html from 'remark-html'
+import remarkGfm from 'remark-gfm'
+import { extractTocHeadings } from 'pliny/mdx-plugins/index.js'
+import Link from '@/components/Link'
+import siteMetadata from '@/data/siteMetadata'
+import { Metadata } from 'next'
 
 const layouts = {
   PostSimple,
   PostLayout,
   PostBanner,
 }
+const defaultLayout = 'PostLayout'
 
 export async function generateMetadata(props: {
   params: Promise<{ slug: string[] }>
 }): Promise<Metadata | undefined> {
-  const params = await props.params
-
-  const slug = decodeURI(params.slug.join('/'))
-
-  const post = allBlogs.find((p) => p.slug === slug)
-
-  const authorList = post?.authors || ['default']
-
-  const authorDetails = authorList.map((author) => {
-    const authorResults = allAuthors.find((p) => p.slug === author)
-    return coreContent(authorResults as Authors)
-  })
-
-  if (!post) {
-    return
-  }
-
-  const publishedAt = new Date(post.date).toISOString()
-
-  const modifiedAt = new Date(post.lastmod || post.date).toISOString()
-
-  const authors = authorDetails.map((author) => author.name)
-
-  let imageList = [siteMetadata.socialBanner]
-
-  if (post.images) {
-    imageList = typeof post.images === 'string' ? [post.images] : post.images
-  }
-
-  const ogImages = imageList.map((img) => {
-    return {
-      url: img && img.includes('http') ? img : siteMetadata.siteUrl + img,
+  try {
+    const params = await props.params
+    const slug = decodeURI(params.slug.join('/'))
+    const post = await getPostBySlug(slug)
+    if (!post) return
+    const authorList = (post.authors as string[]) || ['default']
+    const authorDetails = authorList.map((author) => getAuthorBySlug(author)).filter(Boolean)
+    const dateStr = post.date || new Date().toISOString()
+    const publishedAt = new Date(dateStr).toISOString()
+    const modifiedAt = post.updatedAt ? post.updatedAt.toISOString() : publishedAt
+    const authors = authorDetails.map((author: any) => author.name)
+    let imageList = [siteMetadata.socialBanner]
+    if (post.images) {
+      imageList = Array.isArray(post.images) ? post.images : [post.images as string]
     }
-  })
-
-  return {
-    title: post.title,
-    description: post.summary,
-    openGraph: {
+    const ogImages = imageList.map((img) => ({
+      url: img && img.includes('http') ? img : siteMetadata.siteUrl + img,
+    }))
+    return {
       title: post.title,
       description: post.summary,
-      siteName: siteMetadata.title,
-      locale: 'en_US',
-      type: 'article',
-      publishedTime: publishedAt,
-      modifiedTime: modifiedAt,
-      url: './',
-      images: ogImages,
-      authors: authors.length > 0 ? authors : [siteMetadata.author],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: post.title,
-      description: post.summary,
-      images: imageList,
-    },
+      openGraph: {
+        title: post.title,
+        description: post.summary,
+        siteName: siteMetadata.title,
+        locale: siteMetadata.locale,
+        type: 'article',
+        publishedTime: publishedAt,
+        modifiedTime: modifiedAt,
+        url: './',
+        images: ogImages,
+        authors: authors.length > 0 ? authors : [siteMetadata.author],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: post.title,
+        description: post.summary,
+        images: imageList,
+      },
+    }
+  } catch (error) {
+    return {}
   }
 }
 
 export const generateStaticParams = async () => {
-  return allBlogs.map((p) => ({ slug: p.slug.split('/').map((name) => decodeURI(name)) }))
+  const allPosts = await getAllPosts()
+  return allPosts.map((p) => ({ slug: p.slug.split('/') }))
+}
+
+function TableOfContents({ toc }: { toc: any[] }) {
+  if (!toc || toc.length === 0) return null
+  return (
+    <div className="mb-8 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
+      <h2 className="mb-4 text-xl font-bold">Table of Contents</h2>
+      <ul className="space-y-2">
+        {toc.map((item) => (
+          <li 
+            key={item.url} 
+            style={{ paddingLeft: `${(item.depth - 1) * 1}rem` }}
+            className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
+          >
+            <Link href={item.url}>{item.value}</Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
 }
 
 export default async function Page(props: { params: Promise<{ slug: string[] }> }) {
   const params = await props.params
   const slug = decodeURI(params.slug.join('/'))
+  const post = await getPostBySlug(slug)
 
-  // Filter out drafts in production
-  const sortedCoreContents = allCoreContent(sortPosts(allBlogs))
-  const postIndex = sortedCoreContents.findIndex((p) => p.slug === slug)
-
-  if (postIndex === -1) {
+  if (!post) {
     return notFound()
   }
 
-  const prev = sortedCoreContents[postIndex + 1]
-  const next = sortedCoreContents[postIndex - 1]
-  const post = allBlogs.find((p) => p.slug === slug) as Blog
+  const authorList = (post.authors as string[]) || ['default']
+  const authorDetails = authorList.map((author) => getAuthorBySlug(author)).filter(Boolean) as any
 
-  const authorList = post?.authors || ['default']
+  let toc = []
+  try {
+    toc = await extractTocHeadings(post.content || '')
+  } catch (e) {
+    console.error('TOC Extraction Error:', e)
+  }
 
-  const authorDetails = authorList.map((author) => {
-    const authorResults = allAuthors.find((p) => p.slug === author)
-    return coreContent(authorResults as Authors)
-  })
+  const processedContent = await remark()
+    .use(remarkGfm)
+    .use(html)
+    .process(post.content || '')
+  
+  const contentHtml = processedContent.toString()
 
-  const mainContent = coreContent(post)
+  const mainContent = {
+    ...mapPost(post),
+    toc,
+  }
 
-  const jsonLd = post.structuredData
-
-  jsonLd['author'] = authorDetails.map((author) => {
-    return {
-      '@type': 'Person',
-      name: author.name,
-    }
-  })
-
-  const Layout = layouts[post.layout || defaultLayout]
+  const Layout = layouts[post.layout as keyof typeof layouts] || layouts[defaultLayout]
 
   return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-      <Layout content={mainContent} authorDetails={authorDetails} next={next} prev={prev}>
-        <MDXLayoutRenderer code={post.body.code} components={components} toc={post.toc} />
-      </Layout>
-    </>
+    <Layout content={mainContent} authorDetails={authorDetails}>
+      <div className="prose dark:prose-invert max-w-none pt-10 pb-8">
+        <TableOfContents toc={toc} />
+        <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
+      </div>
+    </Layout>
   )
 }

@@ -1,0 +1,258 @@
+'use client'
+
+import { useState, useMemo } from 'react'
+import dynamic from 'next/dynamic'
+import { savePostAction, deletePostAction } from './actions'
+import 'easymde/dist/easymde.min.css'
+import { marked } from 'marked'
+
+// Dynamically import the editor to prevent SSR errors
+const SimpleMDE = dynamic(() => import('react-simplemde-editor'), { ssr: false })
+
+// Font Awesome is required for the editor icons
+const FONT_AWESOME_URL = 'https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css'
+
+interface PostFormProps {
+  post?: any
+  isEditing?: boolean
+}
+
+export default function PostForm({ post, isEditing }: PostFormProps) {
+  const [content, setContent] = useState(post?.content || '')
+
+  // Editor options for a professional experience
+  const editorOptions = useMemo(() => {
+    return {
+      autofocus: false,
+      spellChecker: false,
+      placeholder: 'Write your masterpiece here...',
+      status: ['lines', 'words', 'cursor'],
+      toolbar: [
+        'bold', 'italic', 'heading', '|', 
+        'quote', 'unordered-list', 'ordered-list', '|', 
+        'link', 'image', 'table', '|', 
+        'preview', 'side-by-side', 'fullscreen', '|', 
+        'guide'
+      ],
+      renderingConfig: {
+        singleLineBreaks: false,
+        codeSyntaxHighlighting: true,
+      },
+      // Restored preview with stable 'marked' v4 rendering
+      previewRender: (plainText: string, preview: HTMLElement) => {
+        if (preview) {
+          // Add website's prose classes for styling
+          preview.classList.add('prose', 'dark:prose-invert', 'max-w-none', 'p-4')
+          
+          // Use marked to render the actual markdown safely
+          return marked.parse(plainText)
+        }
+        return ''
+      }
+    }
+  }, [])
+
+  return (
+    <form action={savePostAction} className="space-y-6">
+      <link rel="stylesheet" href={FONT_AWESOME_URL} preconnect-href="https://maxcdn.bootstrapcdn.com" />
+      <input type="hidden" name="isEditing" value={isEditing ? 'true' : 'false'} />
+      {isEditing && <input type="hidden" name="originalSlug" value={post.slug} />}
+      
+      <input type="hidden" name="content" value={content} />
+
+      {/* Grid for metadata */}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <div className="space-y-2">
+          <label htmlFor="title" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Title
+          </label>
+          <input
+            type="text"
+            name="title"
+            id="title"
+            defaultValue={post?.title}
+            required
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-700"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="slug" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Slug
+          </label>
+          <input
+            type="text"
+            name="slug"
+            id="slug"
+            defaultValue={post?.slug}
+            required
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-700"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Date
+          </label>
+          <input
+            type="datetime-local"
+            name="date"
+            id="date"
+            defaultValue={post?.date ? new Date(post.date).toISOString().slice(0, 16) : new Date().toISOString().slice(0, 16)}
+            required
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-700"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="tags" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Tags (comma separated)
+          </label>
+          <input
+            type="text"
+            name="tags"
+            id="tags"
+            defaultValue={post?.tags?.join(', ')}
+            placeholder="news, tech, lifestyle"
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-700"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="authors" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Authors (comma separated)
+          </label>
+          <input
+            type="text"
+            name="authors"
+            id="authors"
+            defaultValue={post?.authors?.join(', ') || 'default'}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-700"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="layout" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Layout
+          </label>
+          <select
+            name="layout"
+            id="layout"
+            defaultValue={post?.layout || 'PostLayout'}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-700"
+          >
+            <option value="PostLayout">Standard</option>
+            <option value="PostSimple">Simple</option>
+            <option value="PostBanner">Banner</option>
+          </select>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            name="draft"
+            id="draft"
+            defaultChecked={post?.draft}
+            className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+          />
+          <label htmlFor="draft" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Keep as Draft
+          </label>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <label htmlFor="summary" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Summary
+        </label>
+        <textarea
+          name="summary"
+          id="summary"
+          rows={3}
+          defaultValue={post?.summary}
+          className="block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 dark:bg-gray-800 dark:border-gray-700"
+        />
+      </div>
+
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Content (WYSIWYG Markdown Editor)
+        </label>
+        <div className="prose-editor dark:prose-invert">
+          <SimpleMDE 
+            value={content} 
+            onChange={setContent} 
+            options={editorOptions}
+          />
+        </div>
+      </div>
+
+      <div className="flex justify-between items-center pt-4">
+        {isEditing && (
+          <button
+            type="button"
+            onClick={async () => {
+              if (confirm('Are you sure you want to delete this post?')) {
+                await deletePostAction(post.slug)
+              }
+            }}
+            className="rounded-md border border-red-300 bg-white px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:bg-gray-800 dark:text-red-400 dark:border-red-900/50 dark:hover:bg-red-900/20"
+          >
+            Delete Post
+          </button>
+        )}
+        <div className="flex space-x-4 ml-auto">
+          <a
+            href="/admin"
+            className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700"
+          >
+            Cancel
+          </a>
+          <button
+            type="submit"
+            className="inline-flex justify-center rounded-md border border-transparent bg-primary-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:hover:bg-primary-400"
+          >
+            {isEditing ? 'Update Post' : 'Save Post'}
+          </button>
+        </div>
+      </div>
+      
+      <style jsx global>{`
+        .editor-toolbar {
+          background: white;
+          border-color: #d1d5db;
+          border-radius: 0.375rem 0.375rem 0 0;
+        }
+        .CodeMirror {
+          border-color: #d1d5db;
+          border-radius: 0 0 0.375rem 0.375rem;
+          min-height: 500px;
+        }
+        .dark .editor-toolbar {
+          background: #111827;
+          border-color: #374151;
+          color: white;
+        }
+        .dark .editor-toolbar button {
+          color: white !important;
+        }
+        .dark .editor-toolbar button.active, .dark .editor-toolbar button:hover {
+          background: #1f2937;
+        }
+        .dark .CodeMirror {
+          background: #111827;
+          color: #f3f4f6;
+          border-color: #374151;
+        }
+        .dark .editor-preview-side {
+          background: #111827;
+          border-color: #374151;
+          color: #f3f4f6;
+        }
+        .editor-preview-side.prose, .editor-preview.prose {
+          max-width: none !important;
+        }
+      `}</style>
+    </form>
+  )
+}

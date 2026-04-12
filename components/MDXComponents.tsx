@@ -6,9 +6,16 @@ import Image from './Image'
 import CustomLink from './Link'
 import TableWrapper from './TableWrapper'
 
+const SafeTOCInline = (props: any) => {
+  if (!props.toc || (Array.isArray(props.toc) && props.toc.length === 0)) {
+    return null
+  }
+  return <TOCInline {...props} />
+}
+
 export const components: MDXComponents = {
   Image,
-  TOCInline,
+  TOCInline: SafeTOCInline,
   a: CustomLink,
   pre: Pre,
   table: TableWrapper,

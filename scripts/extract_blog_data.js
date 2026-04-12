@@ -5,6 +5,7 @@ const blogDir = 'd:/Projects/yasir.com.pk/data/blog';
 const outputFile = 'd:/Projects/yasir.com.pk/data/blog_data.json';
 
 function getFiles(dir, fileList = []) {
+  if (!fs.existsSync(dir)) return fileList;
   const files = fs.readdirSync(dir);
   files.forEach(file => {
     const filePath = path.join(dir, file);
@@ -18,23 +19,29 @@ function getFiles(dir, fileList = []) {
 }
 
 function parseFrontmatter(content) {
-  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!match) return { metadata: {}, content };
+  // More robust frontmatter extraction
+  const parts = content.split(/---+\r?\n/);
+  if (parts.length < 3) {
+    // If no frontmatter delimiter found, try just a very simple check
+    return { metadata: {}, body: content };
+  }
   
-  const yaml = match[1];
-  const body = content.slice(match[0].length).trim();
+  const yaml = parts[1];
+  const body = parts.slice(2).join('---').trim();
   const metadata = {};
   
   yaml.split(/\r?\n/).forEach(line => {
-    const [key, ...valueParts] = line.split(':');
-    if (key && valueParts.length > 0) {
-      let value = valueParts.join(':').trim();
+    const separatorIndex = line.indexOf(':');
+    if (separatorIndex !== -1) {
+      const key = line.slice(0, separatorIndex).trim();
+      let value = line.slice(separatorIndex + 1).trim();
+      
       if (value.startsWith('"') && value.endsWith('"')) value = value.slice(1, -1);
       if (value.startsWith("'") && value.endsWith("'")) value = value.slice(1, -1);
       if (value.startsWith('[') && value.endsWith(']')) {
         value = value.slice(1, -1).split(',').map(s => s.trim().replace(/^['"]|['"]$/g, ''));
       }
-      metadata[key.trim()] = value;
+      metadata[key] = value;
     }
   });
   
@@ -42,11 +49,17 @@ function parseFrontmatter(content) {
 }
 
 const allFiles = getFiles(blogDir);
+console.log(`Analyzing ${allFiles.length} files...`);
+
 const data = allFiles.map(file => {
   const content = fs.readFileSync(file, 'utf8');
   const { metadata, body } = parseFrontmatter(content);
   const relativePath = path.relative(blogDir, file).replace(/\\/g, '/');
   const slug = relativePath.replace(/\.(mdx|md)$/, '');
+  
+  if (!metadata.title) {
+    console.warn(`⚠️ Warning: No title found for ${relativePath}`);
+  }
   
   return {
     slug,
