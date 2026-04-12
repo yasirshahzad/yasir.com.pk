@@ -13,7 +13,10 @@ export function middleware(req: NextRequest) {
     const adminPwd = process.env.ADMIN_PASSWORD || 'password'
 
     if (user === adminUser && pwd === adminPwd) {
-      return NextResponse.next()
+      const response = NextResponse.next()
+      // Set a cookie so the frontend knows the user is an admin without abandoning SSG
+      response.cookies.set('adminSession', '1', { path: '/', maxAge: 60 * 60 * 24 * 7 })
+      return response
     }
   }
 
