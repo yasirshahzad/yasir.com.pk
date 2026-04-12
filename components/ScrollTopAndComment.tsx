@@ -2,6 +2,7 @@
 
 import siteMetadata from '@/data/siteMetadata'
 import { useEffect, useState } from 'react'
+import InlineReader from '@/components/InlineReader'
 
 const ScrollTopAndComment = () => {
   const [show, setShow] = useState(false)
@@ -24,8 +25,10 @@ const ScrollTopAndComment = () => {
   }
   return (
     <div
-      className={`fixed right-8 bottom-8 hidden flex-col gap-3 ${show ? 'md:flex' : 'md:hidden'}`}
+      className={`fixed right-8 bottom-8 hidden flex-col gap-3 z-40 ${show ? 'md:flex' : 'md:hidden'}`}
     >
+      {/* Inline Quick Dictionary Button */}
+      <InlineReader />
       {siteMetadata.comments?.provider && (
         <button
           aria-label="Scroll To Comment"

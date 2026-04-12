@@ -4,6 +4,7 @@ import Link from './Link'
 import MobileNav from './MobileNav'
 import ThemeSwitch from './ThemeSwitch'
 import SearchButton from './SearchButton'
+import StreakWidget from './StreakWidget'
 import Image from 'next/image'
 
 const Header = () => {
@@ -44,6 +45,7 @@ const Header = () => {
             ))}
         </div>
         <SearchButton />
+        <StreakWidget />
         <ThemeSwitch />
         <MobileNav />
       </div>

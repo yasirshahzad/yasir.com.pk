@@ -1,4 +1,4 @@
-import { pgTable, serial, text, timestamp, boolean, jsonb, varchar } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, boolean, jsonb, varchar, integer, date } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -20,4 +20,19 @@ export const posts = pgTable('posts', {
   content: text('content').notNull(),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const readerProfiles = pgTable('reader_profiles', {
+  id: text('id').primaryKey(), // UUID string, securely pinned in the user's browser cookie
+  currentStreak: integer('current_streak').default(0), 
+  longestStreak: integer('longest_streak').default(0),
+  lastActiveDate: date('last_active_date'), // 'YYYY-MM-DD'
+  createdAt: timestamp('created_at').defaultNow(),
+});
+
+export const readingLogs = pgTable('reading_logs', {
+  id: serial('id').primaryKey(),
+  readerId: text('reader_id').notNull(), // Links to reader_profiles.id
+  date: date('date').notNull(), // 'YYYY-MM-DD'
+  totalSeconds: integer('total_seconds').default(0),
 });
