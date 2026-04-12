@@ -7,8 +7,10 @@ import PostLayout from '@/layouts/PostLayout'
 import PostBanner from '@/layouts/PostBanner'
 import { notFound } from 'next/navigation'
 import { remark } from 'remark'
-import html from 'remark-html'
 import remarkGfm from 'remark-gfm'
+import remarkRehype from 'remark-rehype'
+import rehypeSlug from 'rehype-slug'
+import rehypeStringify from 'rehype-stringify'
 import { extractTocHeadings } from 'pliny/mdx-plugins/index.js'
 import Link from '@/components/Link'
 import siteMetadata from '@/data/siteMetadata'
@@ -115,7 +117,9 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
 
   const processedContent = await remark()
     .use(remarkGfm)
-    .use(html)
+    .use(remarkRehype)
+    .use(rehypeSlug)
+    .use(rehypeStringify)
     .process(post.content || '')
   
   const contentHtml = processedContent.toString()
