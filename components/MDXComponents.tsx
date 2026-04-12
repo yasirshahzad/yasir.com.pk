@@ -5,6 +5,7 @@ import type { MDXComponents } from 'mdx/types'
 import Image from './Image'
 import CustomLink from './Link'
 import TableWrapper from './TableWrapper'
+import QuizQuestion from './QuizQuestion'
 
 const SafeTOCInline = (props: any) => {
   if (!props.toc || (Array.isArray(props.toc) && props.toc.length === 0)) {
@@ -18,7 +19,8 @@ export const components: MDXComponents = {
   TOCInline: SafeTOCInline,
   a: CustomLink,
   pre: AdvancedPre,
-
   table: TableWrapper,
   BlogNewsletterForm,
+  QuizQuestion,
 }
+

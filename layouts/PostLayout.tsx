@@ -12,6 +12,8 @@ import AdminControls from '@/components/AdminControls'
 import FocusTracker from '@/components/FocusTracker'
 import SectionContainer from '@/components/SectionContainer'
 import DynamicTOC from '@/components/DynamicTOC'
+import HighlightToShare from '@/components/HighlightToShare'
+
 
 const editUrl = (path) => `${siteMetadata.siteRepo}/blob/main/data/${path}`
 const discussUrl = (path) =>
@@ -42,6 +44,7 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
       <ScrollTopAndComment />
       <FocusTracker />
       <ReadingProgressBar />
+      <HighlightToShare />
       <article>
         <div className="xl:divide-y xl:divide-gray-200 xl:dark:divide-gray-700">
           <header className="pt-6 xl:pb-6">

@@ -36,3 +36,11 @@ export const readingLogs = pgTable('reading_logs', {
   date: date('date').notNull(), // 'YYYY-MM-DD'
   totalSeconds: integer('total_seconds').default(0),
 });
+
+export const readerNotes = pgTable('reader_notes', {
+  id: serial('id').primaryKey(),
+  userId: text('user_id').notNull(), // Links to reader_profiles.id
+  quote: text('quote').notNull(),
+  sourceUrl: text('source_url').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+});
