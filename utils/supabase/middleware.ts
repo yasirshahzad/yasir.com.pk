@@ -32,13 +32,14 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  // Guard all /admin routes. If no user, immediately redirect to /login
-  if (
-    !user &&
-    request.nextUrl.pathname.startsWith('/admin')
-  ) {
+  // Guard all /admin routes. Only process.env.ADMIN_EMAIL gets access.
+  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
+  const isAdmin = user && user.email === process.env.ADMIN_EMAIL
+
+  if (isAdminRoute && !isAdmin) {
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    // Bounce fully unauthenticated to login, bounce low-privilege users back to home
+    url.pathname = user ? '/' : '/login'
     return NextResponse.redirect(url)
   }
 

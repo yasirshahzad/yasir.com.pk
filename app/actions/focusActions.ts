@@ -12,18 +12,17 @@ function getTodayDateString() {
   return d.toISOString().split('T')[0]
 }
 
-// Ensure the Admin profile exists gracefully
-async function getOrInstallAdminProfile() {
-  const adminId = 'admin'
+// Ensure the Reader profile exists gracefully
+async function getOrInstallReaderProfile(userId: string) {
   try {
-    const existing = await db.select().from(readerProfiles).where(eq(readerProfiles.id, adminId)).limit(1)
+    const existing = await db.select().from(readerProfiles).where(eq(readerProfiles.id, userId)).limit(1)
     if (existing.length === 0) {
-      await db.insert(readerProfiles).values({ id: adminId, currentStreak: 0, longestStreak: 0 })
+      await db.insert(readerProfiles).values({ id: userId, currentStreak: 0, longestStreak: 0 })
     }
   } catch (e) {
-    console.error('Failed to query or seed admin account', e)
+    console.error('Failed to query or seed reader account', e)
   }
-  return adminId
+  return userId
 }
 
 export async function syncFocusTime(seconds: number) {
@@ -33,11 +32,11 @@ export async function syncFocusTime(seconds: number) {
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) {
-    return { success: false, reason: 'Not authenticated as admin' }
+    return { success: false, reason: 'Not authenticated' }
   }
 
   try {
-    const readerId = await getOrInstallAdminProfile()
+    const readerId = await getOrInstallReaderProfile(user.id)
     const todayStr = getTodayDateString()
 
     // 1. Log or update today's focus time
@@ -99,17 +98,18 @@ export async function getReaderStats() {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-      return null
+      return { isLoggedIn: false }
     }
 
-    const focusId = 'admin'
+    const focusId = user.id
 
     const profileArray = await db.select()
       .from(readerProfiles)
       .where(eq(readerProfiles.id, focusId))
       .limit(1)
 
-    if (profileArray.length === 0) return null
+    if (profileArray.length === 0) return { isLoggedIn: true, currentStreak: 0, longestStreak: 0, secondsToday: 0 }
+    
     const profile = profileArray[0]
 
     const todayStr = getTodayDateString()
@@ -121,6 +121,7 @@ export async function getReaderStats() {
     const secondsToday = logArray.length > 0 ? (logArray[0].totalSeconds || 0) : 0
 
     return {
+      isLoggedIn: true,
       currentStreak: profile.currentStreak || 0,
       longestStreak: profile.longestStreak || 0,
       secondsToday,
@@ -128,6 +129,7 @@ export async function getReaderStats() {
     }
   } catch (error) {
     console.error('Focus fetch error', error)
-    return null
+    return { isLoggedIn: false }
   }
 }
+
