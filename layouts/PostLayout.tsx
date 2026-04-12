@@ -10,6 +10,8 @@ import ScrollTopAndComment from '@/components/ScrollTopAndComment'
 import ReadingProgressBar from '@/components/ReadingProgressBar'
 import AdminControls from '@/components/AdminControls'
 import FocusTracker from '@/components/FocusTracker'
+import SectionContainer from '@/components/SectionContainer'
+import DynamicTOC from '@/components/DynamicTOC'
 
 const editUrl = (path) => `${siteMetadata.siteRepo}/blob/main/data/${path}`
 const discussUrl = (path) =>
@@ -102,6 +104,11 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
                   ))}
                 </ul>
               </dd>
+              
+              {/* Dynamic Reading Nav Map */}
+              <div className="hidden xl:block mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
+                <DynamicTOC />
+              </div>
             </dl>
             <div className="divide-y divide-gray-200 xl:col-span-3 xl:row-span-2 xl:pb-0 dark:divide-gray-700">
               <AdminControls slug={slug} />

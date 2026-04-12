@@ -193,3 +193,21 @@ input:-webkit-autofill:focus {
   display: inline-block;
   vertical-align: middle;
 }
+
+/* ZEN MODE CHROME DIMMING */
+body.zen-mode-active header,
+body.zen-mode-active footer,
+body.zen-mode-active .zen-mode-hide {
+  opacity: 0.15;
+  transition: opacity 0.4s ease;
+}
+
+body.zen-mode-active header:hover,
+body.zen-mode-active footer:hover,
+body.zen-mode-active .zen-mode-hide:hover {
+  opacity: 1;
+}
+
+html {
+  transition: font-size 0.2s ease-out;
+}
