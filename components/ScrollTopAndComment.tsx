@@ -25,9 +25,7 @@ const ScrollTopAndComment = () => {
     document.getElementById('comment')?.scrollIntoView()
   }
   return (
-    <div
-      className="fixed right-8 bottom-8 hidden flex-col gap-3 z-40 md:flex"
-    >
+    <div className="fixed right-8 bottom-8 z-40 hidden flex-col gap-3 md:flex">
       {/* Zen Mode / Typography Options (Always Visible on Desktop) */}
       <ZenModeControls />
 
@@ -61,7 +59,6 @@ const ScrollTopAndComment = () => {
           />
         </svg>
       </button>
-
     </div>
   )
 }

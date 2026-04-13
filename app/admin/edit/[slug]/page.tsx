@@ -1,4 +1,4 @@
-import { getPostBySlug } from 'lib/db/posts'
+import { getPostBySlug } from '@/lib/db/posts'
 import PostForm from '../../PostForm'
 import SectionContainer from '@/components/SectionContainer'
 import PageTitle from '@/components/PageTitle'

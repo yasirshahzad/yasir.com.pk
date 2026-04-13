@@ -132,7 +132,10 @@ export default function ListLayoutWithTags({
                       <dl>
                         <dt className="sr-only">Published on</dt>
                         <dd className="text-base leading-6 font-medium text-gray-500 dark:text-gray-400">
-                          <time dateTime={date || new Date().toISOString()} suppressHydrationWarning>
+                          <time
+                            dateTime={date || new Date().toISOString()}
+                            suppressHydrationWarning
+                          >
                             {formatDate(date || new Date().toISOString(), siteMetadata.locale)}
                           </time>
                         </dd>

@@ -1,4 +1,4 @@
-import { getAllPosts, mapPost } from 'lib/db/posts'
+import { getAllPosts, mapPost } from '@/lib/db/posts'
 import Main from './Main'
 
 export default async function Page() {

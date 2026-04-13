@@ -2,6 +2,7 @@
 
 import { useState, useRef, ReactNode } from 'react'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export default function AdvancedPre({ children, ...props }: { children: any; [key: string]: any }) {
   const [copied, setCopied] = useState(false)
   const preRef = useRef<HTMLPreElement>(null)
@@ -29,10 +30,10 @@ export default function AdvancedPre({ children, ...props }: { children: any; [ke
   }
 
   return (
-    <div className="group relative my-6 overflow-hidden rounded-xl bg-gray-900 border border-gray-800 shadow-2xl">
+    <div className="group relative my-6 overflow-hidden rounded-xl border border-gray-800 bg-gray-900 shadow-2xl">
       {/* Top action bar */}
       <div className="flex items-center justify-between bg-gray-800/80 px-4 py-2 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-        <span className="text-xs font-bold uppercase tracking-wider text-gray-400">
+        <span className="text-xs font-bold tracking-wider text-gray-400 uppercase">
           {language || 'Code'}
         </span>
         <button
@@ -41,15 +42,31 @@ export default function AdvancedPre({ children, ...props }: { children: any; [ke
         >
           {copied ? (
             <>
-              <svg className="h-3 w-3 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+              <svg
+                className="h-3 w-3 text-green-400"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={3}
+              >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               Copied!
             </>
           ) : (
             <>
-              <svg className="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+              <svg
+                className="h-3 w-3"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                />
               </svg>
               Copy
             </>
@@ -57,7 +74,11 @@ export default function AdvancedPre({ children, ...props }: { children: any; [ke
         </button>
       </div>
 
-      <pre ref={preRef} className="p-4 overflow-x-auto text-sm leading-relaxed text-gray-100 no-scrollbar mt-0" {...props}>
+      <pre
+        ref={preRef}
+        className="no-scrollbar mt-0 overflow-x-auto p-4 text-sm leading-relaxed text-gray-100"
+        {...props}
+      >
         {children}
       </pre>
     </div>

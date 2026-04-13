@@ -10,7 +10,9 @@ export default function AdminControls({ slug }: { slug: string }) {
   useEffect(() => {
     const checkAuth = async () => {
       const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
       if (user) setIsAdmin(true)
     }
     checkAuth()
@@ -19,10 +21,10 @@ export default function AdminControls({ slug }: { slug: string }) {
   if (!isAdmin) return null
 
   return (
-    <div className="mt-4 flex items-center justify-center rounded-lg border border-primary-100 bg-primary-50 px-4 py-3 dark:border-primary-900 dark:bg-primary-900/10">
+    <div className="border-primary-100 bg-primary-50 dark:border-primary-900 dark:bg-primary-900/10 mt-4 flex items-center justify-center rounded-lg border px-4 py-3">
       <Link
         href={`/admin/edit/${slug}`}
-        className="flex items-center text-sm font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+        className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 flex items-center text-sm font-bold"
       >
         ✏️ Edit this Article in Admin Panel
       </Link>

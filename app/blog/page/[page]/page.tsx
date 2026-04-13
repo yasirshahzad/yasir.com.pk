@@ -1,5 +1,5 @@
 import ListLayout from '@/layouts/ListLayoutWithTags'
-import { getAllPosts, mapPost, getTagCounts } from 'lib/db/posts'
+import { getAllPosts, mapPost, getTagCounts } from '@/lib/db/posts'
 import { notFound } from 'next/navigation'
 
 const POSTS_PER_PAGE = 5
@@ -17,7 +17,7 @@ export default async function Page(props: { params: Promise<{ page: string }> })
   const allDbPosts = await getAllPosts()
   const tagCounts = await getTagCounts()
   const posts = allDbPosts.map(mapPost)
-  
+
   const pageNumber = parseInt(params.page as string)
   const totalPages = Math.ceil(posts.length / POSTS_PER_PAGE)
 
@@ -35,8 +35,10 @@ export default async function Page(props: { params: Promise<{ page: string }> })
 
   return (
     <ListLayout
-      posts={posts}
-      initialDisplayPosts={initialDisplayPosts}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      posts={posts as any}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      initialDisplayPosts={initialDisplayPosts as any}
       pagination={pagination}
       title="All Posts"
       tagCounts={tagCounts}

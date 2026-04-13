@@ -33,7 +33,7 @@ export default function ZenModeControls() {
   const toggleZenMode = (enabled: boolean) => {
     setIsZenMode(enabled)
     localStorage.setItem('blog-zen-mode', enabled ? 'true' : 'false')
-    
+
     // Zen mode hides standard site navigations to focus entirely on the reading content
     if (enabled) {
       document.body.classList.add('zen-mode-active')
@@ -50,10 +50,19 @@ export default function ZenModeControls() {
         aria-label="Reader Preferences"
         title="Reader Preferences (Zen Mode, Font Size)"
         onClick={() => setIsOpen(true)}
-        className="rounded-full bg-gray-200 p-2 text-gray-500 transition-all hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600 shadow-lg hover:rotate-3"
+        className="rounded-full bg-gray-200 p-2 text-gray-500 shadow-lg transition-all hover:rotate-3 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M10 2a1 1 0 00-.707.293l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7A1 1 0 0010 2zm3 9a1 1 0 00-1-1H8a1 1 0 00-1 1v1h6v-1z" clipRule="evenodd" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-5 w-5"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fillRule="evenodd"
+            d="M10 2a1 1 0 00-.707.293l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7A1 1 0 0010 2zm3 9a1 1 0 00-1-1H8a1 1 0 00-1 1v1h6v-1z"
+            clipRule="evenodd"
+          />
         </svg>
       </button>
 
@@ -82,33 +91,33 @@ export default function ZenModeControls() {
                 leaveFrom="opacity-100 scale-100 translate-y-0"
                 leaveTo="opacity-0 scale-95 translate-y-4"
               >
-                <Dialog.Panel className="w-full max-w-sm transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-2xl transition-all dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+                <Dialog.Panel className="w-full max-w-sm transform overflow-hidden rounded-2xl border border-gray-200 bg-white p-6 text-left align-middle shadow-2xl transition-all dark:border-gray-800 dark:bg-gray-900">
                   <Dialog.Title
                     as="h3"
-                    className="text-lg font-bold leading-6 text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700 pb-3"
+                    className="border-b border-gray-200 pb-3 text-lg leading-6 font-bold text-gray-900 dark:border-gray-700 dark:text-gray-100"
                   >
                     Reader Preferences
                   </Dialog.Title>
-                  
+
                   <div className="mt-6 flex flex-col gap-6">
                     {/* Font Scaling */}
                     <div>
-                      <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-wider">
+                      <p className="mb-3 text-sm font-semibold tracking-wider text-gray-700 uppercase dark:text-gray-300">
                         Typography Scale
                       </p>
-                      <div className="flex items-center gap-4 bg-gray-50 dark:bg-gray-800 p-2 rounded-xl">
+                      <div className="flex items-center gap-4 rounded-xl bg-gray-50 p-2 dark:bg-gray-800">
                         <button
                           onClick={() => applyFontScale(fontSizeScale - 10)}
-                          className="flex-1 rounded-lg bg-gray-200 dark:bg-gray-700 py-2 text-gray-900 dark:text-gray-100 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                          className="flex-1 rounded-lg bg-gray-200 py-2 font-bold text-gray-900 transition hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
                         >
                           A-
                         </button>
-                        <span className="w-16 text-center font-mono text-primary-500 font-bold">
+                        <span className="text-primary-500 w-16 text-center font-mono font-bold">
                           {fontSizeScale}%
                         </span>
                         <button
                           onClick={() => applyFontScale(fontSizeScale + 10)}
-                          className="flex-1 rounded-lg bg-gray-200 dark:bg-gray-700 py-2 text-gray-900 dark:text-gray-100 font-bold hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                          className="flex-1 rounded-lg bg-gray-200 py-2 font-bold text-gray-900 transition hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-600"
                         >
                           A+
                         </button>
@@ -116,14 +125,18 @@ export default function ZenModeControls() {
                     </div>
 
                     {/* Zen Mode Toggle */}
-                    <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <div className="flex items-center justify-between border-t border-gray-200 pt-6 dark:border-gray-700">
                       <div>
-                        <p className="text-sm font-bold text-gray-900 dark:text-gray-100">Zen Mode</p>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">Dim all distractions globally</p>
+                        <p className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                          Zen Mode
+                        </p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          Dim all distractions globally
+                        </p>
                       </div>
                       <button
                         onClick={() => toggleZenMode(!isZenMode)}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 ${
+                        className={`focus:ring-primary-500 relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:ring-2 focus:ring-offset-2 focus:outline-none ${
                           isZenMode ? 'bg-primary-600' : 'bg-gray-200 dark:bg-gray-700'
                         }`}
                       >
@@ -139,7 +152,7 @@ export default function ZenModeControls() {
                   <div className="mt-8">
                     <button
                       type="button"
-                      className="w-full inline-flex justify-center rounded-xl border border-transparent bg-primary-100 px-4 py-3 text-sm font-semibold text-primary-900 hover:bg-primary-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 dark:bg-primary-900/30 dark:text-primary-300 dark:hover:bg-primary-900/50"
+                      className="bg-primary-100 text-primary-900 hover:bg-primary-200 focus-visible:ring-primary-500 dark:bg-primary-900/30 dark:text-primary-300 dark:hover:bg-primary-900/50 inline-flex w-full justify-center rounded-xl border border-transparent px-4 py-3 text-sm font-semibold focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
                       onClick={() => setIsOpen(false)}
                     >
                       Done Editing

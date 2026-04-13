@@ -57,4 +57,3 @@ export async function logout() {
   revalidatePath('/', 'layout')
   redirect('/')
 }
-

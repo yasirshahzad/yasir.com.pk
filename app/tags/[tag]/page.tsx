@@ -1,7 +1,7 @@
 import { slug } from 'github-slugger'
 import siteMetadata from '@/data/siteMetadata'
 import ListLayout from '@/layouts/ListLayoutWithTags'
-import { getAllPosts, mapPost, getTagCounts } from 'lib/db/posts'
+import { getAllPosts, mapPost, getTagCounts } from '@/lib/db/posts'
 import { genPageMetadata } from 'app/seo'
 import { Metadata } from 'next'
 
@@ -28,8 +28,8 @@ export async function generateMetadata(props: {
 export const generateStaticParams = async () => {
   const allPosts = await getAllPosts()
   const tags = new Set<string>()
-  allPosts.forEach(post => {
-    post.tags?.forEach(tag => tags.add(slug(tag)))
+  allPosts.forEach((post) => {
+    post.tags?.forEach((tag) => tags.add(slug(tag)))
   })
   return Array.from(tags).map((tag) => ({
     tag: encodeURI(tag),
@@ -40,7 +40,7 @@ export default async function TagPage(props: { params: Promise<{ tag: string }> 
   const params = await props.params
   const tag = decodeURI(params.tag)
   const title = tag[0].toUpperCase() + tag.split(' ').join('-').slice(1)
-  
+
   const allDbPosts = await getAllPosts()
   const tagCounts = await getTagCounts()
   const filteredPosts = allDbPosts
@@ -56,8 +56,10 @@ export default async function TagPage(props: { params: Promise<{ tag: string }> 
 
   return (
     <ListLayout
-      posts={filteredPosts}
-      initialDisplayPosts={initialDisplayPosts}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      posts={filteredPosts as any}
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      initialDisplayPosts={initialDisplayPosts as any}
       pagination={pagination}
       title={title}
       tagCounts={tagCounts}

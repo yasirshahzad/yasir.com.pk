@@ -34,10 +34,11 @@ export default function HighlightToShare() {
       }
 
       const text = selection.toString().trim()
-      if (text.length > 5) { // Only trigger for meaningful selections
+      if (text.length > 5) {
+        // Only trigger for meaningful selections
         const range = selection.getRangeAt(0)
         const rect = range.getBoundingClientRect()
-        
+
         // Position it explicitly above the center of the selection
         setPosition({
           x: rect.left + rect.width / 2,
@@ -78,12 +79,12 @@ export default function HighlightToShare() {
 
   const handleSaveNote = async () => {
     // Dynamic import to avoid SSR issues if any, but since it's a server action, static import is cleaner.
-    // We didn't import it at the top, let's do it now. 
+    // We didn't import it at the top, let's do it now.
     setIsSaving(true)
     const { saveNote } = await import('app/actions/noteActions')
     const result = await saveNote(selectedText, window.location.pathname)
     setIsSaving(false)
-    
+
     if (result.success) {
       setSaveStatus('Saved!')
       setTimeout(() => {
@@ -99,7 +100,7 @@ export default function HighlightToShare() {
   return (
     <div
       id="highlight-toolbar"
-      className="fixed z-50 flex items-center gap-2 rounded-xl bg-gray-900 border border-gray-700 px-3 py-2 text-sm shadow-2xl transition-all duration-200 animate-in fade-in zoom-in-95 pointer-events-auto"
+      className="animate-in fade-in zoom-in-95 pointer-events-auto fixed z-50 flex items-center gap-2 rounded-xl border border-gray-700 bg-gray-900 px-3 py-2 text-sm shadow-2xl transition-all duration-200"
       style={{
         left: position.x,
         top: position.y,
@@ -108,46 +109,57 @@ export default function HighlightToShare() {
     >
       <button
         onClick={handleShareX}
-        className="flex items-center gap-2 rounded-lg py-1 px-2.5 font-semibold text-white hover:bg-gray-800 transition"
+        className="flex items-center gap-2 rounded-lg px-2.5 py-1 font-semibold text-white transition hover:bg-gray-800"
       >
-        <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg>
+        <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+        </svg>
         Quote
       </button>
-      
-      <div className="w-px h-5 bg-gray-700"></div>
-      
+
+      <div className="h-5 w-px bg-gray-700"></div>
+
       <button
         onClick={handleCopy}
-        className="flex items-center gap-1.5 rounded-lg py-1 px-2.5 font-semibold text-gray-300 hover:text-white hover:bg-gray-800 transition"
+        className="flex items-center gap-1.5 rounded-lg px-2.5 py-1 font-semibold text-gray-300 transition hover:bg-gray-800 hover:text-white"
       >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+        <svg
+          className="h-4 w-4"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+          />
         </svg>
         Copy
       </button>
 
-      <div className="w-px h-5 bg-gray-700"></div>
-      
+      <div className="h-5 w-px bg-gray-700"></div>
+
       <button
         onClick={handleSaveNote}
         disabled={isSaving || saveStatus !== null}
-        className={`flex items-center gap-1.5 rounded-lg py-1 px-2.5 font-semibold transition ${
-          saveStatus === 'Saved!' 
-            ? 'text-green-400 bg-green-900/40' 
+        className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 font-semibold transition ${
+          saveStatus === 'Saved!'
+            ? 'bg-green-900/40 text-green-400'
             : saveStatus === 'Login required'
-              ? 'text-red-400 bg-red-900/40'
+              ? 'bg-red-900/40 text-red-400'
               : 'text-primary-400 hover:text-primary-300 hover:bg-gray-800'
         }`}
       >
-        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
           <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
         </svg>
         {isSaving ? 'Saving...' : saveStatus || 'Save'}
       </button>
 
       {/* Downward Caret Arrow */}
-      <div className="absolute left-1/2 top-full -mt-px -ml-2 border-[8px] border-transparent border-t-gray-900 drop-shadow-sm"></div>
+      <div className="absolute top-full left-1/2 -mt-px -ml-2 border-[8px] border-transparent border-t-gray-900 drop-shadow-sm"></div>
     </div>
   )
 }
-

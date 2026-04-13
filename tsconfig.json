@@ -23,6 +23,7 @@
       "@/css/*": ["css/*"],
       "@/utils/*": ["utils/*"],
       "@/app/*": ["app/*"],
+      "@/lib/*": ["lib/*"],
       "pliny/*": ["node_modules/pliny/*"],
       "lib/*": ["lib/*"],
       "types/*": ["types/*"]

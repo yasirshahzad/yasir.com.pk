@@ -14,7 +14,6 @@ import SectionContainer from '@/components/SectionContainer'
 import DynamicTOC from '@/components/DynamicTOC'
 import HighlightToShare from '@/components/HighlightToShare'
 
-
 const editUrl = (path) => `${siteMetadata.siteRepo}/blob/main/data/${path}`
 const discussUrl = (path) =>
   `https://mobile.twitter.com/search?q=${encodeURIComponent(`${siteMetadata.siteUrl}/${path}`)}`
@@ -52,9 +51,12 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
               <dl className="space-y-10">
                 <div>
                   <dt className="sr-only">Published on</dt>
-                  <dd className="text-base leading-6 font-medium text-gray-500 dark:text-gray-400 border-b border-gray-200 pb-2 xl:border-b-0 xl:pb-0 dark:border-gray-700">
+                  <dd className="border-b border-gray-200 pb-2 text-base leading-6 font-medium text-gray-500 xl:border-b-0 xl:pb-0 dark:border-gray-700 dark:text-gray-400">
                     <time dateTime={date || new Date().toISOString()}>
-                      {new Date(date || new Date().toISOString()).toLocaleDateString(siteMetadata.locale, postDateTemplate)}
+                      {new Date(date || new Date().toISOString()).toLocaleDateString(
+                        siteMetadata.locale,
+                        postDateTemplate
+                      )}
                     </time>
                     {readingTime && (
                       <>
@@ -107,15 +109,17 @@ export default function PostLayout({ content, authorDetails, next, prev, childre
                   ))}
                 </ul>
               </dd>
-              
+
               {/* Dynamic Reading Nav Map */}
-              <div className="hidden xl:block mt-8 border-t border-gray-200 dark:border-gray-700 pt-8">
+              <div className="mt-8 hidden border-t border-gray-200 pt-8 xl:block dark:border-gray-700">
                 <DynamicTOC />
               </div>
             </dl>
             <div className="divide-y divide-gray-200 xl:col-span-3 xl:row-span-2 xl:pb-0 dark:divide-gray-700">
               <AdminControls slug={slug} />
-              <div className="prose prose-lg dark:prose-invert max-w-none pt-10 pb-8">{children}</div>
+              <div className="prose prose-lg dark:prose-invert max-w-none pt-10 pb-8">
+                {children}
+              </div>
               <div className="pt-6 pb-6 text-sm text-gray-700 dark:text-gray-300">
                 <Link href={discussUrl(path)} rel="nofollow">
                   Discuss on Twitter

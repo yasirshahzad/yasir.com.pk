@@ -1,4 +1,4 @@
-import { getAllPosts } from 'lib/db/posts'
+import { getAllPosts } from '@/lib/db/posts'
 import Link from '@/components/Link'
 import SectionContainer from '@/components/SectionContainer'
 import PageTitle from '@/components/PageTitle'
@@ -16,7 +16,7 @@ export default async function AdminDashboard() {
             <PageTitle>Admin Dashboard</PageTitle>
             <Link
               href="/admin/new"
-              className="rounded-md bg-primary-500 px-4 py-2 font-medium text-white hover:bg-primary-600 dark:hover:bg-primary-400"
+              className="bg-primary-500 hover:bg-primary-600 dark:hover:bg-primary-400 rounded-md px-4 py-2 font-medium text-white"
             >
               New Post
             </Link>
@@ -30,16 +30,16 @@ export default async function AdminDashboard() {
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                     Date
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                     Title
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400">
+                  <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
                     Actions
                   </th>
                 </tr>
@@ -50,13 +50,13 @@ export default async function AdminDashboard() {
                 ))}
                 {posts.map((post) => (
                   <tr key={post.slug} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                       {post.date ? formatDate(post.date, siteMetadata.locale) : 'No Date'}
                     </td>
                     <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
                       {post.title}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                       {post.draft ? (
                         <span className="rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
                           Draft
@@ -67,10 +67,10 @@ export default async function AdminDashboard() {
                         </span>
                       )}
                     </td>
-                    <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                    <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
                       <Link
                         href={`/admin/edit/${post.slug}`}
-                        className="mr-4 text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
+                        className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400 mr-4"
                       >
                         Edit
                       </Link>

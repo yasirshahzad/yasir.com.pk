@@ -29,7 +29,9 @@ export default function PostLayout({ content, next, prev, children }: LayoutProp
                 <div>
                   <dt className="sr-only">Published on</dt>
                   <dd className="text-base leading-6 font-medium text-gray-500 dark:text-gray-400">
-                    <time dateTime={date || new Date().toISOString()}>{formatDate(date || new Date().toISOString(), siteMetadata.locale)}</time>
+                    <time dateTime={date || new Date().toISOString()}>
+                      {formatDate(date || new Date().toISOString(), siteMetadata.locale)}
+                    </time>
                   </dd>
                 </div>
               </dl>

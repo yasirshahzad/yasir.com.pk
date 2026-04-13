@@ -7,7 +7,8 @@ import CustomLink from './Link'
 import TableWrapper from './TableWrapper'
 import QuizQuestion from './QuizQuestion'
 
-const SafeTOCInline = (props: any) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const SafeTOCInline = (props: { toc: any[]; [key: string]: any }) => {
   if (!props.toc || (Array.isArray(props.toc) && props.toc.length === 0)) {
     return null
   }
@@ -23,4 +24,3 @@ export const components: MDXComponents = {
   BlogNewsletterForm,
   QuizQuestion,
 }
-

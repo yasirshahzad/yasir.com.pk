@@ -15,11 +15,13 @@ export default function DynamicTOC() {
   useEffect(() => {
     // 1. Scan the article for headers
     const elements = Array.from(document.querySelectorAll('.prose h2, .prose h3'))
-    const items: TOCItem[] = elements.map((elem) => ({
-      id: elem.id,
-      text: elem.textContent || '',
-      level: Number(elem.tagName.substring(1)), // 2 or 3
-    })).filter(item => item.id) // Only keep items with IDs (injected by rehype-slug)
+    const items: TOCItem[] = elements
+      .map((elem) => ({
+        id: elem.id,
+        text: elem.textContent || '',
+        level: Number(elem.tagName.substring(1)), // 2 or 3
+      }))
+      .filter((item) => item.id) // Only keep items with IDs (injected by rehype-slug)
 
     setHeadings(items)
 
@@ -43,8 +45,8 @@ export default function DynamicTOC() {
   if (headings.length === 0) return null
 
   return (
-    <div className="sticky top-24 max-h-[calc(100vh-6rem)] overflow-y-auto no-scrollbar rounded-xl bg-gray-50/50 p-4 dark:bg-gray-900/30 border border-gray-100 dark:border-gray-800 hidden xl:block z-10 transition-all">
-      <h3 className="mb-4 text-xs font-bold uppercase tracking-wider text-gray-500 dark:text-gray-400">
+    <div className="no-scrollbar sticky top-24 z-10 hidden max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-all xl:block dark:border-gray-800 dark:bg-gray-900/30">
+      <h3 className="mb-4 text-xs font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
         On this page
       </h3>
       <ul className="space-y-2.5 text-sm">
@@ -55,7 +57,7 @@ export default function DynamicTOC() {
               heading.level === 3 ? 'ml-4 text-xs' : 'font-medium'
             } ${
               activeId === heading.id
-                ? 'text-primary-600 dark:text-primary-400 font-bold border-l-2 border-primary-500 pl-2 -ml-[10px]'
+                ? 'text-primary-600 dark:text-primary-400 border-primary-500 -ml-[10px] border-l-2 pl-2 font-bold'
                 : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >

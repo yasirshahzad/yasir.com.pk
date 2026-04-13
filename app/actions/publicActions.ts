@@ -1,6 +1,6 @@
 'use server'
 
-import { getPostBySlug } from 'lib/db/posts'
+import { getPostBySlug } from '@/lib/db/posts'
 import { remark } from 'remark'
 import remarkGfm from 'remark-gfm'
 import remarkRehype from 'remark-rehype'
@@ -23,10 +23,10 @@ export async function fetchRenderedPost(slug: string) {
       .use(rehypeStringify)
       .process(post.content)
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       html: processedContent.toString(),
-      title: post.title 
+      title: post.title,
     }
   } catch (error) {
     console.error('Error fetching inline post:', error)

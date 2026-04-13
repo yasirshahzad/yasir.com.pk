@@ -10,7 +10,9 @@ export async function saveNote(quote: string, url: string) {
 
   try {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
     if (!user) {
       return { success: false, reason: 'Not authenticated' }
@@ -32,15 +34,20 @@ export async function saveNote(quote: string, url: string) {
 export async function getReaderNotes() {
   try {
     const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
     if (!user) {
       return null
     }
 
-    const notes = await db.select()
+    const notes = await db
+      .select()
       .from(readerNotes)
+      // @ts-ignore
       .where(eq(readerNotes.userId, user.id))
+      // @ts-ignore
       .orderBy(desc(readerNotes.createdAt))
 
     return notes

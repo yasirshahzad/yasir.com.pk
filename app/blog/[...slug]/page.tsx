@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import 'css/prism.css'
 import 'katex/dist/katex.css'
-import { getPostBySlug, getAllPosts, mapPost } from 'lib/db/posts'
-import { getAuthorBySlug } from 'lib/db/authors'
+import { getPostBySlug, getAllPosts, mapPost } from '@/lib/db/posts'
+import { getAuthorBySlug } from '@/lib/db/authors'
 import PostSimple from '@/layouts/PostSimple'
 import PostLayout from '@/layouts/PostLayout'
 import PostBanner from '@/layouts/PostBanner'
@@ -36,6 +37,7 @@ export async function generateMetadata(props: {
     const dateStr = post.date || new Date().toISOString()
     const publishedAt = new Date(dateStr).toISOString()
     const modifiedAt = post.updatedAt ? post.updatedAt.toISOString() : publishedAt
+
     const authors = authorDetails.map((author: any) => author.name)
     let imageList = [siteMetadata.socialBanner]
     if (post.images) {
@@ -46,10 +48,10 @@ export async function generateMetadata(props: {
     }))
     return {
       title: post.title,
-      description: post.summary,
+      description: post.summary || undefined,
       openGraph: {
         title: post.title,
-        description: post.summary,
+        description: post.summary || undefined,
         siteName: siteMetadata.title,
         locale: siteMetadata.locale,
         type: 'article',
@@ -62,7 +64,7 @@ export async function generateMetadata(props: {
       twitter: {
         card: 'summary_large_image',
         title: post.title,
-        description: post.summary,
+        description: post.summary || undefined,
         images: imageList,
       },
     }
@@ -73,7 +75,9 @@ export async function generateMetadata(props: {
 
 export const generateStaticParams = async () => {
   const allPosts = await getAllPosts()
-  return allPosts.map((p) => ({ slug: p.slug.split('/') }))
+  return allPosts.map((p) => ({
+    slug: p.slug.split('/').filter(Boolean),
+  }))
 }
 
 function TableOfContents({ toc }: { toc: any[] }) {
@@ -83,8 +87,8 @@ function TableOfContents({ toc }: { toc: any[] }) {
       <h2 className="mb-4 text-xl font-bold">Table of Contents</h2>
       <ul className="space-y-2">
         {toc.map((item) => (
-          <li 
-            key={item.url} 
+          <li
+            key={item.url}
             style={{ paddingLeft: `${(item.depth - 1) * 1}rem` }}
             className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
           >
@@ -108,7 +112,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
   const authorList = (post.authors as string[]) || ['default']
   const authorDetails = authorList.map((author) => getAuthorBySlug(author)).filter(Boolean) as any
 
-  let toc = []
+  let toc: any = []
   try {
     toc = await extractTocHeadings(post.content || '')
   } catch (e) {
@@ -121,12 +125,12 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
     .use(rehypeSlug)
     .use(rehypeStringify)
     .process(post.content || '')
-  
+
   const contentHtml = processedContent.toString()
 
   // Calculate reading time
-  const words = (post.content || '').trim().split(/\s+/).length;
-  const readingTime = Math.ceil(words / 200);
+  const words = (post.content || '').trim().split(/\s+/).length
+  const readingTime = Math.ceil(words / 200)
 
   const mainContent = {
     ...mapPost(post),
@@ -137,7 +141,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
   const Layout = layouts[post.layout as keyof typeof layouts] || layouts[defaultLayout]
 
   return (
-    <Layout content={mainContent} authorDetails={authorDetails}>
+    <Layout content={mainContent as any} authorDetails={authorDetails}>
       <div className="prose dark:prose-invert max-w-none pt-10 pb-8">
         <TableOfContents toc={toc} />
         <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
