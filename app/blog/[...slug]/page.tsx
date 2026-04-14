@@ -16,6 +16,8 @@ import { extractTocHeadings } from 'pliny/mdx-plugins/index.js'
 import Link from '@/components/Link'
 import siteMetadata from '@/data/siteMetadata'
 import { Metadata } from 'next'
+import { createClient } from '@/utils/supabase/server'
+import InlinePostEditor from '@/components/InlinePostEditor'
 
 const layouts = {
   PostSimple,
@@ -140,11 +142,20 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
 
   const Layout = layouts[post.layout as keyof typeof layouts] || layouts[defaultLayout]
 
+  // Check for admin session to enable inline editing
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const isAdmin = user && user.email === process.env.ADMIN_EMAIL
+
   return (
     <Layout content={mainContent as any} authorDetails={authorDetails}>
       <div className="prose dark:prose-invert max-w-none pt-10 pb-8">
         <TableOfContents toc={toc} />
-        <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
+        <InlinePostEditor slug={post.slug} initialHtml={contentHtml} isAdmin={!!isAdmin}>
+          <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
+        </InlinePostEditor>
       </div>
     </Layout>
   )
