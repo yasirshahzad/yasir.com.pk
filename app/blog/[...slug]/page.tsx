@@ -19,6 +19,7 @@ import { Metadata } from 'next'
 import { createClient } from '@/utils/supabase/server'
 import InlinePostEditor from '@/components/InlinePostEditor'
 
+
 const layouts = {
   PostSimple,
   PostLayout,
@@ -85,16 +86,29 @@ export const generateStaticParams = async () => {
 function TableOfContents({ toc }: { toc: any[] }) {
   if (!toc || toc.length === 0) return null
   return (
-    <div className="mb-8 rounded-lg border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-gray-800/50">
-      <h2 className="mb-4 text-xl font-bold">Table of Contents</h2>
+    <div className="mb-12 border-l border-gray-100 dark:border-gray-800 py-1 pl-6">
+      <h2 className="text-[11px] font-bold uppercase tracking-widest text-gray-400 mb-6">
+        Table of Contents
+      </h2>
       <ul className="space-y-2">
-        {toc.map((item) => (
+        {toc.map((item, index) => (
           <li
             key={item.url}
-            style={{ paddingLeft: `${(item.depth - 1) * 1}rem` }}
-            className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400"
+            style={{ paddingLeft: `${Math.max(0, item.depth - 2) * 1.5}rem` }}
+            className={`transition-all duration-200 ${
+              item.depth <= 2 && index !== 0 ? 'pt-4' : ''
+            }`}
           >
-            <Link href={item.url}>{item.value}</Link>
+            <Link
+              href={item.url}
+              className={`inline-block py-0.5 transition-colors ${
+                item.depth <= 2
+                  ? 'text-sm font-semibold text-gray-900 dark:text-gray-100 hover:text-primary-500'
+                  : 'text-[13px] text-gray-500 hover:text-primary-500 dark:text-gray-400'
+              }`}
+            >
+              {item.value}
+            </Link>
           </li>
         ))}
       </ul>
@@ -116,7 +130,8 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
 
   let toc: any = []
   try {
-    toc = await extractTocHeadings(post.content || '')
+    const allToc = await extractTocHeadings(post.content || '')
+    toc = allToc.filter((item: any) => item.depth <= 3)
   } catch (e) {
     console.error('TOC Extraction Error:', e)
   }

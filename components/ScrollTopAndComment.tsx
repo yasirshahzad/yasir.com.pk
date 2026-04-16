@@ -4,6 +4,7 @@ import siteMetadata from '@/data/siteMetadata'
 import { useEffect, useState } from 'react'
 import InlineReader from '@/components/InlineReader'
 import ZenModeControls from '@/components/ZenModeControls'
+import ExportMdxButton from '@/components/ExportMdxButton'
 
 const ScrollTopAndComment = () => {
   const [show, setShow] = useState(false)
@@ -31,6 +32,9 @@ const ScrollTopAndComment = () => {
 
       {/* Inline Quick Dictionary Button */}
       <InlineReader />
+
+      {/* Export MDX (visible on blog posts for logged-in users) */}
+      <ExportMdxButton />
       {siteMetadata.comments?.provider && (
         <button
           aria-label="Scroll To Comment"
