@@ -11,75 +11,116 @@ type TOCItem = {
 export default function DynamicTOC() {
   const [headings, setHeadings] = useState<TOCItem[]>([])
   const [activeId, setActiveId] = useState<string>('')
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    // 1. Scan the article for headers
     const elements = Array.from(document.querySelectorAll('.prose h2, .prose h3'))
     const items: TOCItem[] = elements
       .map((elem) => ({
         id: elem.id,
         text: elem.textContent || '',
-        level: Number(elem.tagName.substring(1)), // 2 or 3
+        level: Number(elem.tagName.substring(1)),
       }))
-      .filter((item) => item.id) // Only keep items with IDs (injected by rehype-slug)
+      .filter((item) => item.id)
 
     setHeadings(items)
 
-    // 2. Setup Intersection Observer for Dynamic Highlighting
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id)
-          }
+          if (entry.isIntersecting) setActiveId(entry.target.id)
         })
       },
-      { rootMargin: '0px 0px -80% 0px' } // Trigger when the heading is near the top
+      { rootMargin: '0px 0px -80% 0px' }
     )
 
     elements.forEach((elem) => observer.observe(elem))
-
     return () => observer.disconnect()
   }, [])
 
   if (headings.length === 0) return null
 
+  const activeHeading = headings.find((h) => h.id === activeId)
+
   return (
-    <div className="no-scrollbar sticky top-24 z-10 hidden max-h-[calc(100vh-6rem)] overflow-y-auto rounded-xl border border-gray-100 bg-gray-50/50 p-4 transition-all xl:block dark:border-gray-800 dark:bg-gray-900/30">
-      <h3 className="mb-4 text-xs font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
-        On this page
-      </h3>
-      <ul className="space-y-2.5 text-sm">
-        {headings.map((heading) => (
-          <li
-            key={heading.id}
-            className={`transition-colors duration-200 ${
-              heading.level === 3 ? 'ml-4 text-xs' : 'font-medium'
-            } ${
-              activeId === heading.id
-                ? 'text-primary-600 dark:text-primary-400 border-primary-500 -ml-[10px] border-l-2 pl-2 font-bold'
-                : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
-            }`}
+    <nav aria-label="Table of contents" className="select-none">
+      {/* Toggle row — always visible, takes ~1 line */}
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="group flex w-full items-center justify-between gap-2 rounded-lg py-1 text-left transition-colors"
+      >
+        <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
+          <svg className="h-3 w-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h10M4 18h7" />
+          </svg>
+          Contents
+        </span>
+
+        <span className="flex items-center gap-1.5 min-w-0">
+          {/* Show active section name when collapsed */}
+          {!open && activeHeading && (
+            <span className="truncate text-[10px] text-primary-500 dark:text-primary-400 font-medium max-w-[120px]">
+              {activeHeading.text}
+            </span>
+          )}
+          <svg
+            className={`h-3 w-3 shrink-0 text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2.5}
           >
-            <a
-              href={`#${heading.id}`}
-              onClick={(e) => {
-                e.preventDefault()
-                const target = document.getElementById(heading.id)
-                if (target) {
-                  // Smooth scroll accounting for sticky headers
-                  const y = target.getBoundingClientRect().top + window.scrollY - 100
-                  window.scrollTo({ top: y, behavior: 'smooth' })
-                }
-              }}
-              className="block truncate"
-              title={heading.text}
-            >
-              {heading.text}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </span>
+      </button>
+
+      {/* Expandable list */}
+      {open && (
+        <ul className="mt-2" style={{ margin: 0, padding: 0 }}>
+          {headings.map((heading) => {
+            const isActive = activeId === heading.id
+            const isH3 = heading.level === 3
+
+            return (
+              <li key={heading.id} style={{ margin: 0, padding: 0 }}>
+                <a
+                  href={`#${heading.id}`}
+                  title={heading.text}
+                  style={{ textDecoration: 'none' }}
+                  onClick={(e) => {
+                    e.preventDefault()
+                    const target = document.getElementById(heading.id)
+                    if (target) {
+                      const y = target.getBoundingClientRect().top + window.scrollY - 100
+                      window.scrollTo({ top: y, behavior: 'smooth' })
+                    }
+                    setOpen(false)
+                  }}
+                  className={[
+                    'group flex items-center gap-1.5 rounded py-[1px] text-[11px] leading-snug transition-all duration-150',
+                    isH3 ? 'pl-4' : 'pl-0',
+                    isActive
+                      ? 'text-primary-600 dark:text-primary-400 font-semibold'
+                      : 'text-gray-400 hover:text-gray-700 dark:text-gray-500 dark:hover:text-gray-300',
+                  ].join(' ')}
+                >
+                  <span
+                    className={[
+                      'inline-block h-1 shrink-0 rounded-full transition-all duration-200',
+                      isActive
+                        ? 'bg-primary-500 w-3'
+                        : 'bg-gray-300 dark:bg-gray-700 w-1 group-hover:w-2',
+                      isH3 ? 'opacity-60' : '',
+                    ].join(' ')}
+                  />
+                  <span className="truncate">{heading.text}</span>
+                </a>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </nav>
   )
 }

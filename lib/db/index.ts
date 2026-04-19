@@ -9,7 +9,14 @@ const globalForDb = global as unknown as {
   client: postgres.Sql | undefined
 }
 
-const client = globalForDb.client ?? postgres(connectionString, { prepare: false, max: 1 })
+const client =
+  globalForDb.client ??
+  postgres(connectionString, {
+    prepare: false,
+    max: 5,           // allow concurrent queries without contention
+    idle_timeout: 20, // release idle connections after 20s
+    connect_timeout: 10,
+  })
 
 if (process.env.NODE_ENV !== 'production') {
   globalForDb.client = client

@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useCallback } from 'react'
+import AIWritingPanel from '@/components/AIWritingPanel'
 import dynamic from 'next/dynamic'
 import { savePostAction, deletePostAction } from './actions'
 import 'easymde/dist/easymde.min.css'
@@ -21,6 +22,12 @@ interface PostFormProps {
 
 export default function PostForm({ post, isEditing }: PostFormProps) {
   const [content, setContent] = useState(post?.content || '')
+  const [aiPanelOpen, setAiPanelOpen] = useState(false)
+
+  const handleAIInsert = useCallback((text: string) => {
+    setContent((prev: string) => prev + '\n\n' + text)
+    // Keep panel open so the user can keep generating
+  }, [])
 
   // Editor options for a professional experience
   const editorOptions = useMemo(() => {
@@ -218,9 +225,21 @@ export default function PostForm({ post, isEditing }: PostFormProps) {
       </div>
 
       <div className="space-y-2">
-        <h3 className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-          Content (WYSIWYG Markdown Editor)
-        </h3>
+        <div className="flex items-center justify-between">
+          <h3 className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+            Content (WYSIWYG Markdown Editor)
+          </h3>
+          <button
+            type="button"
+            onClick={() => setAiPanelOpen(true)}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white rounded-lg text-xs font-bold transition-all"
+          >
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            AI Assistant
+          </button>
+        </div>
         <div className="prose-editor dark:prose-invert">
           <SimpleMDE
             value={content}
@@ -299,6 +318,28 @@ export default function PostForm({ post, isEditing }: PostFormProps) {
           max-width: none !important;
         }
       `}</style>
+
+      {/* AI Panel — rendered as a fixed right-side drawer in admin context */}
+      {aiPanelOpen && (
+        <>
+          {/* Clickable overlay (no blur) to close */}
+          <div
+            className="fixed inset-0 z-[200]"
+            onClick={() => setAiPanelOpen(false)}
+          />
+          <div className="fixed top-0 right-0 h-full w-full max-w-md z-[201] shadow-2xl">
+            <AIWritingPanel
+              isOpen={aiPanelOpen}
+              onClose={() => setAiPanelOpen(false)}
+              currentContent={content}
+              selectedText=""
+              onInsert={handleAIInsert}
+              onReplaceSelection={handleAIInsert}
+              onSendToAI={() => {}}
+            />
+          </div>
+        </>
+      )}
     </form>
   )
 }

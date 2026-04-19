@@ -16,16 +16,17 @@ export default function StreakWidget() {
   const [stats, setStats] = useState<StatsData | null>(null)
 
   useEffect(() => {
-    getReaderStats().then((data) => {
-      if (data) setStats(data as StatsData)
-    })
-
-    const interval = setInterval(() => {
-      getReaderStats().then((data) => {
+    const fetchStats = async () => {
+      try {
+        const data = await getReaderStats()
         if (data) setStats(data as StatsData)
-      })
-    }, 60000)
+      } catch {
+        // Silently ignore — stale action IDs or network errors shouldn't crash the widget
+      }
+    }
 
+    fetchStats()
+    const interval = setInterval(fetchStats, 60000)
     return () => clearInterval(interval)
   }, [])
 

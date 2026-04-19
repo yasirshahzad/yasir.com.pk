@@ -9,27 +9,31 @@ const PING_INTERVAL = 30000
 export default function FocusTracker() {
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const isTracking = useRef(true)
+  const failCountRef = useRef(0)
 
   useEffect(() => {
-    // Only track when the user actually has the window visible/focused
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        isTracking.current = true
-      } else {
-        isTracking.current = false
-      }
+      isTracking.current = document.visibilityState === 'visible'
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange)
 
-    const tick = () => {
-      if (isTracking.current) {
-        // Ping silently in the background
-        syncFocusTime(PING_INTERVAL / 1000).catch(console.error)
+    const tick = async () => {
+      if (!isTracking.current) return
+      try {
+        await syncFocusTime(PING_INTERVAL / 1000)
+        failCountRef.current = 0 // reset on success
+      } catch (err: unknown) {
+        failCountRef.current += 1
+        // If action IDs are stale (dev server recompiled), reload once to re-sync
+        const msg = err instanceof Error ? err.message : String(err)
+        if (msg.includes('Failed to find Server Action') || failCountRef.current >= 3) {
+          if (timerRef.current) clearInterval(timerRef.current)
+          window.location.reload()
+        }
       }
     }
 
-    // Start tracking loop
     timerRef.current = setInterval(tick, PING_INTERVAL)
 
     return () => {
@@ -38,5 +42,5 @@ export default function FocusTracker() {
     }
   }, [])
 
-  return null // Ghost Tracker (No UI)
+  return null
 }

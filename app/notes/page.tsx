@@ -2,6 +2,7 @@ import { getReaderNotes } from 'app/actions/noteActions'
 import Link from 'next/link'
 import SectionContainer from '@/components/SectionContainer'
 import siteMetadata from '@/data/siteMetadata'
+import NoteCard from './NoteCard'
 
 export const metadata = {
   title: `My Notebook - ${siteMetadata.title}`,
@@ -41,7 +42,8 @@ export default async function NotesDashboard() {
             My Notebook 💾
           </h1>
           <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
-            A curated list of insights you have actively captured while reading.
+            A curated list of insights you have actively captured while reading. Click any note to
+            jump back — the highlighted text will be automatically located on the page.
           </p>
         </div>
 
@@ -50,40 +52,14 @@ export default async function NotesDashboard() {
             <span className="mb-4 block text-4xl opacity-70">🧭</span>
             <h3 className="text-xl font-bold dark:text-gray-200">No notes yet.</h3>
             <p className="mt-2 text-gray-500">
-              Highlight any text while reading an article, and click 'Save' to collect insights
-              here!
+              Highlight any text while reading an article, and click &apos;Save&apos; to collect
+              insights here!
             </p>
           </div>
         ) : (
           <div className="columns-1 gap-6 space-y-6 md:columns-2 lg:columns-3">
             {notes.map((note) => (
-              <div
-                key={note.id}
-                className="break-inside-avoid rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
-              >
-                <div className="mb-4">
-                  <span className="bg-primary-50 text-primary-700 ring-primary-700/10 dark:bg-primary-900/40 dark:text-primary-400 inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset">
-                    {new Date(note.createdAt!).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      year: 'numeric',
-                    })}
-                  </span>
-                </div>
-
-                <p className="border-primary-500 border-l-4 py-1 pl-4 font-medium text-gray-800 italic dark:text-gray-200">
-                  {note.quote}
-                </p>
-
-                <div className="mt-6 flex justify-end border-t border-gray-100 pt-4 dark:border-gray-800">
-                  <Link
-                    href={note.sourceUrl}
-                    className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400 text-sm font-semibold transition"
-                  >
-                    Return to source &rarr;
-                  </Link>
-                </div>
-              </div>
+              <NoteCard key={note.id} note={note as any} />
             ))}
           </div>
         )}

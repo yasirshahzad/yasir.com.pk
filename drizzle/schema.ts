@@ -42,5 +42,7 @@ export const readerNotes = pgTable('reader_notes', {
   userId: text('user_id').notNull(), // Links to reader_profiles.id
   quote: text('quote').notNull(),
   sourceUrl: text('source_url').notNull(),
+  highlightText: text('highlight_text'), // The exact selected text for deep-link re-highlighting
+  postTitle: text('post_title'),         // Human-readable title of the source post
   createdAt: timestamp('created_at').defaultNow(),
 });
