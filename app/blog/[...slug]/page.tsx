@@ -12,12 +12,15 @@ import remarkGfm from 'remark-gfm'
 import remarkRehype from 'remark-rehype'
 import rehypeSlug from 'rehype-slug'
 import rehypeStringify from 'rehype-stringify'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 import { extractTocHeadings } from 'pliny/mdx-plugins/index.js'
 import Link from '@/components/Link'
 import siteMetadata from '@/data/siteMetadata'
 import { Metadata } from 'next'
 import { createClient } from '@/utils/supabase/server'
 import InlinePostEditor from '@/components/InlinePostEditor'
+import ExcalidrawHydrator from '@/components/ExcalidrawHydrator'
 
 
 const layouts = {
@@ -138,7 +141,9 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
 
   const processedContent = await remark()
     .use(remarkGfm)
+    .use(remarkMath)
     .use(remarkRehype)
+    .use(rehypeKatex)
     .use(rehypeSlug)
     .use(rehypeStringify)
     .process(post.content || '')
@@ -169,7 +174,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
       <div className="prose dark:prose-invert max-w-none pt-10 pb-8">
         <TableOfContents toc={toc} />
         <InlinePostEditor slug={post.slug} initialHtml={contentHtml} isAdmin={!!isAdmin}>
-          <div dangerouslySetInnerHTML={{ __html: contentHtml }} />
+          <ExcalidrawHydrator html={contentHtml} />
         </InlinePostEditor>
       </div>
     </Layout>

@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import TurndownService from 'turndown'
 import { updateBlogPostContent } from '@/app/actions/blogActions'
 import AIWritingPanel from '@/components/AIWritingPanel'
+import katex from 'katex'
+import 'katex/dist/katex.css'
 
 interface InlinePostEditorProps {
   slug: string
@@ -336,13 +338,26 @@ export default function InlinePostEditor({
 
 // ── Minimal markdown → HTML helper ───────────────────────────────────────────
 function markdownToHtml(text: string): string {
-  return text
+  let html = text
     .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-    .replace(/^## (.*$)/gim,  '<h2>$1</h2>')
-    .replace(/^# (.*$)/gim,   '<h1>$1</h1>')
+    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g,     '<em>$1</em>')
-    .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
-    .replace(/`(.*?)`/g,       '<code>$1</code>')
-    .replace(/\n/g,            '<br>')
+    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+    .replace(/```(\w*)\n([\s\S]*?)```/g, (_, lang, content) => {
+      const className = lang ? ` class="language-${lang}"` : ''
+      return `<pre><code${className}>${content}</code></pre>`
+    })
+    .replace(/`(.*?)`/g, '<code>$1</code>')
+
+  // Handle KaTeX math: $...$
+  html = html.replace(/\$(.*?)\$/g, (_, math) => {
+    try {
+      return katex.renderToString(math, { throwOnError: false })
+    } catch (e) {
+      return `<span class="text-red-500">$${math}$</span>`
+    }
+  })
+
+  return html.replace(/\n/g, '<br>')
 }

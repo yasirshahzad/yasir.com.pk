@@ -15,6 +15,7 @@
     "lint": "next lint --fix --dir pages --dir app --dir components --dir lib --dir layouts --dir scripts"
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "^0.18.0",
     "@headlessui/react": "2.2.0",
     "@next/bundle-analyzer": "15.2.4",
     "@supabase/ssr": "^0.10.2",

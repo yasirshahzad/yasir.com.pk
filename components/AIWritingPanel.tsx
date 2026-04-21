@@ -2,6 +2,7 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
+import ExcalidrawWrapper from './ExcalidrawWrapper'
 
 interface AIWritingPanelProps {
   isOpen: boolean
@@ -27,7 +28,7 @@ export default function AIWritingPanel({
   onReplaceSelection,
 }: AIWritingPanelProps) {
   const [instruction, setInstruction] = useState('')
-  const [mode, setMode] = useState<'generate' | 'rewrite' | 'continue'>('generate')
+  const [mode, setMode] = useState<'generate' | 'rewrite' | 'continue' | 'diagram'>('generate')
   const [model, setModel] = useState('')
   const [models, setModels] = useState<string[]>([])
   const [modelsLoading, setModelsLoading] = useState(false)
@@ -175,7 +176,12 @@ export default function AIWritingPanel({
 
   const handleInsertAtEnd = () => {
     if (output.trim()) {
-      onInsert(output)
+      let finalOutput = output
+      if (mode === 'diagram') {
+        // Wrap JSON in an excalidraw code block for the markdown editor to pick up
+        finalOutput = `\n\n\`\`\`excalidraw\n${output.trim()}\n\`\`\`\n\n`
+      }
+      onInsert(finalOutput)
       setOutput('')
       setInstruction('')
     }
@@ -221,6 +227,7 @@ export default function AIWritingPanel({
           </div>
         </div>
         <button
+          type="button"
           onClick={onClose}
           disabled={isGenerating}
           className="p-1.5 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
@@ -242,6 +249,7 @@ export default function AIWritingPanel({
             </label>
             {context && (
               <button
+                type="button"
                 onClick={() => setContext('')}
                 className="text-[9px] text-gray-400 hover:text-red-400 uppercase tracking-wider font-bold"
               >
@@ -290,12 +298,14 @@ export default function AIWritingPanel({
           </label>
           <div className="grid grid-cols-3 gap-1.5">
             {[
-              { value: 'generate', label: 'Generate', icon: '✨' },
-              { value: 'rewrite',  label: 'Rewrite',  icon: '✏️'  },
-              { value: 'continue', label: 'Continue', icon: '→'   },
+                { value: 'generate', label: 'Generate', icon: '✨' },
+                { value: 'rewrite',  label: 'Rewrite',  icon: '✏️'  },
+                { value: 'continue', label: 'Continue', icon: '→'   },
+                { value: 'diagram',  label: 'Diagram',  icon: '🎨'   },
             ].map((m) => (
               <button
                 key={m.value}
+                type="button"
                 onClick={() => setMode(m.value as any)}
                 className={`flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
                   mode === m.value
@@ -326,7 +336,7 @@ export default function AIWritingPanel({
                   <span className="font-medium text-purple-700 dark:text-purple-300 truncate pr-2">
                     {ref.title}
                   </span>
-                  <button onClick={() => removeRef(ref.slug)} className="text-purple-400 hover:text-red-500 shrink-0">
+                  <button type="button" onClick={() => removeRef(ref.slug)} className="text-purple-400 hover:text-red-500 shrink-0">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
@@ -354,6 +364,7 @@ export default function AIWritingPanel({
                   {searchResults.map((post) => (
                     <button
                       key={post.slug}
+                      type="button"
                       onClick={() => addRef(post)}
                       className="w-full text-left px-3 py-2 text-xs hover:bg-gray-50 dark:hover:bg-gray-750 transition-colors border-b border-gray-50 dark:border-gray-800 last:border-0"
                     >
@@ -383,10 +394,12 @@ export default function AIWritingPanel({
             }}
             placeholder={
               mode === 'generate'
-                ? 'Write an introduction about distributed caching…'
+                ? 'Write an introduction about distributed caching strategies...'
                 : mode === 'rewrite'
-                  ? 'Make it more concise and add code examples…'
-                  : 'Add a section about cache invalidation patterns…'
+                  ? 'Make it more concise and add code examples...'
+                  : mode === 'diagram'
+                    ? 'Describe a microservices architecture with API Gateway and Auth Service...'
+                    : 'Add a section about cache invalidation patterns...'
             }
             rows={3}
             className="w-full text-xs rounded-lg border border-gray-200 dark:border-gray-700 dark:bg-gray-800 focus:ring-purple-500 focus:border-purple-500 resize-none px-3 py-2"
@@ -398,6 +411,7 @@ export default function AIWritingPanel({
         <div>
           {isGenerating ? (
             <button
+              type="button"
               onClick={handleStop}
               className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg text-xs font-bold transition-colors"
             >
@@ -408,6 +422,7 @@ export default function AIWritingPanel({
             </button>
           ) : (
             <button
+              type="button"
               onClick={handleGenerate}
               disabled={!instruction.trim() || (models.length === 0 && !model)}
               className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 disabled:from-gray-300 disabled:to-gray-300 dark:disabled:from-gray-700 dark:disabled:to-gray-700 text-white rounded-lg text-xs font-bold transition-all disabled:cursor-not-allowed"
@@ -430,6 +445,7 @@ export default function AIWritingPanel({
               <div className="flex items-center gap-2">
                 {!isGenerating && (
                   <button
+                    type="button"
                     onClick={() => navigator.clipboard.writeText(output)}
                     className="text-[9px] font-bold text-gray-400 hover:text-purple-500 uppercase tracking-wider"
                   >
@@ -437,6 +453,7 @@ export default function AIWritingPanel({
                   </button>
                 )}
                 <button
+                  type="button"
                   onClick={() => setOutput('')}
                   className="text-[9px] font-bold text-gray-400 hover:text-red-400 uppercase tracking-wider"
                 >
@@ -456,11 +473,33 @@ export default function AIWritingPanel({
               )}
             </div>
 
+            {/* Diagram Preview */}
+            {mode === 'diagram' && !isGenerating && output.trim() && (
+              <div className="mt-4">
+                <label className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-2 block">
+                  Diagram Preview
+                </label>
+                {(() => {
+                  try {
+                    const cleanJson = output.replace(/```json|```excalidraw|```/g, '').trim()
+                    return <ExcalidrawWrapper initialData={JSON.parse(cleanJson)} />
+                  } catch (e) {
+                    return (
+                      <div className="p-4 rounded-xl border border-red-200 bg-red-50 text-red-600 text-[11px] font-mono">
+                        Invalid JSON for Diagram: {String(e)}
+                      </div>
+                    )
+                  }
+                })()}
+              </div>
+            )}
+
             {/* Action row */}
             {!isGenerating && (
               <div className="mt-2 grid grid-cols-2 gap-2">
                 {/* Replace the selected text in the editor with AI output */}
                 <button
+                  type="button"
                   onClick={handleReplaceSelection}
                   disabled={!context}
                   title={context ? 'Replace the selected text in the editor' : 'Select text in the editor first'}
@@ -474,6 +513,7 @@ export default function AIWritingPanel({
 
                 {/* Append AI output at the end of the editor */}
                 <button
+                  type="button"
                   onClick={handleInsertAtEnd}
                   className="flex items-center justify-center gap-1.5 px-3 py-2 bg-green-600 hover:bg-green-500 text-white rounded-lg text-[11px] font-bold transition-colors"
                 >
