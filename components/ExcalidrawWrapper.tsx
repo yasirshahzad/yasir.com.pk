@@ -94,9 +94,18 @@ const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({
   // 5. Cleanup on unmount
   useEffect(() => {
     return () => {
-      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+      // If there's a pending save, trigger it immediately
+      if (saveTimerRef.current) {
+        clearTimeout(saveTimerRef.current)
+        if (excalidrawAPI.current && onSave) {
+          const elements = excalidrawAPI.current.getSceneElements()
+          const appState = excalidrawAPI.current.getAppState()
+          const files = excalidrawAPI.current.getFiles()
+          onSave({ elements, appState, files })
+        }
+      }
     }
-  }, [])
+  }, [onSave])
 
   if (!ExcalidrawComponent) {
     return (

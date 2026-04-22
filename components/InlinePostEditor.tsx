@@ -8,7 +8,6 @@ import FloatingToolbar from '@/components/FloatingToolbar'
 import ExcalidrawHydrator from '@/components/ExcalidrawHydrator'
 import katex from 'katex'
 import 'katex/dist/katex.css'
-
 interface InlinePostEditorProps {
   slug: string
   initialHtml: string
@@ -306,11 +305,13 @@ export default function InlinePostEditor({
             suppressContentEditableWarning={true}
             className={`outline-none ${isEditing ? 'cursor-text' : ''}`}
           >
-             <ExcalidrawHydrator 
-                html={initialHtml} 
-                canEdit={isEditing} 
-                onChange={() => setHasChanges(true)} 
-             />
+             <div contentEditable={false}>
+               <ExcalidrawHydrator 
+                  html={initialHtml} 
+                  canEdit={isEditing} 
+                  onChange={() => setHasChanges(true)} 
+               />
+             </div>
           </div>
         </div>
 
