@@ -173,9 +173,16 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
     <Layout content={mainContent as any} authorDetails={authorDetails}>
       <div className="prose dark:prose-invert max-w-none pt-10 pb-8">
         <TableOfContents toc={toc} />
-        <InlinePostEditor slug={post.slug} initialHtml={contentHtml} isAdmin={!!isAdmin}>
-          <ExcalidrawHydrator html={contentHtml} />
-        </InlinePostEditor>
+        <InlinePostEditor 
+          slug={post.slug} 
+          initialHtml={contentHtml} 
+          isAdmin={!!isAdmin} 
+          metadata={{
+            title: post.title || '',
+            summary: post.summary || '',
+            images: (post.images as string[]) || []
+          }}
+        />
       </div>
     </Layout>
   )

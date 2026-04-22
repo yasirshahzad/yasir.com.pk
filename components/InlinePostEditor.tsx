@@ -4,6 +4,8 @@ import React, { useState, useRef, useEffect, useCallback } from 'react'
 import TurndownService from 'turndown'
 import { updateBlogPostContent } from '@/app/actions/blogActions'
 import AIWritingPanel from '@/components/AIWritingPanel'
+import FloatingToolbar from '@/components/FloatingToolbar'
+import ExcalidrawHydrator from '@/components/ExcalidrawHydrator'
 import katex from 'katex'
 import 'katex/dist/katex.css'
 
@@ -11,14 +13,18 @@ interface InlinePostEditorProps {
   slug: string
   initialHtml: string
   isAdmin: boolean
-  children: React.ReactNode
+  metadata?: {
+    title: string
+    summary: string
+    images?: string[]
+  }
 }
 
 export default function InlinePostEditor({
   slug,
   initialHtml,
   isAdmin,
-  children,
+  metadata,
 }: InlinePostEditorProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -104,6 +110,14 @@ export default function InlinePostEditor({
         },
       })
 
+      turndownService.addRule('excalidraw', {
+        filter: (node: any) => node.hasAttribute('data-excalidraw'),
+        replacement: function (content, node: any) {
+          const json = node.getAttribute('data-excalidraw')
+          return '\n\n```excalidraw\n' + json + '\n```\n\n'
+        },
+      })
+
       const editedHtml = contentRef.current.innerHTML
       const markdown = turndownService.turndown(editedHtml)
 
@@ -164,7 +178,7 @@ export default function InlinePostEditor({
   }, [saveStatus])
 
   if (!isAdmin) {
-    return <>{children}</>
+    return <div className="excalidraw-hydrator-static"><ExcalidrawHydrator html={initialHtml} /></div>
   }
 
   const handleDoubleClick = () => {
@@ -215,6 +229,41 @@ export default function InlinePostEditor({
     setHasChanges(true)
   }, [])
 
+  // ── Toolbar Handlers ─────────────────────────────────────────────────────
+  const onBold = () => {
+    document.execCommand('bold', false)
+    setHasChanges(true)
+  }
+  const onItalic = () => {
+    document.execCommand('italic', false)
+    setHasChanges(true)
+  }
+  const onHeading = (level: number) => {
+    document.execCommand('formatBlock', false, `h${level}`)
+    setHasChanges(true)
+  }
+  const onLink = () => {
+    const url = prompt('Enter URL:')
+    if (url) {
+      document.execCommand('createLink', false, url)
+      setHasChanges(true)
+    }
+  }
+  const onImage = (url: string) => {
+    const imgHtml = `<br><img src="${url}" alt="Uploaded Image" class="rounded-xl shadow-lg my-6" /><br>`
+    document.execCommand('insertHTML', false, imgHtml)
+    setHasChanges(true)
+  }
+  const onDiagram = () => {
+    setAiPanelOpen(true)
+    // Small tip: switch to diagram mode in the AI panel
+  }
+  const onCallout = (type: string) => {
+    const html = `<br><blockquote class="admonition admonition-${type.toLowerCase()}"><strong>${type}</strong><br>New ${type.toLowerCase()} content...</blockquote><br>`
+    document.execCommand('insertHTML', false, html)
+    setHasChanges(true)
+  }
+
   // ── Open AI panel & optionally send selected text as context ─────────────
   const openAIPanel = () => {
     setAiPanelOpen(true)
@@ -256,7 +305,13 @@ export default function InlinePostEditor({
             contentEditable={isEditing}
             suppressContentEditableWarning={true}
             className={`outline-none ${isEditing ? 'cursor-text' : ''}`}
-          />
+          >
+             <ExcalidrawHydrator 
+                html={initialHtml} 
+                canEdit={isEditing} 
+                onChange={() => setHasChanges(true)} 
+             />
+          </div>
         </div>
 
         {/* ── Right: AI Panel (docked, no backdrop) ── */}
@@ -272,57 +327,33 @@ export default function InlinePostEditor({
               onInsert={handleAIInsert}
               onReplaceSelection={handleAIReplaceSelection}
               onSendToAI={() => {/* handled automatically via selectedEditorText */}}
+              title={metadata?.title}
+              summary={metadata?.summary}
+              slug={slug}
+              images={metadata?.images}
             />
           </div>
         )}
       </div>
 
-      {/* ── Floating Control Bar ── */}
+      {/* ── Floating Toolbar ── */}
       {isEditing && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 px-4 py-2 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl rounded-2xl shadow-2xl border border-gray-200/50 dark:border-gray-800/50 z-[100]">
-          {/* Status dot */}
-          <div className="flex items-center gap-2">
-            <div className={`w-2 h-2 rounded-full ${hasChanges ? 'bg-orange-500 animate-pulse' : 'bg-green-500'}`} />
-            <span className="text-[11px] font-bold uppercase tracking-wider text-gray-500">
-              {hasChanges ? 'Unsaved Changes' : 'Draft Synced'}
-            </span>
-          </div>
-
-          <div className="w-px h-4 bg-gray-200 dark:bg-gray-700" />
-
-          <div className="flex items-center gap-1.5">
-            {/* AI toggle */}
-            <button
-              onClick={() => setAiPanelOpen((o) => !o)}
-              className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
-                aiPanelOpen
-                  ? 'bg-purple-500/20 text-purple-600 dark:text-purple-400'
-                  : 'text-purple-500 hover:bg-purple-500/10'
-              }`}
-              title={aiPanelOpen ? 'Close AI panel' : 'Open AI Writing Assistant'}
-            >
-              ⚡ AI
-            </button>
-
-            <button
-              onClick={doSave}
-              disabled={isSaving || !hasChanges}
-              className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-all ${
-                isSaving || !hasChanges
-                  ? 'text-gray-400 cursor-not-allowed'
-                  : 'text-primary-500 hover:bg-primary-500/10'
-              }`}
-            >
-              {isSaving ? 'Saving…' : 'Save (Ctrl+S)'}
-            </button>
-
-            <button
-              onClick={doCancel}
-              className="text-xs font-bold px-3 py-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-500/10 rounded-lg transition-all"
-            >
-              Discard (Esc)
-            </button>
-          </div>
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100]">
+          <FloatingToolbar
+            onBold={onBold}
+            onItalic={onItalic}
+            onHeading={onHeading}
+            onLink={onLink}
+            onImage={onImage}
+            onDiagram={onDiagram}
+            onCallout={onCallout}
+            onAI={() => setAiPanelOpen((o) => !o)}
+            onSave={doSave}
+            onCancel={doCancel}
+            isSaving={isSaving}
+            hasChanges={hasChanges}
+            aiActive={aiPanelOpen}
+          />
         </div>
       )}
 

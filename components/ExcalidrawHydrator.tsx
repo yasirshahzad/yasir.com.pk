@@ -1,24 +1,24 @@
 'use client'
 
-import React, { useEffect, useState, useRef, useMemo } from 'react'
+import React, { useEffect, useState, useRef, useLayoutEffect } from 'react'
 import { createPortal } from 'react-dom'
 import ExcalidrawWrapper from './ExcalidrawWrapper'
 
 interface ExcalidrawHydratorProps {
   html: string
+  canEdit?: boolean
+  onChange?: () => void
 }
 
 /**
- * ExcalidrawHydrator scans HTML for code blocks marked as 'excalidraw'
- * and replaces them with live interactive diagrams.
- * Uses hash-based IDs to prevent unnecessary re-mounts during live editing.
+ * ExcalidrawHydrator scanning logic with Direct Editing support.
+ * Optimized for stability using MutationObservers instead of polling.
  */
-export default function ExcalidrawHydrator({ html }: ExcalidrawHydratorProps) {
+export default function ExcalidrawHydrator({ html, canEdit = false, onChange }: ExcalidrawHydratorProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const [processedHtml, setProcessedHtml] = useState('')
   const [diagrams, setDiagrams] = useState<{ id: string; data: any }[]>([])
 
-  // Simple hash function to generate stable IDs from content
   const getContentHash = (text: string) => {
     let hash = 0
     for (let i = 0; i < text.length; i++) {
@@ -39,19 +39,16 @@ export default function ExcalidrawHydrator({ html }: ExcalidrawHydratorProps) {
     codeBlocks.forEach((block, index) => {
       try {
         const rawContent = block.textContent || ''
-        // Clean up: remove markdown fences and language tags if they leaked in
         const jsonText = rawContent.replace(/```json|```excalidraw|```/g, '').trim()
         if (!jsonText) return
 
         const json = JSON.parse(jsonText)
-        
-        // Stable ID based on the JSON content hash + position
-        // This prevents the diagram from re-mounting every keystroke if its content hasn't changed
         const hash = getContentHash(jsonText)
         const id = `excalidraw-${index}-${hash}`
         
         const placeholder = doc.createElement('div')
         placeholder.id = id
+        placeholder.setAttribute('data-excalidraw', JSON.stringify(json))
         placeholder.className = 'excalidraw-container my-8 w-full h-[500px] bg-gray-50 dark:bg-gray-900/50 rounded-xl overflow-hidden'
         
         const pre = block.parentElement
@@ -61,7 +58,6 @@ export default function ExcalidrawHydrator({ html }: ExcalidrawHydratorProps) {
         
         newDiagrams.push({ id, data: json })
       } catch (e) {
-        // Only log parse errors if the content is long enough to be an actual attempt at JSON
         if (block.textContent && block.textContent.length > 10) {
            console.error('Excalidraw parse error:', e)
         }
@@ -72,40 +68,63 @@ export default function ExcalidrawHydrator({ html }: ExcalidrawHydratorProps) {
     setDiagrams(newDiagrams)
   }, [html])
 
+  const handleDiagramChange = (id: string, newData: any) => {
+    if (!containerRef.current) return
+    const el = containerRef.current.querySelector(`#${id}`)
+    if (el) {
+      el.setAttribute('data-excalidraw', JSON.stringify(newData))
+      if (onChange) onChange()
+    }
+  }
+
   return (
-    <div ref={containerRef} className="relative">
+    <div ref={containerRef} className="relative excalidraw-hydrator-root">
       <div dangerouslySetInnerHTML={{ __html: processedHtml }} />
       {diagrams.map((diagram) => (
         <ExcalidrawPortal key={diagram.id} targetId={diagram.id} container={containerRef.current}>
-          <ExcalidrawWrapper initialData={diagram.data} readOnly={true} />
+          <ExcalidrawWrapper 
+            initialData={diagram.data} 
+            readOnly={!canEdit} 
+            canEdit={canEdit}
+            onSave={(newData) => handleDiagramChange(diagram.id, newData)}
+          />
         </ExcalidrawPortal>
       ))}
     </div>
   )
 }
 
+/**
+ * ExcalidrawPortal uses MutationObserver for high-stability DOM targeting.
+ */
 function ExcalidrawPortal({ targetId, container, children }: { targetId: string; container: HTMLElement | null; children: React.ReactNode }) {
   const [target, setTarget] = useState<HTMLElement | null>(null)
 
-  // Use MutationObserver or Interval to find the target reliably since the HTML is rendered via dangerouslySetInnerHTML
-  useEffect(() => {
-    const findTarget = () => {
-        if (!container) return
-        const el = container.querySelector(`#${targetId}`)
-        if (el) {
-          setTarget(el as HTMLElement)
-          return true
-        }
-        return false
+  useLayoutEffect(() => {
+    if (!container) return
+
+    // 1. Initial check
+    const existing = container.querySelector(`#${targetId}`)
+    if (existing) {
+      setTarget(existing as HTMLElement)
+      return
     }
 
-    if (findTarget()) return
+    // 2. Observe for the element if it's not there yet
+    const observer = new MutationObserver(() => {
+      const el = container.querySelector(`#${targetId}`)
+      if (el) {
+        setTarget(el as HTMLElement)
+        observer.disconnect()
+      }
+    })
 
-    const interval = setInterval(() => {
-        if (findTarget()) clearInterval(interval)
-    }, 100)
+    observer.observe(container, {
+      childList: true,
+      subtree: true
+    })
 
-    return () => clearInterval(interval)
+    return () => observer.disconnect()
   }, [container, targetId])
 
   if (!target) return null

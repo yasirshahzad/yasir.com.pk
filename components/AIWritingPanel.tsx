@@ -3,6 +3,9 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import ExcalidrawWrapper from './ExcalidrawWrapper'
+import ImageUploader from './ImageUploader'
+import MediaLibrary from './MediaLibrary'
+import SEOPreview from './SEOPreview'
 
 interface AIWritingPanelProps {
   isOpen: boolean
@@ -12,6 +15,10 @@ interface AIWritingPanelProps {
   onInsert: (text: string) => void
   onReplaceSelection: (text: string) => void
   onSendToAI: () => void        // parent signals that selectedText was pushed
+  title?: string
+  slug?: string
+  summary?: string
+  images?: string[]
 }
 
 interface BlogPostRef {
@@ -26,7 +33,12 @@ export default function AIWritingPanel({
   selectedText,
   onInsert,
   onReplaceSelection,
+  title = '',
+  slug = '',
+  summary = '',
+  images = []
 }: AIWritingPanelProps) {
+  const [activeTab, setActiveTab] = useState<'write' | 'media' | 'seo'>('write')
   const [instruction, setInstruction] = useState('')
   const [mode, setMode] = useState<'generate' | 'rewrite' | 'continue' | 'diagram'>('generate')
   const [model, setModel] = useState('')
@@ -239,7 +251,43 @@ export default function AIWritingPanel({
       </div>
 
       {/* ── Scrollable body ──────────────────────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      {/* ── Tabs ── */}
+      <div className="flex border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-900/50 p-1">
+        <button
+          onClick={() => setActiveTab('write')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all ${
+            activeTab === 'write'
+              ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 shadow-sm'
+              : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+          }`}
+        >
+          Write
+        </button>
+        <button
+          onClick={() => setActiveTab('media')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all ${
+            activeTab === 'media'
+              ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 shadow-sm'
+              : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+          }`}
+        >
+          Library
+        </button>
+        <button
+          onClick={() => setActiveTab('seo')}
+          className={`flex-1 flex items-center justify-center gap-2 py-2 text-[10px] font-bold uppercase tracking-widest rounded-lg transition-all ${
+            activeTab === 'seo'
+              ? 'bg-white dark:bg-gray-800 text-purple-600 dark:text-purple-400 shadow-sm'
+              : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'
+          }`}
+        >
+          SEO
+        </button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 custom-scrollbar">
+        {activeTab === 'write' ? (
+          <>
 
         {/* Context from blog post */}
         <div>
@@ -378,6 +426,23 @@ export default function AIWritingPanel({
           )}
         </div>
 
+        {/* Media Upload */}
+        <div>
+          <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
+            Quick Image Upload
+          </label>
+          <div className="flex items-center gap-2">
+            <ImageUploader 
+              label="Upload Asset"
+              onUploadSuccess={(url) => {
+                setInstruction(prev => prev + ` (Ref: ${url})`)
+                setOutput(url)
+              }} 
+            />
+            <p className="text-[9px] text-gray-400">Upload to Supabase and get URL</p>
+          </div>
+        </div>
+
         {/* Instruction */}
         <div>
           <label className="block text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-1.5">
@@ -434,8 +499,33 @@ export default function AIWritingPanel({
             </button>
           )}
         </div>
+      </>
+        ) : activeTab === 'media' ? (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                Asset Gallery
+              </label>
+            </div>
+            <MediaLibrary onSelect={(url) => {
+               onInsert(`![Image](${url})`)
+               setActiveTab('write')
+            }} />
+            <p className="text-[9px] text-gray-400 p-2 bg-gray-50 dark:bg-gray-900/50 rounded italic">
+              Click an image to insert it into your post.
+            </p>
+          </div>
+        ) : (
+          <SEOPreview 
+            title={title}
+            summary={summary}
+            slug={slug}
+            image={images[0]}
+          />
+        )}
+      </div>
 
-        {/* ── Output ──────────────────────────────────────────────────────── */}
+      {/* ── Output ──────────────────────────────────────────────────────── */}
         {output && (
           <div>
             <div className="flex items-center justify-between mb-1.5">
@@ -527,6 +617,5 @@ export default function AIWritingPanel({
           </div>
         )}
       </div>
-    </div>
-  )
-}
+    )
+  }

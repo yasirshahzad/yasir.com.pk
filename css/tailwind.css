@@ -211,3 +211,23 @@ body.zen-mode-active .zen-mode-hide:hover {
 html {
   transition: font-size 0.2s ease-out;
 }
+/* Callout/Admonition Styles */
+.prose blockquote.admonition {
+  @apply border-l-4 rounded-r-xl py-3 px-5 my-6 backdrop-blur-sm not-italic;
+}
+
+.prose blockquote.admonition-note {
+  @apply border-purple-500 bg-purple-50/50 dark:bg-purple-900/10 text-purple-900 dark:text-purple-100;
+}
+
+.prose blockquote.admonition-tip {
+  @apply border-green-500 bg-green-50/50 dark:bg-green-900/10 text-green-900 dark:text-green-100;
+}
+
+.prose blockquote.admonition-warning {
+  @apply border-amber-500 bg-amber-50/50 dark:bg-amber-900/10 text-amber-900 dark:text-amber-100;
+}
+
+.prose blockquote.admonition strong {
+  @apply block text-[10px] font-bold uppercase tracking-widest mb-1 opacity-70;
+}

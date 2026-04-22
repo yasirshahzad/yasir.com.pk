@@ -6,20 +6,25 @@ import { useTheme } from 'next-themes'
 interface ExcalidrawWrapperProps {
   initialData: any
   readOnly?: boolean
+  canEdit?: boolean
+  onSave?: (data: any) => void
 }
 
 /**
- * A robust wrapper for Excalidraw that handles:
- * 1. Client-side only loading (Dynamic Import)
- * 2. Theme synchronization (Light/Dark)
- * 3. Auto-centering content
- * 4. Handling of structural data fixes
+ * Enhanced ExcalidrawWrapper with Direct Editing support.
  */
-const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({ initialData, readOnly = true }) => {
+const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({ 
+  initialData, 
+  readOnly = true, 
+  canEdit = false,
+  onSave 
+}) => {
   const [ExcalidrawComponent, setExcalidrawComponent] = useState<any>(null)
+  const [isEditing, setIsEditing] = useState(false)
   const { resolvedTheme } = useTheme()
   const excalidrawAPI = useRef<any>(null)
   const [isReady, setIsReady] = useState(false)
+  const saveTimerRef = useRef<NodeJS.Timeout|null>(null)
 
   // 1. Dynamic import of Excalidraw (browser only)
   useEffect(() => {
@@ -44,23 +49,54 @@ const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({ initialData, read
     }
   }, [initialData, resolvedTheme])
 
-  // 3. Center content when everything is ready
+  // 3. Center content
   useEffect(() => {
-    if (ExcalidrawComponent && excalidrawAPI.current && sceneData && sceneData.elements.length > 0) {
+    if (ExcalidrawComponent && excalidrawAPI.current && sceneData && sceneData.elements.length > 0 && !isEditing) {
       const timer = setTimeout(() => {
         try {
-          excalidrawAPI.current.scrollToContent(sceneData.elements, {
-            fitToViewport: true,
-            padding: 40,
-          })
-          setIsReady(true)
+          if (excalidrawAPI.current) {
+            excalidrawAPI.current.scrollToContent(sceneData.elements, {
+              fitToViewport: true,
+              padding: 40,
+            })
+          }
         } catch (e) {
-          console.error('Excalidraw scroll error:', e)
+          console.error('Excalidraw focus error:', e)
+        } finally {
+          setIsReady(true)
         }
-      }, 400)
+      }, 500)
       return () => clearTimeout(timer)
+    } else if (ExcalidrawComponent && isEditing) {
+       setIsReady(true)
     }
-  }, [ExcalidrawComponent, sceneData])
+  }, [ExcalidrawComponent, sceneData, isEditing])
+
+  // 4. Handle changes (Debounced)
+  const handleChange = (elements: any[], appState: any, files: any) => {
+    if (!isEditing || !onSave) return
+
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    saveTimerRef.current = setTimeout(() => {
+      onSave({
+        type: 'excalidraw',
+        version: 2,
+        elements,
+        appState: {
+           viewBackgroundColor: appState.viewBackgroundColor,
+           gridSize: appState.gridSize,
+        },
+        files
+      })
+    }, 1000)
+  }
+
+  // 5. Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current)
+    }
+  }, [])
 
   if (!ExcalidrawComponent) {
     return (
@@ -74,6 +110,7 @@ const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({ initialData, read
   }
 
   const currentTheme = (resolvedTheme === 'dark' ? 'dark' : 'light')
+  const effectiveReadOnly = readOnly && !isEditing
 
   return (
     <div 
@@ -83,23 +120,53 @@ const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({ initialData, read
       <ExcalidrawComponent
         excalidrawRef={(api: any) => (excalidrawAPI.current = api)}
         initialData={sceneData}
-        viewModeEnabled={readOnly}
-        zenModeEnabled={readOnly}
-        gridModeEnabled={false}
+        onChange={handleChange}
+        viewModeEnabled={effectiveReadOnly}
+        zenModeEnabled={effectiveReadOnly}
+        gridModeEnabled={isEditing}
         theme={currentTheme}
         UIOptions={{
           canvasActions: {
-            changeViewBackgroundColor: !readOnly,
-            loadScene: !readOnly,
-            export: !readOnly,
+            changeViewBackgroundColor: isEditing,
+            loadScene: isEditing,
+            export: true,
+            saveToActiveFile: isEditing,
           },
         }}
       />
+      
+      {/* Edit Trigger */}
+      {canEdit && (
+        <div className="absolute top-4 right-4 z-20 flex gap-2">
+          {!isEditing ? (
+            <button
+              onClick={() => setIsEditing(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-xl hover:bg-gray-50 dark:hover:bg-gray-750 transition-all"
+            >
+              <svg className="w-3.5 h-3.5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit Diagram
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsEditing(false)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-500 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-xl hover:bg-primary-600 transition-all animate-pulse"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              </svg>
+              Done Editing
+            </button>
+          )}
+        </div>
+      )}
+
       {!isReady && (
         <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-[#121212] z-10">
            <div className="flex flex-col items-center gap-3">
              <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
-             <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Rendering Design...</span>
+             <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Initialising Editor...</span>
            </div>
         </div>
       )}

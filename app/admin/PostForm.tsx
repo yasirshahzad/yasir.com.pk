@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
 import AIWritingPanel from '@/components/AIWritingPanel'
+import ImageUploader from '@/components/ImageUploader'
+import FloatingToolbar from '@/components/FloatingToolbar'
 import dynamic from 'next/dynamic'
+import { useRef, useState, useMemo, useCallback } from 'react'
 import { savePostAction, deletePostAction } from './actions'
 import 'easymde/dist/easymde.min.css'
 import { marked } from 'marked'
@@ -22,7 +24,11 @@ interface PostFormProps {
 
 export default function PostForm({ post, isEditing }: PostFormProps) {
   const [content, setContent] = useState(post?.content || '')
+  const [title, setTitle] = useState(post?.title || '')
+  const [summary, setSummary] = useState(post?.summary || '')
+  const [slug, setSlug] = useState(post?.slug || '')
   const [aiPanelOpen, setAiPanelOpen] = useState(false)
+  const editorRef = useRef<any>(null)
 
   const handleAIInsert = useCallback((text: string) => {
     setContent((prev: string) => prev + '\n\n' + text)
@@ -98,7 +104,8 @@ export default function PostForm({ post, isEditing }: PostFormProps) {
             type="text"
             name="title"
             id="title"
-            defaultValue={post?.title}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             required
             className="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-700 dark:bg-gray-800"
           />
@@ -115,7 +122,8 @@ export default function PostForm({ post, isEditing }: PostFormProps) {
             type="text"
             name="slug"
             id="slug"
-            defaultValue={post?.slug}
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
             required
             className="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-700 dark:bg-gray-800"
           />
@@ -219,7 +227,8 @@ export default function PostForm({ post, isEditing }: PostFormProps) {
           name="summary"
           id="summary"
           rows={3}
-          defaultValue={post?.summary}
+          value={summary}
+          onChange={(e) => setSummary(e.target.value)}
           className="focus:border-primary-500 focus:ring-primary-500 block w-full rounded-md border-gray-300 shadow-sm dark:border-gray-700 dark:bg-gray-800"
         />
       </div>
@@ -229,25 +238,89 @@ export default function PostForm({ post, isEditing }: PostFormProps) {
           <h3 className="block text-sm font-medium text-gray-700 dark:text-gray-300">
             Content (WYSIWYG Markdown Editor)
           </h3>
-          <button
-            type="button"
-            onClick={() => setAiPanelOpen(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white rounded-lg text-xs font-bold transition-all"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-            AI Assistant
-          </button>
+          <div className="flex items-center gap-2">
+            <ImageUploader 
+              onUploadSuccess={(url) => {
+                setContent(prev => prev + `\n\n![Image Description](${url})\n\n`)
+              }} 
+            />
+            <button
+              type="button"
+              onClick={() => setAiPanelOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-500 hover:to-purple-500 text-white rounded-lg text-xs font-bold transition-all"
+            >
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              AI Assistant
+            </button>
+          </div>
         </div>
         <div className="prose-editor dark:prose-invert">
           <SimpleMDE
             value={content}
             onChange={setContent}
+            getMdeInstance={(instance) => {
+              editorRef.current = instance.codemirror
+            }}
             // @ts-ignore
-            options={editorOptions}
+            options={{
+              ...editorOptions,
+              toolbar: false, // Hide default toolbar to use our floating one
+            }}
           />
         </div>
+      </div>
+
+      {/* Floating Toolbar for Admin Form */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100]">
+        <FloatingToolbar
+          onBold={() => {
+            const cm = editorRef.current
+            const selection = cm.getSelection()
+            cm.replaceSelection(`**${selection}**`)
+            cm.focus()
+          }}
+          onItalic={() => {
+            const cm = editorRef.current
+            const selection = cm.getSelection()
+            cm.replaceSelection(`_${selection}_`)
+            cm.focus()
+          }}
+          onHeading={(level) => {
+            const cm = editorRef.current
+            const line = cm.getLine(cm.getCursor().line)
+            cm.replaceRange(`${'#'.repeat(level)} `, { line: cm.getCursor().line, ch: 0 })
+            cm.focus()
+          }}
+          onLink={() => {
+            const url = prompt('Enter URL:')
+            if (url) {
+              const cm = editorRef.current
+              const selection = cm.getSelection()
+              cm.replaceSelection(`[${selection || 'link'}](${url})`)
+              cm.focus()
+            }
+          }}
+          onImage={(url) => {
+            const cm = editorRef.current
+            const cursor = cm.getCursor()
+            cm.replaceRange(`\n\n![Image Description](${url})\n\n`, cursor)
+            cm.focus()
+          }}
+          onDiagram={() => {
+             setAiPanelOpen(true)
+          }}
+          onCallout={(type) => {
+            const cm = editorRef.current
+            const selection = cm.getSelection()
+            cm.replaceSelection(`\n\n> [!${type}]\n> ${selection || 'Update this message...'}\n\n`)
+            cm.focus()
+          }}
+          onAI={() => setAiPanelOpen(!aiPanelOpen)}
+          showSaveButtons={false} // PostForm has separate submit button
+          aiActive={aiPanelOpen}
+        />
       </div>
 
       <div className="flex items-center justify-between pt-4">
@@ -336,6 +409,10 @@ export default function PostForm({ post, isEditing }: PostFormProps) {
               onInsert={handleAIInsert}
               onReplaceSelection={handleAIInsert}
               onSendToAI={() => {}}
+              title={title}
+              summary={summary}
+              slug={slug}
+              images={post?.images}
             />
           </div>
         </>
