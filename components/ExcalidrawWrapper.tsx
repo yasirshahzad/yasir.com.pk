@@ -35,17 +35,17 @@ const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({
     }
   }, [])
 
-  // 2. Process and sanitize data
+  // 2. Process and sanitize data (Avoid spreading unknown appState which can cause runtime errors)
   const sceneData = useMemo(() => {
     if (!initialData) return null
     return {
       elements: Array.isArray(initialData.elements) ? initialData.elements : [],
       appState: {
-        viewBackgroundColor: resolvedTheme === 'dark' ? '#121212' : '#ffffff',
+        viewBackgroundColor: resolvedTheme === 'dark' ? '#313131' : '#ffffff',
         currentItemStrokeColor: resolvedTheme === 'dark' ? '#ffffff' : '#000000',
-        ...initialData.appState,
+        gridSize: initialData.appState?.gridSize || 20,
       },
-      files: initialData.files || {},
+      files: typeof initialData.files === 'object' ? initialData.files : {},
     }
   }, [initialData, resolvedTheme])
 
@@ -130,16 +130,18 @@ const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({
         excalidrawRef={(api: any) => (excalidrawAPI.current = api)}
         initialData={sceneData}
         onChange={handleChange}
-        viewModeEnabled={effectiveReadOnly}
-        zenModeEnabled={effectiveReadOnly}
-        gridModeEnabled={isEditing}
+        viewModeEnabled={!!effectiveReadOnly}
+        zenModeEnabled={!!effectiveReadOnly}
+        gridModeEnabled={!!isEditing}
         theme={currentTheme}
         UIOptions={{
           canvasActions: {
-            changeViewBackgroundColor: isEditing,
-            loadScene: isEditing,
-            export: true,
-            saveToActiveFile: isEditing,
+            changeViewBackgroundColor: !!isEditing,
+            loadScene: !!isEditing,
+            export: {
+              saveFileToDisk: true,
+            },
+            themeSelection: false,
           },
         }}
       />

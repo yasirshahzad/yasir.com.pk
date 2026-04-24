@@ -177,7 +177,7 @@ export default function InlinePostEditor({
   }, [saveStatus])
 
   if (!isAdmin) {
-    return <div className="excalidraw-hydrator-static"><ExcalidrawHydrator html={initialHtml} /></div>
+    return <ExcalidrawHydrator html={initialHtml} />
   }
 
   const handleDoubleClick = () => {
@@ -303,16 +303,14 @@ export default function InlinePostEditor({
             onInput={handleInput}
             contentEditable={isEditing}
             suppressContentEditableWarning={true}
-            className={`outline-none ${isEditing ? 'cursor-text' : ''}`}
-          >
-             <div contentEditable={false}>
-               <ExcalidrawHydrator 
-                  html={initialHtml} 
-                  canEdit={isEditing} 
-                  onChange={() => setHasChanges(true)} 
-               />
-             </div>
-          </div>
+            className={`outline-none min-h-[100px] ${isEditing ? 'cursor-text ring-1 ring-violet-200 dark:ring-violet-800 rounded-xl p-4' : ''}`}
+          />
+          {/* External Hydrator: Points to the editable div and manages diagrams from the outside */}
+          <ExcalidrawHydrator 
+            externalContainer={contentRef.current}
+            canEdit={isEditing} 
+            onChange={() => setHasChanges(true)} 
+          />
         </div>
 
         {/* ── Right: AI Panel (docked, no backdrop) ── */}
