@@ -6,7 +6,6 @@ import TurndownService from 'turndown'
 import { updateBlogPostContent } from '@/app/actions/blogActions'
 import AIWritingPanel from '@/components/AIWritingPanel'
 import FloatingToolbar from '@/components/FloatingToolbar'
-import ExcalidrawHydrator from '@/components/ExcalidrawHydrator'
 import katex from 'katex'
 import 'katex/dist/katex.css'
 interface InlinePostEditorProps {
@@ -148,13 +147,6 @@ export default function InlinePostEditor({
         },
       })
 
-      turndownService.addRule('excalidraw', {
-        filter: (node: any) => node.hasAttribute('data-excalidraw'),
-        replacement: function (content, node: any) {
-          const json = node.getAttribute('data-excalidraw')
-          return '\n\n```excalidraw\n' + json + '\n```\n\n'
-        },
-      })
 
       const editedHtml = contentRef.current.innerHTML
       const markdown = turndownService.turndown(editedHtml)
@@ -216,7 +208,7 @@ export default function InlinePostEditor({
   }, [saveStatus])
 
   if (!isAdmin) {
-    return <ExcalidrawHydrator html={initialHtml} />
+    return <div dangerouslySetInnerHTML={{ __html: initialHtml }} />
   }
 
   const handleDoubleClick = () => {
@@ -255,10 +247,6 @@ export default function InlinePostEditor({
     const imgHtml = `<br><img src="${url}" alt="Uploaded Image" class="rounded-xl shadow-lg my-6" /><br>`
     document.execCommand('insertHTML', false, imgHtml)
     setHasChanges(true)
-  }
-  const onDiagram = () => {
-    setAiPanelOpen(true)
-    // Small tip: switch to diagram mode in the AI panel
   }
   const onCallout = (type: string) => {
     const html = `<br><blockquote class="admonition admonition-${type.toLowerCase()}"><strong>${type}</strong><br>New ${type.toLowerCase()} content...</blockquote><br>`
@@ -316,12 +304,6 @@ export default function InlinePostEditor({
             suppressContentEditableWarning={true}
             className={`min-h-[100px] outline-none ${isEditing ? 'cursor-text rounded-xl p-4 ring-1 ring-violet-200 dark:ring-violet-800' : ''}`}
           />
-          {/* External Hydrator: Points to the editable div and manages diagrams from the outside */}
-          <ExcalidrawHydrator
-            externalContainer={contentRef.current}
-            canEdit={isEditing}
-            onChange={() => setHasChanges(true)}
-          />
         </div>
 
         {/* ── Right: AI Panel (docked, no backdrop) ── */}
@@ -358,7 +340,6 @@ export default function InlinePostEditor({
             onHeading={onHeading}
             onLink={onLink}
             onImage={onImage}
-            onDiagram={onDiagram}
             onCallout={onCallout}
             onAI={() => setAiPanelOpen((o) => !o)}
             onSave={doSave}

@@ -243,26 +243,3 @@ When given reference material from the blog, match the tone and depth of those p
 - Keep the tone professional and technical.
 Output ONLY the markdown content. Do not wrap in code fences or add explanations about what you wrote.`
 }
-
-export function getDiagramSystemPrompt(): string {
-  return `You are an expert at creating system architecture diagrams in Excalidraw JSON format.
-Your task is to convert a technical description into a clean, professional-looking Excalidraw diagram.
-
-RULES:
-1. Output ONLY valid JSON in the Excalidraw schema format.
-2. Use "rectangle" elements for services, databases, caches, and APIs.
-3. Use "arrow" elements for data flow and dependencies.
-4. Always add "text" labels for components and arrows.
-5. Keep the layout clean (left-to-right or top-to-bottom).
-6. Use a professional color palette (e.g., subtle grays for background, violet/primary colors for borders).
-7. Do not include any extra commentary, markdown formatting, or code fences in your output.
-8. Ensure all elements have unique IDs and proper coordinates so they don't overlap.
-9. Link arrows to the components they connect using "startBinding" and "endBinding" if possible, or just exact coordinates.
-
-Example elements:
-- Services/Components: Rectangle with text inside.
-- Databases: Rectangle with a distinct stroke or label.
-- Caches: Rectangle with a dashed stroke.
-
-Return the complete JSON object that can be passed to the Excalidraw component.`
-}

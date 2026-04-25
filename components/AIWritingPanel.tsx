@@ -2,7 +2,6 @@
 'use client'
 
 import { useState, useEffect, useRef, useCallback } from 'react'
-import ExcalidrawWrapper from './ExcalidrawWrapper'
 import ImageUploader from './ImageUploader'
 import MediaLibrary from './MediaLibrary'
 import SEOPreview from './SEOPreview'
@@ -40,7 +39,7 @@ export default function AIWritingPanel({
 }: AIWritingPanelProps) {
   const [activeTab, setActiveTab] = useState<'write' | 'media' | 'seo'>('write')
   const [instruction, setInstruction] = useState('')
-  const [mode, setMode] = useState<'generate' | 'rewrite' | 'continue' | 'diagram'>('generate')
+  const [mode, setMode] = useState<'generate' | 'rewrite' | 'continue'>('generate')
   const [model, setModel] = useState('')
   const [models, setModels] = useState<string[]>([])
   const [modelsLoading, setModelsLoading] = useState(false)
@@ -188,12 +187,7 @@ export default function AIWritingPanel({
 
   const handleInsertAtEnd = () => {
     if (output.trim()) {
-      let finalOutput = output
-      if (mode === 'diagram') {
-        // Wrap JSON in an excalidraw code block for the markdown editor to pick up
-        finalOutput = `\n\n\`\`\`excalidraw\n${output.trim()}\n\`\`\`\n\n`
-      }
-      onInsert(finalOutput)
+      onInsert(output)
       setOutput('')
       setInstruction('')
     }
@@ -370,7 +364,6 @@ export default function AIWritingPanel({
                   { value: 'generate', label: 'Generate', icon: '✨' },
                   { value: 'rewrite', label: 'Rewrite', icon: '✏️' },
                   { value: 'continue', label: 'Continue', icon: '→' },
-                  { value: 'diagram', label: 'Diagram', icon: '🎨' },
                 ].map((m) => (
                   <button
                     key={m.value}
@@ -512,9 +505,7 @@ export default function AIWritingPanel({
                     ? 'Write an introduction about distributed caching strategies...'
                     : mode === 'rewrite'
                       ? 'Make it more concise and add code examples...'
-                      : mode === 'diagram'
-                        ? 'Describe a microservices architecture with API Gateway and Auth Service...'
-                        : 'Add a section about cache invalidation patterns...'
+                      : 'Add a section about cache invalidation patterns...'
                 }
                 rows={3}
                 className="w-full resize-none rounded-lg border border-gray-200 px-3 py-2 text-xs focus:border-purple-500 focus:ring-purple-500 dark:border-gray-700 dark:bg-gray-800"
@@ -620,26 +611,6 @@ export default function AIWritingPanel({
             )}
           </div>
 
-          {/* Diagram Preview */}
-          {mode === 'diagram' && !isGenerating && output.trim() && (
-            <div className="mt-4">
-              <span className="mb-2 block text-[10px] font-bold tracking-widest text-gray-400 uppercase">
-                Diagram Preview
-              </span>
-              {(() => {
-                try {
-                  const cleanJson = output.replace(/```json|```excalidraw|```/g, '').trim()
-                  return <ExcalidrawWrapper initialData={JSON.parse(cleanJson)} />
-                } catch (e) {
-                  return (
-                    <div className="rounded-xl border border-red-200 bg-red-50 p-4 font-mono text-[11px] text-red-600">
-                      Invalid JSON for Diagram: {String(e)}
-                    </div>
-                  )
-                }
-              })()}
-            </div>
-          )}
 
           {/* Action row */}
           {!isGenerating && (

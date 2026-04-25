@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from 'utils/supabase/server'
+import { headers } from 'next/headers'
 
 export async function login(formData: FormData) {
   const email = formData.get('email') as string
@@ -63,8 +64,11 @@ export async function requestPasswordReset(formData: FormData) {
   if (!email) return { error: 'Email is required' }
 
   const supabase = await createClient()
+  const headerList = await headers()
+  const origin = headerList.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || ''
+
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || ''}/auth/callback?next=/reset-password`,
+    redirectTo: `${origin}/auth/callback?next=/reset-password`,
   })
 
   if (error) return { error: error.message }

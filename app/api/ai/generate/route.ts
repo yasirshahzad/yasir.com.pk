@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/utils/supabase/server'
 import { getPostBySlug } from '@/lib/db/posts'
-import { streamAIResponse, getOllamaModels, getDiagramSystemPrompt } from '@/lib/ai/provider'
+import { streamAIResponse, getOllamaModels } from '@/lib/ai/provider'
 
 // POST: Stream AI-generated content
 export async function POST(request: NextRequest) {
@@ -43,16 +43,13 @@ export async function POST(request: NextRequest) {
       fullInstruction = `Rewrite and improve the following content based on these instructions: ${instruction}`
     } else if (mode === 'continue') {
       fullInstruction = `Continue writing from where the current content ends. Instructions: ${instruction}`
-    } else if (mode === 'diagram') {
-      fullInstruction = `Generate an Excalidraw JSON diagram for this system architecture: ${instruction}`
     }
 
     const stream = await streamAIResponse({
       instruction: fullInstruction,
-      currentContent: mode !== 'generate' && mode !== 'diagram' ? currentContent : undefined,
+      currentContent: mode !== 'generate' ? currentContent : undefined,
       referenceContent: referenceContent || undefined,
       model,
-      systemPrompt: mode === 'diagram' ? getDiagramSystemPrompt() : undefined,
     })
 
     return new Response(stream, {

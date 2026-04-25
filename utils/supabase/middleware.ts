@@ -32,6 +32,17 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Catch-all for PKCE codes that land on unintended pages (e.g. home)
+  // This happens if Supabase ignores or rejects the redirectTo param
+  const code = request.nextUrl.searchParams.get('code')
+  if (code && request.nextUrl.pathname !== '/auth/callback') {
+    const url = request.nextUrl.clone()
+    url.pathname = '/auth/callback'
+    // If it's a recovery flow, Supabase often includes a type or we can infer it
+    // But for now, we just let /auth/callback handle the exchange
+    return NextResponse.redirect(url)
+  }
+
   // Guard all /admin routes. Only process.env.ADMIN_EMAIL gets access.
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
   const isAdmin = user && user.email === process.env.ADMIN_EMAIL

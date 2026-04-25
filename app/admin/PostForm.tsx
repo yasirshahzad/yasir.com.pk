@@ -552,7 +552,6 @@ export default function PostForm({ post, isEditing }: PostFormProps) {
             cm.replaceRange(`\n\n![Image](${url})\n\n`, cm.getCursor())
             cm.focus()
           }}
-          onDiagram={() => setAiPanelOpen(true)}
           onCallout={(type) => {
             const cm = editorRef.current
             const selection = cm.getSelection()
