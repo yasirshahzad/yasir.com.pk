@@ -89,6 +89,16 @@ export default function LoginPage() {
                   className="focus:border-primary-500 focus:ring-primary-500 block w-full min-w-0 flex-1 rounded-md border-gray-300 sm:text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
                 />
               </div>
+              {isLoginView && (
+                <div className="mt-2 text-right">
+                  <a
+                    href="/forgot-password"
+                    className="text-xs text-gray-500 hover:text-primary-500"
+                  >
+                    Forgot password?
+                  </a>
+                </div>
+              )}
             </div>
 
             {error && (
