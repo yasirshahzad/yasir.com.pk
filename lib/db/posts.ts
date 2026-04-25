@@ -117,16 +117,18 @@ export async function getPostBySlug(slug: string) {
 }
 
 export async function incrementViewCount(slug: string) {
-  return (
-    db
+  try {
+    return await db
       .update(posts)
       .set({
         // @ts-ignore
-        viewCount: sql`${posts.viewCount} + 1`,
+        viewCount: sql`COALESCE(${posts.viewCount}, 0) + 1`,
       })
       // @ts-ignore
       .where(eq(posts.slug as any, slug) as any)
-  )
+  } catch (e) {
+    console.error('Failed to increment view count', e)
+  }
 }
 
 export async function getPostsByTag(tag: string, includeDrafts = false) {

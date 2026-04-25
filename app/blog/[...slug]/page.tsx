@@ -147,8 +147,8 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
       return notFound()
     }
 
-    // Increment view count for real users
-    await incrementViewCount(slug)
+    // Increment view count for real users (non-blocking)
+    incrementViewCount(slug).catch(e => console.error('Increment views failed', e))
   }
 
   const authorList = (post.authors as string[]) || ['default']
@@ -156,22 +156,28 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
 
   let toc: any = []
   try {
+    // Some posts might have content that fails TOC extraction in some environments
     const allToc = await extractTocHeadings(post.content || '')
-    toc = allToc.filter((item: any) => item.depth <= 3)
+    toc = allToc?.filter((item: any) => item.depth <= 3) || []
   } catch (e) {
-    console.error('TOC Extraction Error:', e)
+    console.error(`TOC Extraction Error for ${slug}:`, e)
   }
 
-  const processedContent = await remark()
-    .use(remarkGfm)
-    .use(remarkMath)
-    .use(remarkRehype)
-    .use(rehypeKatex)
-    .use(rehypeSlug)
-    .use(rehypeStringify)
-    .process(post.content || '')
-
-  const contentHtml = processedContent.toString()
+  let contentHtml = ''
+  try {
+    const processedContent = await remark()
+      .use(remarkGfm)
+      .use(remarkMath)
+      .use(remarkRehype)
+      .use(rehypeKatex)
+      .use(rehypeSlug)
+      .use(rehypeStringify)
+      .process(post.content || '')
+    contentHtml = processedContent.toString()
+  } catch (e) {
+    console.error(`Remark processing error for ${slug}:`, e)
+    contentHtml = `<p>Error processing content. Please check the markdown syntax.</p>`
+  }
 
   const mainContent = {
     ...mapPost(post),
