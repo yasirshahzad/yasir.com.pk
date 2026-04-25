@@ -5,7 +5,10 @@ import { createPost, updatePost, deletePost } from '@/lib/db/posts'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
+import { assertAdmin } from '@/lib/auth'
+
 export async function savePostAction(formData: FormData) {
+  await assertAdmin()
   const slug = formData.get('slug') as string
   const isEditing = formData.get('isEditing') === 'true'
   const originalSlug = formData.get('originalSlug') as string
@@ -57,6 +60,7 @@ export async function savePostAction(formData: FormData) {
 }
 
 export async function deletePostAction(slug: string) {
+  await assertAdmin()
   await deletePost(slug)
   revalidatePath('/admin')
   revalidatePath('/blog')
@@ -64,11 +68,13 @@ export async function deletePostAction(slug: string) {
 }
 
 export async function getRevisionsAction(postId: number) {
+  await assertAdmin()
   const { getPostRevisions } = await import('@/lib/db/posts')
   return await getPostRevisions(postId)
 }
 
 export async function restoreRevisionAction(revisionId: number) {
+  await assertAdmin()
   const { db } = await import('@/lib/db/index')
   const { postRevisions, posts } = await import('../../drizzle/schema')
   const { eq } = await import('drizzle-orm')
@@ -99,8 +105,9 @@ export async function restoreRevisionAction(revisionId: number) {
 }
 
 export async function autoSavePostAction(slug: string, data: Record<string, any>) {
-  const { updatePost } = await import('@/lib/db/posts')
   try {
+    await assertAdmin()
+    const { updatePost } = await import('@/lib/db/posts')
     await updatePost(slug, data)
     return { success: true, timestamp: new Date().toISOString() }
   } catch (error) {

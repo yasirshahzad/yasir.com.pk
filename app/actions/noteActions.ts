@@ -75,11 +75,12 @@ export async function deleteNote(noteId: number) {
 
     if (!user) return { success: false, reason: 'Not authenticated' }
 
+    const { and } = await import('drizzle-orm')
     // Only allow deleting your own notes
     await db
       .delete(readerNotes)
       // @ts-ignore
-      .where(eq(readerNotes.id, noteId))
+      .where(and(eq(readerNotes.id, noteId), eq(readerNotes.userId, user.id)))
 
     return { success: true }
   } catch (error) {

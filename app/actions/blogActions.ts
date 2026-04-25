@@ -7,19 +7,11 @@ import { posts } from '@/drizzle/schema'
 import { db } from '@/lib/db'
 import { inArray } from 'drizzle-orm'
 
+import { assertAdmin } from '@/lib/auth'
+
 export async function updateBlogPostContent(slug: string, content: string) {
-  const supabase = await createClient()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Security check: Only the admin can update post content
-  if (!user || user.email !== process.env.ADMIN_EMAIL) {
-    return { success: false, error: 'Unauthorized: Admin access required.' }
-  }
-
   try {
+    await assertAdmin()
     await updatePost(slug, { content })
 
     // Revalidate the blog paths to reflect changes
@@ -28,9 +20,9 @@ export async function updateBlogPostContent(slug: string, content: string) {
     revalidatePath('/admin')
 
     return { success: true }
-  } catch (error) {
+  } catch (error: any) {
     console.error('Failed to update blog post content:', error)
-    return { success: false, error: 'Failed to update database.' }
+    return { success: false, error: error.message || 'Failed to update database.' }
   }
 }
 
@@ -80,11 +72,8 @@ export async function fetchPostForExport(slug: string) {
 }
 
 export async function bulkUpdatePosts(ids: number[], data: { status?: any }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email !== process.env.ADMIN_EMAIL) return { success: false, error: 'Unauthorized' }
-
   try {
+    await assertAdmin()
     // @ts-ignore
     await db.update(posts)
       .set(data)
@@ -94,18 +83,15 @@ export async function bulkUpdatePosts(ids: number[], data: { status?: any }) {
     revalidatePath('/admin')
     revalidatePath('/blog')
     return { success: true }
-  } catch (e) {
+  } catch (e: any) {
     console.error('Bulk update failed:', e)
-    return { success: false, error: 'Bulk update failed' }
+    return { success: false, error: e.message || 'Bulk update failed' }
   }
 }
 
 export async function bulkDeletePosts(ids: number[]) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user || user.email !== process.env.ADMIN_EMAIL) return { success: false, error: 'Unauthorized' }
-
   try {
+    await assertAdmin()
     // @ts-ignore
     await db.delete(posts)
       // @ts-ignore
@@ -114,8 +100,8 @@ export async function bulkDeletePosts(ids: number[]) {
     revalidatePath('/admin')
     revalidatePath('/blog')
     return { success: true }
-  } catch (e) {
+  } catch (e: any) {
     console.error('Bulk delete failed:', e)
-    return { success: false, error: 'Bulk delete failed' }
+    return { success: false, error: e.message || 'Bulk delete failed' }
   }
 }

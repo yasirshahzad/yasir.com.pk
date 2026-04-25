@@ -45,12 +45,19 @@ export async function updateSession(request: NextRequest) {
 
   // Guard all /admin routes. Only process.env.ADMIN_EMAIL gets access.
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
-  const isAdmin = user && user.email === process.env.ADMIN_EMAIL
+  const adminEmail = process.env.ADMIN_EMAIL
+
+  // If the environment variable isn't set, we must fail secure and deny all admin access
+  const isAdmin = user && adminEmail && user.email === adminEmail
 
   if (isAdminRoute && !isAdmin) {
     const url = request.nextUrl.clone()
     // Bounce fully unauthenticated to login, bounce low-privilege users back to home
     url.pathname = user ? '/' : '/login'
+    // Keep the intended destination if we're going to login
+    if (!user) {
+      url.searchParams.set('next', request.nextUrl.pathname)
+    }
     return NextResponse.redirect(url)
   }
 

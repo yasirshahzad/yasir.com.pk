@@ -8,6 +8,12 @@ import { headers } from 'next/headers'
 export async function login(formData: FormData) {
   const email = formData.get('email') as string
   const password = formData.get('password') as string
+  let next = (formData.get('next') as string) || '/admin'
+
+  // Security: Prevent open redirects
+  if (next.startsWith('http') || next.startsWith('//')) {
+    next = '/admin'
+  }
 
   if (!email || !password) {
     return { error: 'Email and password are required' }
@@ -25,7 +31,7 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/admin')
+  redirect(next)
 }
 
 export async function signup(formData: FormData) {
