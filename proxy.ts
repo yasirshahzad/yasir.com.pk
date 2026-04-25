@@ -1,7 +1,7 @@
 import { type NextRequest } from 'next/server'
 import { updateSession } from './utils/supabase/middleware'
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   // Pass all traffic through the Supabase edge interceptor 
   // It handles JWT refreshing and specifically guards /admin
   return await updateSession(request)
