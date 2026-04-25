@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { syncFocusTime } from '../app/actions/focusActions'
+import { syncFocusTime } from '@/app/actions/focusActions'
 
 // Pings the backend every 30 seconds to strictly track focus time
 const PING_INTERVAL = 30000

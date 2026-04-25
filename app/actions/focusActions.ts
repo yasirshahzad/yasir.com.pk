@@ -1,10 +1,10 @@
 'use server'
 
 import { cookies } from 'next/headers'
-import { db } from 'lib/db'
-import { readerProfiles, readingLogs } from 'drizzle/schema'
+import { db } from '@/lib/db'
+import { readerProfiles, readingLogs } from '@/drizzle/schema'
 import { eq, and } from 'drizzle-orm'
-import { createClient } from 'utils/supabase/server'
+import { createClient } from '@/utils/supabase/server'
 
 // Helper to get local date string YYYY-MM-DD
 function getTodayDateString() {

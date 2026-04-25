@@ -50,6 +50,9 @@
       ],
       "types/*": [
         "types/*"
+      ],
+      "@/drizzle/*": [
+        "drizzle/*"
       ]
     },
     "plugins": [

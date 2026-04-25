@@ -130,25 +130,20 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
     return notFound()
   }
 
-  // Check for admin session
-  const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-  const isAdmin = user && user.email === process.env.ADMIN_EMAIL
+  // Handle status and visibility (Static check)
+  const isPublished = post.status === 'published'
+  const isScheduled =
+    post.status === 'scheduled' && post.publishedAt && new Date(post.publishedAt) > new Date()
 
-  // Status check for non-admins
-  if (!isAdmin) {
-    const isPublished = post.status === 'published'
-    const isScheduled =
-      post.status === 'scheduled' && post.publishedAt && new Date(post.publishedAt) > new Date()
+  // During static generation, we only build published/non-scheduled posts
+  // For admins viewing drafts, they should use a different preview route or we handle it in middleware
+  if (!isPublished || isScheduled) {
+    return notFound()
+  }
 
-    if (!isPublished || isScheduled) {
-      return notFound()
-    }
-
-    // Increment view count for real users (non-blocking)
-    incrementViewCount(slug).catch(e => console.error('Increment views failed', e))
+  // Increment view count (this will be skipped during build but run on the server during request)
+  if (process.env.NEXT_PHASE !== 'phase-production-build') {
+      incrementViewCount(slug).catch(e => console.error('Increment views failed', e))
   }
 
   const authorList = (post.authors as string[]) || ['default']
@@ -194,7 +189,6 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
         <InlinePostEditor
           slug={post.slug}
           initialHtml={contentHtml}
-          isAdmin={!!isAdmin}
           metadata={{
             title: post.title || '',
             summary: post.summary || '',

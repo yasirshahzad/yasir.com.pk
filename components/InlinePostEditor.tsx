@@ -8,10 +8,11 @@ import AIWritingPanel from '@/components/AIWritingPanel'
 import FloatingToolbar from '@/components/FloatingToolbar'
 import katex from 'katex'
 import 'katex/dist/katex.css'
+import { createClient } from '@/utils/supabase/client'
+
 interface InlinePostEditorProps {
   slug: string
   initialHtml: string
-  isAdmin: boolean
   metadata?: {
     title: string
     summary: string
@@ -22,9 +23,9 @@ interface InlinePostEditorProps {
 export default function InlinePostEditor({
   slug,
   initialHtml,
-  isAdmin,
   metadata,
 }: InlinePostEditorProps) {
+  const [isAdmin, setIsAdmin] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [hasChanges, setHasChanges] = useState(false)
@@ -38,6 +39,17 @@ export default function InlinePostEditor({
   const [selectedEditorText, setSelectedEditorText] = useState('')
   // Saved selection range so that "replace selection" can restore it
   const savedRangeRef = useRef<Range | null>(null)
+
+  useEffect(() => {
+    const checkAdmin = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user && user.email === 'shahzadyasir77@gmail.com') { // Hardcoded for performance or fetch from env if possible
+          setIsAdmin(true)
+      }
+    }
+    checkAdmin()
+  }, [])
 
   // ── AI: Append at end ────────────────────────────────────────────────────
   const handleAIInsert = useCallback((text: string) => {

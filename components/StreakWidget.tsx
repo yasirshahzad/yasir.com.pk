@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { getReaderStats } from 'app/actions/focusActions'
-import { logout } from 'app/login/actions'
+import { getReaderStats } from '@/app/actions/focusActions'
+import { logout } from '@/app/login/actions'
 
 type StatsData = {
   isLoggedIn: boolean
