@@ -20,7 +20,7 @@ async function getOrInstallReaderProfile(userId: string) {
       .select()
       .from(readerProfiles)
       // @ts-ignore
-      .where(eq(readerProfiles.id, userId))
+      .where(eq(readerProfiles.id as any, userId as any) as any)
       .limit(1)
     if (existing.length === 0) {
       await db.insert(readerProfiles).values({ id: userId, currentStreak: 0, longestStreak: 0 })
@@ -29,6 +29,43 @@ async function getOrInstallReaderProfile(userId: string) {
     console.error('Failed to query or seed reader account', e)
   }
   return userId
+}
+
+export async function startFocusSession(minutes: number = 25) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Auth required' }
+
+  try {
+    await db.update(readerProfiles)
+      .set({ 
+        activeFocusSessionStartedAt: new Date(),
+        focusGoalMinutes: minutes 
+      })
+      .where(eq(readerProfiles.id as any, user.id as any) as any)
+    
+    return { success: true }
+  } catch (e) {
+    console.error('Start focus error', e)
+    return { success: false }
+  }
+}
+
+export async function endFocusSession() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false }
+
+  try {
+    await db.update(readerProfiles)
+      .set({ activeFocusSessionStartedAt: null })
+      .where(eq(readerProfiles.id as any, user.id as any) as any)
+    
+    return { success: true }
+  } catch (e) {
+    console.error('End focus error', e)
+    return { success: false }
+  }
 }
 
 export async function syncFocusTime(seconds: number) {
@@ -52,13 +89,13 @@ export async function syncFocusTime(seconds: number) {
       .select()
       .from(readingLogs)
       // @ts-ignore
-      .where(and(eq(readingLogs.readerId, readerId), eq(readingLogs.date, todayStr)))
+      .where(and(eq(readingLogs.readerId as any, readerId as any), eq(readingLogs.date as any, todayStr as any)) as any)
       .limit(1)
 
     if (existingLogArray.length > 0) {
       await db
         .update(readingLogs)
-        .set({ totalSeconds: (existingLogArray[0].totalSeconds || 0) + seconds })
+        .set({ totalSeconds: (existingLogArray[0].totalSeconds || 0) + Math.min(seconds, 3600) }) // Cap at 1hr per sync for robustness
         // @ts-ignore
         .where(eq(readingLogs.id, existingLogArray[0].id))
     } else {
@@ -71,7 +108,7 @@ export async function syncFocusTime(seconds: number) {
       .select()
       .from(readerProfiles)
       // @ts-ignore
-      .where(eq(readerProfiles.id, readerId))
+      .where(eq(readerProfiles.id as any, readerId as any) as any)
       .limit(1)
     if (profileArray.length > 0) {
       const profile = profileArray[0]
@@ -129,7 +166,7 @@ export async function getReaderStats() {
       .select()
       .from(readerProfiles)
       // @ts-ignore
-      .where(eq(readerProfiles.id, focusId))
+      .where(eq(readerProfiles.id as any, focusId as any) as any)
       .limit(1)
 
     if (profileArray.length === 0)
@@ -142,7 +179,7 @@ export async function getReaderStats() {
       .select()
       .from(readingLogs)
       // @ts-ignore
-      .where(and(eq(readingLogs.readerId, focusId), eq(readingLogs.date, todayStr)))
+      .where(and(eq(readingLogs.readerId as any, focusId as any), eq(readingLogs.date as any, todayStr as any)) as any)
       .limit(1)
 
     const secondsToday = logArray.length > 0 ? logArray[0].totalSeconds || 0 : 0
@@ -153,6 +190,9 @@ export async function getReaderStats() {
       longestStreak: profile.longestStreak || 0,
       secondsToday,
       hasReadToday: profile.lastActiveDate === todayStr && secondsToday > 0,
+      // Focus Session State
+      activeSessionStart: profile.activeFocusSessionStartedAt ? profile.activeFocusSessionStartedAt.toISOString() : null,
+      focusGoalMinutes: profile.focusGoalMinutes || 25,
     }
   } catch (error) {
     console.error('Focus fetch error', error)

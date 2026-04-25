@@ -55,6 +55,8 @@ export const readerProfiles = pgTable('reader_profiles', {
   currentStreak: integer('current_streak').default(0), 
   longestStreak: integer('longest_streak').default(0),
   lastActiveDate: date('last_active_date'), // 'YYYY-MM-DD'
+  activeFocusSessionStartedAt: timestamp('active_focus_session_started_at'),
+  focusGoalMinutes: integer('focus_goal_minutes').default(25),
   createdAt: timestamp('created_at').defaultNow(),
 });
 

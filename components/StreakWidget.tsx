@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
-import { getReaderStats } from '@/app/actions/focusActions'
+import { getReaderStats, startFocusSession, endFocusSession } from '@/app/actions/focusActions'
 import { logout } from '@/app/login/actions'
 
 type StatsData = {
@@ -10,25 +10,75 @@ type StatsData = {
   currentStreak?: number
   secondsToday?: number
   longestStreak?: number
+  activeSessionStart?: string | null
+  focusGoalMinutes?: number
 }
 
 export default function StreakWidget() {
   const [stats, setStats] = useState<StatsData | null>(null)
+  const [timeLeft, setTimeLeft] = useState<number | null>(null)
+  const [isSyncing, setIsSyncing] = useState(false)
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const data = await getReaderStats()
+      if (data) setStats(data as StatsData)
+    } catch {
+      // Silently ignore — stale action IDs or network errors shouldn't crash the widget
+    }
+  }, [])
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const data = await getReaderStats()
-        if (data) setStats(data as StatsData)
-      } catch {
-        // Silently ignore — stale action IDs or network errors shouldn't crash the widget
-      }
-    }
-
     fetchStats()
     const interval = setInterval(fetchStats, 60000)
     return () => clearInterval(interval)
-  }, [])
+  }, [fetchStats])
+
+  // Timer Tick
+  useEffect(() => {
+    if (!stats?.activeSessionStart) {
+      setTimeLeft(null)
+      return
+    }
+
+    const tick = () => {
+      const start = new Date(stats.activeSessionStart!).getTime()
+      const now = new Date().getTime()
+      const elapsedSeconds = Math.floor((now - start) / 1000)
+      const totalSeconds = (stats.focusGoalMinutes || 25) * 60
+      const remaining = Math.max(0, totalSeconds - elapsedSeconds)
+      
+      setTimeLeft(remaining)
+
+      if (remaining === 0 && stats.activeSessionStart) {
+        // Auto-end session when time is up? 
+        // Or let user end it. For now, we just stay at 0.
+      }
+    }
+
+    tick()
+    const interval = setInterval(tick, 1000)
+    return () => clearInterval(interval)
+  }, [stats?.activeSessionStart, stats?.focusGoalMinutes])
+
+  const handleStartFocus = async (mins: number) => {
+    setIsSyncing(true)
+    const res = await startFocusSession(mins)
+    if (res.success) await fetchStats()
+    setIsSyncing(false)
+  }
+
+  const handleEndFocus = async () => {
+    setIsSyncing(true)
+    const res = await endFocusSession()
+    if (res.success) await fetchStats()
+    setIsSyncing(false)
+    
+    // Notify user if goal met
+    if (timeLeft === 0) {
+      alert("Focus session complete! Great work. 🔥")
+    }
+  }
 
   if (!stats) return null // Hide while fetching gracefully
 
@@ -38,13 +88,13 @@ export default function StreakWidget() {
         href="/login"
         className="bg-primary-50 text-primary-600 hover:bg-primary-100 dark:bg-primary-900/40 dark:text-primary-400 dark:hover:bg-primary-900/60 border-primary-200 dark:border-primary-800 rounded-full border px-3 py-1.5 text-sm font-semibold transition-all"
       >
-        Sign In to Track Streaks
+        Sign In
       </Link>
     )
   }
 
   // They are logged in!
-  const targetSeconds = 1800 // 30 mins
+  const targetSeconds = 1800 // 30 mins goal
   const activeSeconds = stats.secondsToday || 0
   const progressPercent = Math.min((activeSeconds / targetSeconds) * 100, 100)
   const minutesToday = Math.floor(activeSeconds / 60)
@@ -54,19 +104,27 @@ export default function StreakWidget() {
   const circumference = 2 * Math.PI * radius
   const strokeDashoffset = circumference - (progressPercent / 100) * circumference
 
+  const formatTime = (s: number) => {
+    const mins = Math.floor(s / 60)
+    const secs = s % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  const isFocusing = timeLeft !== null
+
   return (
     <div className="group relative z-50 flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800">
-      <span title="Your Daily Streak" className="flex items-center gap-1 text-orange-500">
-        🔥 {stats.currentStreak}
+      <span title="Your Daily Streak" className={`flex items-center gap-1 ${stats.currentStreak ? 'text-orange-500' : 'text-gray-400'}`}>
+        🔥 {stats.currentStreak || 0}
       </span>
       <div className="h-4 w-px bg-gray-300 dark:bg-gray-600"></div>
 
       {/* Dynamic Visual Ring! */}
       <span
-        title="Minutes focused today"
-        className="text-primary-500 relative flex items-center justify-center gap-2 pr-1"
+        title={isFocusing ? 'Focus in progress' : 'Minutes focused today'}
+        className={`${isFocusing ? 'text-rose-500' : 'text-primary-500'} relative flex items-center justify-center gap-2 pr-1`}
       >
-        <svg className="absolute left-0 h-5 w-5 -rotate-90" viewBox="0 0 24 24">
+        <svg className={`absolute left-0 h-5 w-5 -rotate-90 ${isFocusing ? 'animate-pulse' : ''}`} viewBox="0 0 24 24">
           <circle
             className="text-gray-200 dark:text-gray-700"
             strokeWidth="3"
@@ -77,7 +135,7 @@ export default function StreakWidget() {
             cy="12"
           />
           <circle
-            className="text-primary-500 transition-all duration-1000 ease-out"
+            className={`${isFocusing ? 'text-rose-500' : 'text-primary-500'} transition-all duration-1000 ease-out`}
             strokeWidth="3"
             strokeDasharray={circumference}
             strokeDashoffset={strokeDashoffset}
@@ -89,57 +147,81 @@ export default function StreakWidget() {
             cy="12"
           />
         </svg>
-        <span className="pl-6">{minutesToday}m</span>
+        <span className="pl-6">{isFocusing ? formatTime(timeLeft) : `${minutesToday}m`}</span>
       </span>
 
       {/* Dropdown hover card */}
-      <div className="absolute top-full right-0 hidden w-56 flex-col gap-4 group-hover:flex">
-        {/* Transparent bridge to prevent hover loss */}
+      <div className="absolute top-full right-0 hidden w-64 flex-col gap-0 group-hover:flex">
+        {/* Transparent bridge */}
         <div className="h-2 w-full"></div>
-        <div className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-xl dark:border-gray-700 dark:bg-gray-900">
-        <div>
-          <h4 className="mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase">
-            Daily Focus Goal
-          </h4>
-          <div className="mt-2 space-y-1 text-base text-gray-900 dark:text-gray-100">
-            <p className="flex justify-between">
-              <span>🔥 Streak</span> <span>{stats.currentStreak}</span>
-            </p>
-            <p className="flex justify-between">
-              <span>⏱️ Today</span> <span>{minutesToday} / 30m</span>
-            </p>
-
-            {/* Visual Progress Bar in Hover Card */}
-            <div className="mt-3 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
-              <div
-                className="bg-primary-500 h-2 rounded-full transition-all"
-                style={{ width: `${progressPercent}%` }}
-              ></div>
-            </div>
-            {progressPercent === 100 && (
-              <p className="pt-2 text-center text-xs font-bold text-green-500">Goal complete! 🏆</p>
-            )}
+        <div className="flex flex-col gap-4 rounded-3xl border border-gray-100 bg-white p-5 shadow-2xl dark:border-gray-800 dark:bg-gray-950">
+          
+          {/* Header with Logout */}
+          <div className="flex items-center justify-between border-b border-gray-50 pb-3 dark:border-gray-900">
+             <span className="text-[10px] font-black uppercase tracking-widest text-gray-400">Focus Hub</span>
+             <button onClick={() => logout()} className="text-[10px] font-bold text-gray-400 hover:text-rose-500 transition-colors">Logout</button>
           </div>
-        </div>
 
-        <div className="flex flex-col gap-2 border-t border-gray-200 pt-3 dark:border-gray-800">
+          {/* Stats Section */}
+          <div className="grid grid-cols-2 gap-4">
+             <div className="rounded-2xl bg-gray-50 p-3 dark:bg-gray-900/50">
+                <p className="text-[9px] font-bold text-gray-400 uppercase">Streak</p>
+                <p className="text-xl font-black text-orange-500">{stats.currentStreak || 0}d</p>
+             </div>
+             <div className="rounded-2xl bg-gray-50 p-3 dark:bg-gray-900/50">
+                <p className="text-[9px] font-bold text-gray-400 uppercase">Today</p>
+                <p className="text-xl font-black text-primary-500">{minutesToday}m</p>
+             </div>
+          </div>
+
+          {/* Pomodoro Section */}
+          <div className="space-y-3">
+             {isFocusing ? (
+               <div className="rounded-2xl bg-rose-50 p-4 dark:bg-rose-950/20 text-center">
+                  <p className="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase mb-1">Deep Focus Active</p>
+                  <p className="text-3xl font-black text-rose-600 dark:text-rose-400 tabular-nums">{formatTime(timeLeft)}</p>
+                  <button 
+                    disabled={isSyncing}
+                    onClick={handleEndFocus}
+                    className="mt-3 w-full rounded-xl bg-rose-600 py-2 text-xs font-bold text-white hover:bg-rose-700 transition-all disabled:opacity-50 shadow-lg shadow-rose-200 dark:shadow-none"
+                  >
+                    {isSyncing ? 'Syncing...' : 'End Focus Session'}
+                  </button>
+               </div>
+             ) : (
+               <div className="space-y-2">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase">Start focus session</p>
+                  <div className="grid grid-cols-2 gap-2">
+                     <button 
+                       disabled={isSyncing}
+                       onClick={() => handleStartFocus(25)}
+                       className="rounded-xl border border-gray-100 bg-white py-2.5 text-xs font-bold hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900"
+                     >
+                       25 min
+                     </button>
+                     <button 
+                       disabled={isSyncing}
+                       onClick={() => handleStartFocus(50)}
+                       className="rounded-xl border border-gray-100 bg-white py-2.5 text-xs font-bold hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900"
+                     >
+                       50 min
+                     </button>
+                  </div>
+               </div>
+             )}
+          </div>
+
+          {/* My Notebook Link */}
           <Link
             href="/notes"
-            className="text-primary-600 hover:bg-primary-50 dark:text-primary-400 dark:hover:bg-primary-900/30 flex w-full items-center justify-between rounded-md px-3 py-2 text-sm font-semibold transition"
+            className="flex items-center justify-between rounded-2xl bg-primary-600 p-3 text-xs font-bold text-white hover:bg-primary-700 transition-all shadow-lg shadow-primary-200 dark:shadow-none"
           >
-            <span>💾 My Notebook</span>
+            <span>📓 My Reading Notes</span>
             <span>&rarr;</span>
           </Link>
 
-          <button
-            onClick={() => logout()}
-            className="w-full rounded-md px-3 py-2 text-left text-sm font-semibold text-gray-600 transition hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
-          >
-            Sign Out
-          </button>
         </div>
       </div>
     </div>
-  </div>
   )
 }
