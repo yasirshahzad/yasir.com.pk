@@ -214,19 +214,11 @@ function buildPrompt(options: AIStreamOptions): string {
   const parts: string[] = []
 
   if (options.referenceContent) {
-    parts.push(
-      '## Reference Material (from our blog)\n\n' +
-        options.referenceContent +
-        '\n\n---\n'
-    )
+    parts.push('## Reference Material (from our blog)\n\n' + options.referenceContent + '\n\n---\n')
   }
 
   if (options.currentContent) {
-    parts.push(
-      '## Current Post Content\n\n' +
-        options.currentContent +
-        '\n\n---\n'
-    )
+    parts.push('## Current Post Content\n\n' + options.currentContent + '\n\n---\n')
   }
 
   parts.push('## Your Task\n\n' + options.instruction)
@@ -245,8 +237,9 @@ Your writing style is:
 
 When given reference material from the blog, match the tone and depth of those posts.
 - Use markdown for formatting (bold, italics, lists, code blocks).
-- For mathematical notations, symbols, or flow diagrams in text (like Frontier $\rightarrow$ Store), use LaTeX math syntax with single dollar signs (e.g., $...$).
-- Example arrows: $\rightarrow$ for right arrow, $\leftarrow$ for left arrow, $\leftrightarrow$ for double arrow.
+- For mathematical notations, symbols, or flow diagrams in text (like Frontier $\\rightarrow$ Store), use LaTeX math syntax with single dollar signs (e.g., $...$).
+- Example arrows: $\\rightarrow$ for right arrow, $\\leftarrow$ for left arrow, $\\leftrightarrow$ for double arrow.
+
 - Keep the tone professional and technical.
 Output ONLY the markdown content. Do not wrap in code fences or add explanations about what you wrote.`
 }

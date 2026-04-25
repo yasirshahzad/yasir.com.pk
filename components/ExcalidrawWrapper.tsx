@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import React, { useState, useEffect, useRef, useMemo } from 'react'
@@ -13,18 +14,18 @@ interface ExcalidrawWrapperProps {
 /**
  * Enhanced ExcalidrawWrapper with Direct Editing support.
  */
-const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({ 
-  initialData, 
-  readOnly = true, 
+const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({
+  initialData,
+  readOnly = true,
   canEdit = false,
-  onSave 
+  onSave,
 }) => {
   const [ExcalidrawComponent, setExcalidrawComponent] = useState<any>(null)
   const [isEditing, setIsEditing] = useState(false)
   const { resolvedTheme } = useTheme()
   const excalidrawAPI = useRef<any>(null)
   const [isReady, setIsReady] = useState(false)
-  const saveTimerRef = useRef<NodeJS.Timeout|null>(null)
+  const saveTimerRef = useRef<NodeJS.Timeout | null>(null)
 
   // 1. Dynamic import of Excalidraw (browser only)
   useEffect(() => {
@@ -51,7 +52,13 @@ const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({
 
   // 3. Center content
   useEffect(() => {
-    if (ExcalidrawComponent && excalidrawAPI.current && sceneData && sceneData.elements.length > 0 && !isEditing) {
+    if (
+      ExcalidrawComponent &&
+      excalidrawAPI.current &&
+      sceneData &&
+      sceneData.elements.length > 0 &&
+      !isEditing
+    ) {
       const timer = setTimeout(() => {
         try {
           if (excalidrawAPI.current) {
@@ -68,7 +75,7 @@ const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({
       }, 500)
       return () => clearTimeout(timer)
     } else if (ExcalidrawComponent && isEditing) {
-       setIsReady(true)
+      setIsReady(true)
     }
   }, [ExcalidrawComponent, sceneData, isEditing])
 
@@ -83,10 +90,10 @@ const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({
         version: 2,
         elements,
         appState: {
-           viewBackgroundColor: appState.viewBackgroundColor,
-           gridSize: appState.gridSize,
+          viewBackgroundColor: appState.viewBackgroundColor,
+          gridSize: appState.gridSize,
         },
-        files
+        files,
       })
     }, 1000)
   }
@@ -110,20 +117,20 @@ const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({
   if (!ExcalidrawComponent) {
     return (
       <div className="flex h-[450px] w-full flex-col items-center justify-center rounded-xl border border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-900/50">
-        <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
-        <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+        <div className="border-primary-500 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent" />
+        <p className="mt-3 text-[10px] font-bold tracking-widest text-gray-400 uppercase">
           Loading Canvas Engine...
         </p>
       </div>
     )
   }
 
-  const currentTheme = (resolvedTheme === 'dark' ? 'dark' : 'light')
+  const currentTheme = resolvedTheme === 'dark' ? 'dark' : 'light'
   const effectiveReadOnly = readOnly && !isEditing
 
   return (
-    <div 
-      className={`relative h-[500px] w-full overflow-hidden rounded-xl border border-gray-200 dark:border-gray-800 shadow-sm transition-opacity duration-300 ${isReady ? 'opacity-100' : 'opacity-0'}`}
+    <div
+      className={`relative h-[500px] w-full overflow-hidden rounded-xl border border-gray-200 shadow-sm transition-opacity duration-300 dark:border-gray-800 ${isReady ? 'opacity-100' : 'opacity-0'}`}
       style={{ background: currentTheme === 'dark' ? '#121212' : '#ffffff' }}
     >
       <ExcalidrawComponent
@@ -145,27 +152,42 @@ const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({
           },
         }}
       />
-      
+
       {/* Edit Trigger */}
       {canEdit && (
         <div className="absolute top-4 right-4 z-20 flex gap-2">
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-xl hover:bg-gray-50 dark:hover:bg-gray-750 transition-all"
+              className="dark:hover:bg-gray-750 flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-[10px] font-bold tracking-wider uppercase shadow-xl transition-all hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
             >
-              <svg className="w-3.5 h-3.5 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              <svg
+                className="text-primary-500 h-3.5 w-3.5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                />
               </svg>
               Edit Diagram
             </button>
           ) : (
             <button
               onClick={() => setIsEditing(false)}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary-500 text-white rounded-lg text-[10px] font-bold uppercase tracking-wider shadow-xl hover:bg-primary-600 transition-all animate-pulse"
+              className="bg-primary-500 hover:bg-primary-600 flex animate-pulse items-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-bold tracking-wider text-white uppercase shadow-xl transition-all"
             >
-              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M5 13l4 4L19 7"
+                />
               </svg>
               Done Editing
             </button>
@@ -174,11 +196,13 @@ const ExcalidrawWrapper: React.FC<ExcalidrawWrapperProps> = ({
       )}
 
       {!isReady && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white dark:bg-[#121212] z-10">
-           <div className="flex flex-col items-center gap-3">
-             <div className="h-5 w-5 animate-spin rounded-full border-2 border-primary-500 border-t-transparent" />
-             <span className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">Initialising Editor...</span>
-           </div>
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white dark:bg-[#121212]">
+          <div className="flex flex-col items-center gap-3">
+            <div className="border-primary-500 h-5 w-5 animate-spin rounded-full border-2 border-t-transparent" />
+            <span className="text-[9px] font-bold tracking-widest text-gray-400 uppercase">
+              Initialising Editor...
+            </span>
+          </div>
         </div>
       )}
     </div>

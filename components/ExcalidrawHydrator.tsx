@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import React, { useEffect, useState, useRef, useLayoutEffect, useCallback } from 'react'
@@ -15,7 +16,12 @@ interface ExcalidrawHydratorProps {
  * ExcalidrawHydrator: Now supports both self-rendering and external container hydration.
  * If externalContainer is provided, it scans that DOM element directly.
  */
-export default function ExcalidrawHydrator({ html, externalContainer, canEdit = false, onChange }: ExcalidrawHydratorProps) {
+export default function ExcalidrawHydrator({
+  html,
+  externalContainer,
+  canEdit = false,
+  onChange,
+}: ExcalidrawHydratorProps) {
   const internalRef = useRef<HTMLDivElement>(null)
   const container = externalContainer || internalRef.current
   const [processedHtml, setProcessedHtml] = useState('')
@@ -24,8 +30,8 @@ export default function ExcalidrawHydrator({ html, externalContainer, canEdit = 
   const getContentHash = (text: string) => {
     let hash = 0
     for (let i = 0; i < text.length; i++) {
-        hash = (hash << 5) - hash + text.charCodeAt(i)
-        hash |= 0
+      hash = (hash << 5) - hash + text.charCodeAt(i)
+      hash |= 0
     }
     return Math.abs(hash).toString(36)
   }
@@ -37,7 +43,7 @@ export default function ExcalidrawHydrator({ html, externalContainer, canEdit = 
     const doc = new DOMParser().parseFromString(html, 'text/html')
     const codeBlocks = doc.querySelectorAll('pre code.language-excalidraw')
     const newDiagrams: { id: string; data: any }[] = []
-    
+
     codeBlocks.forEach((block, index) => {
       try {
         const rawContent = block.textContent || ''
@@ -46,13 +52,14 @@ export default function ExcalidrawHydrator({ html, externalContainer, canEdit = 
         const json = JSON.parse(jsonText)
         const hash = getContentHash(jsonText)
         const id = `excalidraw-${index}-${hash}`
-        
+
         const placeholder = doc.createElement('div')
         placeholder.id = id
         placeholder.setAttribute('data-excalidraw', JSON.stringify(json))
-        placeholder.className = 'excalidraw-container my-8 w-full h-[500px] bg-gray-50 dark:bg-gray-900/50 rounded-xl overflow-hidden'
+        placeholder.className =
+          'excalidraw-container my-8 w-full h-[500px] bg-gray-50 dark:bg-gray-900/50 rounded-xl overflow-hidden'
         placeholder.contentEditable = 'false' // CRITICAL for stability
-        
+
         const pre = block.parentElement
         if (pre && pre.parentElement) {
           pre.parentElement.replaceChild(placeholder, pre)
@@ -72,7 +79,7 @@ export default function ExcalidrawHydrator({ html, externalContainer, canEdit = 
     if (!externalContainer) return
     const codeBlocks = externalContainer.querySelectorAll('pre code.language-excalidraw')
     const newDiagrams: { id: string; data: any }[] = []
-    
+
     codeBlocks.forEach((block, index) => {
       try {
         const rawContent = block.textContent || ''
@@ -81,13 +88,14 @@ export default function ExcalidrawHydrator({ html, externalContainer, canEdit = 
         const json = JSON.parse(jsonText)
         const hash = getContentHash(jsonText)
         const id = `excalidraw-${index}-${hash}`
-        
+
         const placeholder = document.createElement('div')
         placeholder.id = id
         placeholder.setAttribute('data-excalidraw', JSON.stringify(json))
-        placeholder.className = 'excalidraw-container my-8 w-full h-[500px] bg-gray-50 dark:bg-gray-900/50 rounded-xl overflow-hidden'
+        placeholder.className =
+          'excalidraw-container my-8 w-full h-[500px] bg-gray-50 dark:bg-gray-900/50 rounded-xl overflow-hidden'
         placeholder.contentEditable = 'false'
-        
+
         const pre = block.parentElement
         if (pre && pre.parentElement) {
           pre.parentElement.replaceChild(placeholder, pre)
@@ -97,12 +105,12 @@ export default function ExcalidrawHydrator({ html, externalContainer, canEdit = 
         console.error('External scan error:', e)
       }
     })
-    
+
     if (newDiagrams.length > 0) {
-      setDiagrams(prev => {
+      setDiagrams((prev) => {
         // Simple merge to avoid unmounting existing ones with same ID
-        const existingIds = prev.map(d => d.id)
-        const filtered = newDiagrams.filter(d => !existingIds.includes(d.id))
+        const existingIds = prev.map((d) => d.id)
+        const filtered = newDiagrams.filter((d) => !existingIds.includes(d.id))
         return [...prev, ...filtered]
       })
     }
@@ -127,15 +135,15 @@ export default function ExcalidrawHydrator({ html, externalContainer, canEdit = 
   }
 
   return (
-    <div ref={internalRef} className="relative excalidraw-hydrator-root">
+    <div ref={internalRef} className="excalidraw-hydrator-root relative">
       {/* Only render processedHtml if we aren't using an external container */}
       {!externalContainer && <div dangerouslySetInnerHTML={{ __html: processedHtml }} />}
-      
+
       {diagrams.map((diagram) => (
         <ExcalidrawPortal key={diagram.id} targetId={diagram.id} container={container}>
-          <ExcalidrawWrapper 
-            initialData={diagram.data} 
-            readOnly={!canEdit} 
+          <ExcalidrawWrapper
+            initialData={diagram.data}
+            readOnly={!canEdit}
             canEdit={canEdit}
             onSave={(newData) => handleDiagramChange(diagram.id, newData)}
           />
@@ -145,7 +153,15 @@ export default function ExcalidrawHydrator({ html, externalContainer, canEdit = 
   )
 }
 
-function ExcalidrawPortal({ targetId, container, children }: { targetId: string; container: HTMLElement | null; children: React.ReactNode }) {
+function ExcalidrawPortal({
+  targetId,
+  container,
+  children,
+}: {
+  targetId: string
+  container: HTMLElement | null
+  children: React.ReactNode
+}) {
   const [target, setTarget] = useState<HTMLElement | null>(null)
   useLayoutEffect(() => {
     if (!container) return
@@ -158,7 +174,9 @@ function ExcalidrawPortal({ targetId, container, children }: { targetId: string;
       return false
     }
     if (find()) return
-    const observer = new MutationObserver(() => { if (find()) observer.disconnect() })
+    const observer = new MutationObserver(() => {
+      if (find()) observer.disconnect()
+    })
     observer.observe(container, { childList: true, subtree: true })
     return () => observer.disconnect()
   }, [container, targetId])

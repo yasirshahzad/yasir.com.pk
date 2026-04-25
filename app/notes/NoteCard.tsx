@@ -31,7 +31,10 @@ function buildDeepLink(pathname: string, highlightText: string | null | undefine
   if (!highlightText) return pathname
 
   // Use the first ~60 chars, trim to the last full word to avoid partial names
-  const raw = highlightText.slice(0, 60).replace(/\s\S*$/, '').trim()
+  const raw = highlightText
+    .slice(0, 60)
+    .replace(/\s\S*$/, '')
+    .trim()
   const fragment = encodeURIComponent(raw)
   return `${pathname}#:~:text=${fragment}`
 }
@@ -70,7 +73,7 @@ export default function NoteCard({ note }: Props) {
       role="link"
       tabIndex={0}
       onKeyDown={(e) => e.key === 'Enter' && handleNoteClick()}
-      className="group break-inside-avoid cursor-pointer rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-lg hover:border-primary-300 dark:border-gray-800 dark:bg-gray-900 dark:hover:border-primary-700"
+      className="group hover:border-primary-300 dark:hover:border-primary-700 cursor-pointer break-inside-avoid rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:shadow-lg dark:border-gray-800 dark:bg-gray-900"
     >
       {/* Header row */}
       <div className="mb-4 flex items-center justify-between">
@@ -91,13 +94,29 @@ export default function NoteCard({ note }: Props) {
           className="ml-2 flex items-center rounded-md p-1 text-gray-400 opacity-0 transition group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 dark:hover:text-red-400"
         >
           {deleting ? (
-            <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="h-4 w-4 animate-spin"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <circle cx="12" cy="12" r="10" strokeOpacity={0.25} />
               <path d="M12 2a10 10 0 0 1 10 10" />
             </svg>
           ) : (
-            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            <svg
+              className="h-4 w-4"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+              />
             </svg>
           )}
         </button>
@@ -117,7 +136,13 @@ export default function NoteCard({ note }: Props) {
         )}
         <span className="text-primary-500 group-hover:text-primary-600 dark:group-hover:text-primary-400 ml-auto flex items-center gap-1 text-sm font-semibold transition">
           Read &amp; highlight
-          <svg className="h-3.5 w-3.5 transition group-hover:translate-x-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg
+            className="h-3.5 w-3.5 transition group-hover:translate-x-0.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </span>

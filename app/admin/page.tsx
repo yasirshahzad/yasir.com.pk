@@ -5,6 +5,13 @@ import PageTitle from '@/components/PageTitle'
 import { formatDate } from 'pliny/utils/formatDate'
 import siteMetadata from '@/data/siteMetadata'
 
+const statusStyles = {
+  draft: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+  published: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  scheduled: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  archived: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-400',
+}
+
 export default async function AdminDashboard() {
   const posts = await getAllPosts()
 
@@ -16,9 +23,9 @@ export default async function AdminDashboard() {
             <PageTitle>Admin Dashboard</PageTitle>
             <Link
               href="/admin/new"
-              className="bg-primary-500 hover:bg-primary-600 dark:hover:bg-primary-400 rounded-md px-4 py-2 font-medium text-white"
+              className="bg-primary-500 hover:bg-primary-600 dark:hover:bg-primary-400 rounded-lg px-4 py-2 font-bold text-white shadow-lg transition-all hover:scale-105 active:scale-95"
             >
-              New Post
+              + New Post
             </Link>
           </div>
           <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
@@ -26,57 +33,59 @@ export default async function AdminDashboard() {
           </p>
         </div>
         <div className="py-8">
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm dark:border-gray-700">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead>
+              <thead className="bg-gray-50 dark:bg-gray-800/50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                    Date
+                  <th className="px-6 py-4 text-left text-xs font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                    Post Details
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
-                    Title
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                  <th className="px-6 py-4 text-left text-xs font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                     Status
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                  <th className="px-6 py-4 text-left text-xs font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
+                    Views
+                  </th>
+                  <th className="px-6 py-4 text-right text-xs font-bold tracking-wider text-gray-500 uppercase dark:text-gray-400">
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="divide-y divide-gray-200 bg-white dark:divide-gray-700 dark:bg-transparent">
                 {posts.map((post) => (
-                  <li key={post.slug} className="hidden" /> // For key consistency if using map in actual table
-                ))}
-                {posts.map((post) => (
-                  <tr key={post.slug} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {post.date ? formatDate(post.date, siteMetadata.locale) : 'No Date'}
+                  <tr
+                    key={post.slug}
+                    className="transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/30"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="text-sm font-bold text-gray-900 dark:text-gray-100">
+                        {post.title}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        {post.date ? formatDate(post.date, siteMetadata.locale) : 'No Date'} •{' '}
+                        {post.readingTime || 0} min read
+                      </div>
                     </td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
-                      {post.title}
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase ${statusStyles[post.status as keyof typeof statusStyles] || statusStyles.draft}`}
+                      >
+                        {post.status || 'draft'}
+                      </span>
                     </td>
-                    <td className="px-6 py-4 text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
-                      {post.draft ? (
-                        <span className="rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:bg-yellow-800 dark:text-yellow-100">
-                          Draft
-                        </span>
-                      ) : (
-                        <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-100">
-                          Published
-                        </span>
-                      )}
+                    <td className="px-6 py-4 text-sm font-medium whitespace-nowrap text-gray-500 dark:text-gray-400">
+                      {post.viewCount || 0}
                     </td>
-                    <td className="px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
+                    <td className="space-x-4 px-6 py-4 text-right text-sm font-medium whitespace-nowrap">
                       <Link
                         href={`/admin/edit/${post.slug}`}
-                        className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400 mr-4"
+                        className="text-primary-500 hover:text-primary-600 dark:text-primary-400 dark:hover:text-primary-300 transition-colors"
                       >
                         Edit
                       </Link>
                       <Link
                         href={`/blog/${post.slug}`}
-                        className="text-gray-500 hover:text-gray-600 dark:hover:text-gray-400"
+                        className="text-gray-500 transition-colors hover:text-gray-600 dark:text-gray-400 dark:hover:text-gray-300"
                       >
                         View
                       </Link>

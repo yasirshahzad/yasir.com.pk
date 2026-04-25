@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getAllPosts, mapPost } from '@/lib/db/posts'
+import { getPostsMetadata, mapPost } from '@/lib/db/posts'
 
 // Keep the search index highly cached since blog posts don't change by the minute.
 // You can lower this if you want instant indexing, but standard SSG is 1 hour default
@@ -7,7 +7,7 @@ export const revalidate = 3600
 
 export async function GET() {
   try {
-    const rawPosts = await getAllPosts()
+    const rawPosts = await getPostsMetadata()
 
     // Map database posts into a lightweight JSON array for KBar search index
     const searchData = rawPosts.map((post) => {

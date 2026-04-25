@@ -8,6 +8,13 @@
       "when": 1776573649381,
       "tag": "0000_add_note_highlight_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777002439672,
+      "tag": "0001_plain_viper",
+      "breakpoints": true
     }
   ]
 }

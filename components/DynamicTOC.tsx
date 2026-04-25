@@ -49,17 +49,23 @@ export default function DynamicTOC() {
         onClick={() => setOpen((o) => !o)}
         className="group flex w-full items-center justify-between gap-2 rounded-lg py-1 text-left transition-colors"
       >
-        <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500">
-          <svg className="h-3 w-3 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+        <span className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-gray-400 uppercase dark:text-gray-500">
+          <svg
+            className="h-3 w-3 shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2.5}
+          >
             <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h10M4 18h7" />
           </svg>
           Contents
         </span>
 
-        <span className="flex items-center gap-1.5 min-w-0">
+        <span className="flex min-w-0 items-center gap-1.5">
           {/* Show active section name when collapsed */}
           {!open && activeHeading && (
-            <span className="truncate text-[10px] text-primary-500 dark:text-primary-400 font-medium max-w-[120px]">
+            <span className="text-primary-500 dark:text-primary-400 max-w-[120px] truncate text-[10px] font-medium">
               {activeHeading.text}
             </span>
           )}
@@ -110,7 +116,7 @@ export default function DynamicTOC() {
                       'inline-block h-1 shrink-0 rounded-full transition-all duration-200',
                       isActive
                         ? 'bg-primary-500 w-3'
-                        : 'bg-gray-300 dark:bg-gray-700 w-1 group-hover:w-2',
+                        : 'w-1 bg-gray-300 group-hover:w-2 dark:bg-gray-700',
                       isH3 ? 'opacity-60' : '',
                     ].join(' ')}
                   />

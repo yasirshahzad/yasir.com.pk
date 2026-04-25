@@ -1,8 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getReaderNotes } from 'app/actions/noteActions'
 import Link from 'next/link'
 import SectionContainer from '@/components/SectionContainer'
 import siteMetadata from '@/data/siteMetadata'
 import NoteCard from './NoteCard'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata = {
   title: `My Notebook - ${siteMetadata.title}`,

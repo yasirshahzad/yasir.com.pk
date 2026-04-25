@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
 import React, { useState, useRef } from 'react'
@@ -8,7 +9,10 @@ interface ImageUploaderProps {
   label?: string
 }
 
-export default function ImageUploader({ onUploadSuccess, label = "Add Image" }: ImageUploaderProps) {
+export default function ImageUploader({
+  onUploadSuccess,
+  label = 'Add Image',
+}: ImageUploaderProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -59,21 +63,26 @@ export default function ImageUploader({ onUploadSuccess, label = "Add Image" }: 
         type="button"
         onClick={() => fileInputRef.current?.click()}
         disabled={isUploading}
-        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+        className={`flex items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-bold transition-all ${
           isUploading
-            ? 'bg-gray-100 text-gray-400 cursor-not-allowed dark:bg-gray-800'
-            : 'bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800'
+            ? 'cursor-not-allowed bg-gray-100 text-gray-400 dark:bg-gray-800'
+            : 'border border-gray-200 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800'
         }`}
       >
         {isUploading ? (
           <>
-            <div className="w-3 h-3 border-2 border-primary-500 border-t-transparent rounded-full animate-spin" />
+            <div className="border-primary-500 h-3 w-3 animate-spin rounded-full border-2 border-t-transparent" />
             Uploading...
           </>
         ) : (
           <>
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
             {label}
           </>
@@ -81,7 +90,7 @@ export default function ImageUploader({ onUploadSuccess, label = "Add Image" }: 
       </button>
 
       {error && (
-        <div className="absolute top-full left-0 mt-2 p-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 text-[10px] rounded-md border border-red-100 dark:border-red-900/50 z-50 whitespace-nowrap">
+        <div className="absolute top-full left-0 z-50 mt-2 rounded-md border border-red-100 bg-red-50 p-2 text-[10px] whitespace-nowrap text-red-600 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400">
           {error}
         </div>
       )}

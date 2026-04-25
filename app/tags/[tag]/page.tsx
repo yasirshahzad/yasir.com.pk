@@ -1,7 +1,7 @@
 import { slug } from 'github-slugger'
 import siteMetadata from '@/data/siteMetadata'
 import ListLayout from '@/layouts/ListLayoutWithTags'
-import { getAllPosts, mapPost, getTagCounts } from '@/lib/db/posts'
+import { getAllPosts, mapPost, getTagCounts, getPostsMetadata } from '@/lib/db/posts'
 import { genPageMetadata } from 'app/seo'
 import { Metadata } from 'next'
 
@@ -26,7 +26,7 @@ export async function generateMetadata(props: {
 }
 
 export const generateStaticParams = async () => {
-  const allPosts = await getAllPosts()
+  const allPosts = await getPostsMetadata()
   const tags = new Set<string>()
   allPosts.forEach((post) => {
     post.tags?.forEach((tag) => tags.add(slug(tag)))
@@ -41,7 +41,7 @@ export default async function TagPage(props: { params: Promise<{ tag: string }> 
   const tag = decodeURI(params.tag)
   const title = tag[0].toUpperCase() + tag.split(' ').join('-').slice(1)
 
-  const allDbPosts = await getAllPosts()
+  const allDbPosts = await getPostsMetadata()
   const tagCounts = await getTagCounts()
   const filteredPosts = allDbPosts
     .filter((post) => post.tags && post.tags.map((t) => slug(t)).includes(tag))

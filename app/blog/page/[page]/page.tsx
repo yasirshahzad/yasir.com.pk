@@ -1,11 +1,11 @@
 import ListLayout from '@/layouts/ListLayoutWithTags'
-import { getAllPosts, mapPost, getTagCounts } from '@/lib/db/posts'
+import { getAllPosts, getPostsMetadata, mapPost, getTagCounts } from '@/lib/db/posts'
 import { notFound } from 'next/navigation'
 
 const POSTS_PER_PAGE = 5
 
 export const generateStaticParams = async () => {
-  const allPosts = await getAllPosts()
+  const allPosts = await getPostsMetadata()
   const totalPages = Math.ceil(allPosts.length / POSTS_PER_PAGE)
   const paths = Array.from({ length: totalPages }, (_, i) => ({ page: (i + 1).toString() }))
 
@@ -14,7 +14,7 @@ export const generateStaticParams = async () => {
 
 export default async function Page(props: { params: Promise<{ page: string }> }) {
   const params = await props.params
-  const allDbPosts = await getAllPosts()
+  const allDbPosts = await getPostsMetadata()
   const tagCounts = await getTagCounts()
   const posts = allDbPosts.map(mapPost)
 

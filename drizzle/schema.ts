@@ -1,4 +1,6 @@
-import { pgTable, serial, text, timestamp, boolean, jsonb, varchar, integer, date } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, boolean, jsonb, varchar, integer, date, pgEnum } from 'drizzle-orm/pg-core';
+
+export const postStatusEnum = pgEnum('post_status', ['draft', 'published', 'archived', 'scheduled']);
 
 export const users = pgTable('users', {
   id: serial('id').primaryKey(),
@@ -12,14 +14,40 @@ export const posts = pgTable('posts', {
   title: text('title').notNull(),
   date: text('date'),
   tags: jsonb('tags').$type<string[]>(),
-  draft: boolean('draft').default(false),
+  categories: jsonb('categories').$type<string[]>(),
+  draft: boolean('draft').default(false), // Keeping for backward compatibility
+  status: postStatusEnum('status').default('draft'),
   authors: jsonb('authors').$type<string[]>(),
   layout: text('layout'),
   images: jsonb('images').$type<string[]>(),
   summary: text('summary'),
   content: text('content').notNull(),
+  
+  // SEO & Social
+  metaTitle: text('meta_title'),
+  metaDescription: text('meta_description'),
+  canonicalUrl: text('canonical_url'),
+  ogImage: text('og_image'),
+  
+  // Analytics & Metadata
+  readingTime: integer('reading_time'),
+  viewCount: integer('view_count').default(0),
+  
+  // Publishing
+  publishedAt: timestamp('published_at'),
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+export const postRevisions = pgTable('post_revisions', {
+  id: serial('id').primaryKey(),
+  postId: integer('post_id').references(() => posts.id, { onDelete: 'cascade' }),
+  title: text('title').notNull(),
+  content: text('content').notNull(),
+  summary: text('summary'),
+  tags: jsonb('tags').$type<string[]>(),
+  authorId: text('author_id'),
+  createdAt: timestamp('created_at').defaultNow(),
 });
 
 export const readerProfiles = pgTable('reader_profiles', {
@@ -46,3 +74,4 @@ export const readerNotes = pgTable('reader_notes', {
   postTitle: text('post_title'),         // Human-readable title of the source post
   createdAt: timestamp('created_at').defaultNow(),
 });
+

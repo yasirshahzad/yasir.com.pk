@@ -7,7 +7,7 @@ const POSTS_PER_PAGE = 5
 export const metadata = genPageMetadata({ title: 'Blog' })
 
 export default async function BlogPage(props: { searchParams: Promise<{ page: string }> }) {
-  const allDbPosts = await getAllPosts()
+  const allDbPosts = await getAllPosts(false) // Only show published posts
   const tagCounts = await getTagCounts()
   const posts = allDbPosts.map(mapPost)
 
