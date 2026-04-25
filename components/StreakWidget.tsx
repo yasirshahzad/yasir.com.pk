@@ -93,7 +93,10 @@ export default function StreakWidget() {
       </span>
 
       {/* Dropdown hover card */}
-      <div className="absolute top-full right-0 mt-2 hidden w-56 flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-xl group-hover:flex dark:border-gray-700 dark:bg-gray-900">
+      <div className="absolute top-full right-0 hidden w-56 flex-col gap-4 group-hover:flex">
+        {/* Transparent bridge to prevent hover loss */}
+        <div className="h-2 w-full"></div>
+        <div className="flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-xl dark:border-gray-700 dark:bg-gray-900">
         <div>
           <h4 className="mb-2 text-xs font-bold tracking-wider text-gray-500 uppercase">
             Daily Focus Goal
@@ -137,5 +140,6 @@ export default function StreakWidget() {
         </div>
       </div>
     </div>
+  </div>
   )
 }
