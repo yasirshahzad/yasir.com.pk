@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getReaderNotes } from 'app/actions/noteActions'
+import { getReaderNotes } from '@/app/actions/noteActions'
 import Link from 'next/link'
 import SectionContainer from '@/components/SectionContainer'
 import siteMetadata from '@/data/siteMetadata'

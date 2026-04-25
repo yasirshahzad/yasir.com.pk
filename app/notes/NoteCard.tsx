@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { deleteNote } from 'app/actions/noteActions'
+import { deleteNote } from '@/app/actions/noteActions'
 
 interface NoteRow {
   id: number

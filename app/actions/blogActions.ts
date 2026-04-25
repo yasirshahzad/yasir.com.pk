@@ -3,6 +3,9 @@
 import { updatePost, getPostBySlug } from '@/lib/db/posts'
 import { createClient } from '@/utils/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { posts } from '@/drizzle/schema'
+import { db } from '@/lib/db'
+import { inArray } from 'drizzle-orm'
 
 export async function updateBlogPostContent(slug: string, content: string) {
   const supabase = await createClient()
@@ -73,5 +76,46 @@ export async function fetchPostForExport(slug: string) {
   } catch (error) {
     console.error('Failed to fetch post for export:', error)
     return { success: false, error: 'Failed to fetch post.' }
+  }
+}
+
+export async function bulkUpdatePosts(ids: number[], data: { status?: any }) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || user.email !== process.env.ADMIN_EMAIL) return { success: false, error: 'Unauthorized' }
+
+  try {
+    // @ts-ignore
+    await db.update(posts)
+      .set(data)
+      // @ts-ignore
+      .where(inArray(posts.id as any, ids))
+
+    revalidatePath('/admin')
+    revalidatePath('/blog')
+    return { success: true }
+  } catch (e) {
+    console.error('Bulk update failed:', e)
+    return { success: false, error: 'Bulk update failed' }
+  }
+}
+
+export async function bulkDeletePosts(ids: number[]) {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user || user.email !== process.env.ADMIN_EMAIL) return { success: false, error: 'Unauthorized' }
+
+  try {
+    // @ts-ignore
+    await db.delete(posts)
+      // @ts-ignore
+      .where(inArray(posts.id as any, ids))
+
+    revalidatePath('/admin')
+    revalidatePath('/blog')
+    return { success: true }
+  } catch (e) {
+    console.error('Bulk delete failed:', e)
+    return { success: false, error: 'Bulk delete failed' }
   }
 }

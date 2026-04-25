@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { saveNote } from 'app/actions/noteActions'
+import { saveNote } from '@/app/actions/noteActions'
 
 export default function HighlightToShare() {
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null)
