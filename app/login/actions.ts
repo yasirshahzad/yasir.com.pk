@@ -21,13 +21,30 @@ export async function login(formData: FormData) {
 
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { error, data } = await supabase.auth.signInWithPassword({
     email,
     password,
   })
 
   if (error) {
     return { error: error.message }
+  }
+
+  // Ensure profile exists (Sync in case it was missed during signup or created via other means)
+  if (data.user) {
+    const { data: profile } = await supabase
+      .from('reader_profiles')
+      .select('id')
+      .eq('id', data.user.id)
+      .single()
+
+    if (!profile) {
+      await supabase.from('reader_profiles').insert({
+        id: data.user.id,
+        email: data.user.email,
+        role: data.user.email === process.env.ADMIN_EMAIL ? 'admin' : 'user',
+      })
+    }
   }
 
   revalidatePath('/', 'layout')
@@ -44,18 +61,37 @@ export async function signup(formData: FormData) {
 
   const supabase = await createClient()
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
   })
 
-  // Note: if confirm email is off, they will essentially be logged in or at least registered
   if (error) {
     return { error: error.message }
   }
 
+  if (data.user) {
+    // Create the profile in our public schema
+    const { error: profileError } = await supabase.from('reader_profiles').insert({
+      id: data.user.id,
+      email: data.user.email,
+      role: data.user.email === process.env.ADMIN_EMAIL ? 'admin' : 'user',
+    })
+    
+    if (profileError) {
+      console.error('Failed to create profile:', profileError)
+      // We don't necessarily want to fail the whole signup if profile creation fails,
+      // but it's good to know. The login check will catch it later.
+    }
+  }
+
   revalidatePath('/', 'layout')
-  redirect('/')
+  
+  if (data.session) {
+    redirect('/admin')
+  } else {
+    return { success: 'Check your email for the confirmation link.' }
+  }
 }
 
 export async function logout() {

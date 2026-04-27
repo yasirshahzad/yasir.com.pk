@@ -115,3 +115,30 @@ export async function autoSavePostAction(slug: string, data: Record<string, any>
     return { success: false }
   }
 }
+
+export async function getUsersAction() {
+  await assertAdmin()
+  const { db } = await import('@/lib/db/index')
+  const { readerProfiles } = await import('../../drizzle/schema')
+  const { desc } = await import('drizzle-orm')
+  return await db.select().from(readerProfiles).orderBy(desc(readerProfiles.createdAt))
+}
+
+export async function updateUserRoleAction(userId: string, role: 'admin' | 'user') {
+  await assertAdmin()
+  const { db } = await import('@/lib/db/index')
+  const { readerProfiles } = await import('../../drizzle/schema')
+  const { eq } = await import('drizzle-orm')
+
+  // Prevent removing own admin status if it's the only one? 
+  // (Optional: safer to just let it happen or check)
+
+  await db
+    .update(readerProfiles)
+    .set({ role })
+    // @ts-ignore
+    .where(eq(readerProfiles.id, userId))
+
+  revalidatePath('/admin/users')
+  return { success: true }
+}

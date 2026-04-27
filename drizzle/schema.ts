@@ -50,9 +50,15 @@ export const postRevisions = pgTable('post_revisions', {
   createdAt: timestamp('created_at').defaultNow(),
 });
 
+export const userRoleEnum = pgEnum('user_role', ['admin', 'user']);
+
 export const readerProfiles = pgTable('reader_profiles', {
-  id: text('id').primaryKey(), // UUID string, securely pinned in the user's browser cookie
-  currentStreak: integer('current_streak').default(0), 
+  id: text('id').primaryKey(), // UUID string from Supabase Auth
+  email: text('email'),
+  fullName: text('full_name'),
+  avatarUrl: text('avatar_url'),
+  role: userRoleEnum('role').default('user'),
+  currentStreak: integer('current_streak').default(0),
   longestStreak: integer('longest_streak').default(0),
   lastActiveDate: date('last_active_date'), // 'YYYY-MM-DD'
   activeFocusSessionStartedAt: timestamp('active_focus_session_started_at'),
@@ -76,4 +82,12 @@ export const readerNotes = pgTable('reader_notes', {
   postTitle: text('post_title'),         // Human-readable title of the source post
   createdAt: timestamp('created_at').defaultNow(),
 });
-
+export const comments = pgTable('comments', {
+  id: serial('id').primaryKey(),
+  postId: integer('post_id').references(() => posts.id, { onDelete: 'cascade' }).notNull(),
+  userId: text('user_id').references(() => readerProfiles.id, { onDelete: 'set null' }),
+  content: text('content').notNull(),
+  parentId: integer('parent_id'), 
+  isApproved: boolean('is_approved').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
+});

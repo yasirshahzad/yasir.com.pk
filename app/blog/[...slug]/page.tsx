@@ -121,6 +121,8 @@ function TableOfContents({ toc }: { toc: any[] }) {
   )
 }
 
+import Comments from '@/components/Comments'
+
 export default async function Page(props: { params: Promise<{ slug: string[] }> }) {
   const params = await props.params
   const slug = decodeURI(params.slug.join('/'))
@@ -196,6 +198,7 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
           }}
         />
       </div>
+      <Comments postId={post.id} />
     </Layout>
   )
 }

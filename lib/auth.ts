@@ -6,11 +6,29 @@ import { createClient } from '@/utils/supabase/server'
  */
 export async function assertAdmin() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    throw new Error('Unauthorized: Authentication required.')
+  }
 
   const adminEmail = process.env.ADMIN_EMAIL
-  
-  if (!user || !adminEmail || user.email !== adminEmail) {
+
+  // If it's the hardcoded admin, they always have access
+  if (adminEmail && user.email === adminEmail) {
+    return user
+  }
+
+  // Otherwise check the database role
+  const { data: profile } = await supabase
+    .from('reader_profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single()
+
+  if (profile?.role !== 'admin') {
     throw new Error('Unauthorized: Admin access required.')
   }
 

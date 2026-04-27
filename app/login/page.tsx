@@ -1,23 +1,37 @@
 'use client'
 
-import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
+import React, { useState, Suspense, useEffect } from 'react'
 import { login, signup } from './actions'
 
-export default function LoginPage() {
-  const [error, setError] = useState<string | null>(null)
+function LoginForm() {
+  const searchParams = useSearchParams()
+  const [error, setError] = useState<string | null>(searchParams.get('error'))
+  const [message, setMessage] = useState<string | null>(searchParams.get('message'))
   const [isLoading, setIsLoading] = useState(false)
   const [isLoginView, setIsLoginView] = useState(true)
+
+  useEffect(() => {
+    const errorParam = searchParams.get('error')
+    if (errorParam) setError(errorParam)
+    const messageParam = searchParams.get('message')
+    if (messageParam) setMessage(messageParam)
+  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
+    setMessage(null)
 
     const formData = new FormData(e.currentTarget)
-    const result = isLoginView ? await login(formData) : await signup(formData)
+    const result = (isLoginView ? await login(formData) : await signup(formData)) as { error?: string, success?: string }
 
     if (result?.error) {
       setError(result.error)
+      setIsLoading(false)
+    } else if (result?.success) {
+      setMessage(result.success)
       setIsLoading(false)
     }
   }
@@ -53,6 +67,7 @@ export default function LoginPage() {
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="border border-gray-200 bg-white px-4 py-8 shadow-xl sm:rounded-xl sm:px-10 dark:border-gray-800 dark:bg-gray-900">
           <form className="space-y-6" onSubmit={handleSubmit}>
+            <input type="hidden" name="next" value={searchParams.get('next') || ''} />
             <div>
               <label
                 htmlFor="email"
@@ -116,6 +131,21 @@ export default function LoginPage() {
               </div>
             )}
 
+            {message && (
+              <div className="rounded-md border border-green-200 bg-green-50 p-4 dark:border-green-800 dark:bg-green-900/30">
+                <div className="flex">
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-green-800 dark:text-green-200">
+                      Success
+                    </h3>
+                    <div className="mt-2 text-sm text-green-700 dark:text-green-300">
+                      <p>{message}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div>
               <button
                 type="submit"
@@ -125,13 +155,21 @@ export default function LoginPage() {
                 {isLoading
                   ? 'Authenticating...'
                   : isLoginView
-                    ? 'Sign in properly'
-                    : 'Create account & Start tracking'}
+                    ? 'Sign In'
+                    : 'Create Account'}
               </button>
             </div>
           </form>
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-[70vh] items-center justify-center">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   )
 }

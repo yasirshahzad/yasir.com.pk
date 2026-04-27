@@ -43,12 +43,27 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Guard all /admin routes. Only process.env.ADMIN_EMAIL gets access.
+  // Guard all /admin routes.
   const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
-  const adminEmail = process.env.ADMIN_EMAIL
-
-  // If the environment variable isn't set, we must fail secure and deny all admin access
-  const isAdmin = user && adminEmail && user.email === adminEmail
+  
+  let isAdmin = false
+  if (user) {
+    // Check if user is the hardcoded admin from env (fallback/initial setup)
+    const isHardcodedAdmin = process.env.ADMIN_EMAIL && user.email === process.env.ADMIN_EMAIL
+    
+    if (isHardcodedAdmin) {
+      isAdmin = true
+    } else {
+      // Check database for role
+      const { data: profile } = await supabase
+        .from('reader_profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single()
+      
+      isAdmin = profile?.role === 'admin'
+    }
+  }
 
   if (isAdminRoute && !isAdmin) {
     const url = request.nextUrl.clone()
