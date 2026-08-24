@@ -16,8 +16,8 @@ import { extractTocHeadings } from 'pliny/mdx-plugins/index.js'
 import Link from '@/components/Link'
 import siteMetadata from '@/data/siteMetadata'
 import { Metadata } from 'next'
-import { createClient } from '@/utils/supabase/server'
 import InlinePostEditor from '@/components/InlinePostEditor'
+import { BlogPostJsonLd, BreadcrumbJsonLd } from '@/components/JsonLd'
 
 const layouts = {
   PostSimple,
@@ -51,11 +51,13 @@ export async function generateMetadata(props: {
       url: img && img.includes('http') ? img : siteMetadata.siteUrl + img,
     }))
 
+    const postUrl = `${siteMetadata.siteUrl}/blog/${slug}`
+
     return {
       title: post.metaTitle || post.title,
       description: post.metaDescription || post.summary || undefined,
       alternates: {
-        canonical: post.canonicalUrl || undefined,
+        canonical: post.canonicalUrl || postUrl,
       },
       openGraph: {
         title: post.metaTitle || post.title,
@@ -65,7 +67,7 @@ export async function generateMetadata(props: {
         type: 'article',
         publishedTime: publishedAt,
         modifiedTime: modifiedAt,
-        url: './',
+        url: postUrl,
         images: ogImages,
         authors: authors.length > 0 ? authors : [siteMetadata.author],
       },
@@ -184,21 +186,56 @@ export default async function Page(props: { params: Promise<{ slug: string[] }> 
 
   const Layout = layouts[post.layout as keyof typeof layouts] || layouts[defaultLayout]
 
+  const postUrl = `${siteMetadata.siteUrl}/blog/${post.slug}`
+  const breadcrumbItems = [
+    { name: 'Home', url: '/' },
+    { name: 'Blog', url: '/blog' },
+    { name: post.title, url: `/blog/${post.slug}` },
+  ]
+
+  const datePublishedStr = post.publishedAt
+    ? typeof post.publishedAt === 'string'
+      ? post.publishedAt
+      : new Date(post.publishedAt).toISOString()
+    : post.date
+    ? typeof post.date === 'string'
+      ? post.date
+      : new Date(post.date).toISOString()
+    : new Date().toISOString()
+
+  const dateModifiedStr = post.updatedAt
+    ? typeof post.updatedAt === 'string'
+      ? post.updatedAt
+      : new Date(post.updatedAt).toISOString()
+    : undefined
+
   return (
-    <Layout content={mainContent as any} authorDetails={authorDetails}>
-      <div className="prose dark:prose-invert max-w-none pt-10 pb-8">
-        <TableOfContents toc={toc} />
-        <InlinePostEditor
-          slug={post.slug}
-          initialHtml={contentHtml}
-          metadata={{
-            title: post.title || '',
-            summary: post.summary || '',
-            images: (post.images as string[]) || [],
-          }}
-        />
-      </div>
-      <Comments postId={post.id} />
-    </Layout>
+    <>
+      <BlogPostJsonLd
+        title={post.title}
+        summary={post.summary || undefined}
+        datePublished={datePublishedStr}
+        dateModified={dateModifiedStr}
+        url={postUrl}
+        images={(post.images as string[]) || (post.ogImage ? [post.ogImage] : [])}
+        authorName={authorDetails[0]?.name}
+      />
+      <BreadcrumbJsonLd items={breadcrumbItems} />
+      <Layout content={mainContent as any} authorDetails={authorDetails}>
+        <div className="prose dark:prose-invert max-w-none pt-10 pb-8">
+          <TableOfContents toc={toc} />
+          <InlinePostEditor
+            slug={post.slug}
+            initialHtml={contentHtml}
+            metadata={{
+              title: post.title || '',
+              summary: post.summary || '',
+              images: (post.images as string[]) || [],
+            }}
+          />
+        </div>
+        <Comments postId={post.id} />
+      </Layout>
+    </>
   )
 }

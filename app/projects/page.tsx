@@ -2,7 +2,11 @@ import projectsData from '@/data/projectsData'
 import Card from '@/components/Card'
 import { genPageMetadata } from 'app/seo'
 
-export const metadata = genPageMetadata({ title: 'Projects' })
+export const metadata = genPageMetadata({
+  title: 'Projects',
+  description: 'Explore open-source software, developer tools, and engineering projects built by HatfLabs.',
+  path: 'projects',
+})
 
 export default function Projects() {
   return (
@@ -13,7 +17,7 @@ export default function Projects() {
             Projects
           </h1>
           <p className="text-lg leading-7 text-gray-500 dark:text-gray-400">
-            Showcase your projects with a hero image (16 x 9)
+            Explore software design, open-source applications, and engineering projects created by HatfLabs.
           </p>
         </div>
         <div className="container py-12">

@@ -12,7 +12,7 @@
     "build": "cross-env INIT_CWD=$PWD next build && npx tsx --env-file .env ./scripts/postbuild.ts",
     "serve": "next start",
     "analyze": "cross-env ANALYZE=true next build",
-    "lint": "eslint --fix pages app components lib layouts scripts"
+    "lint": "eslint --fix app components lib layouts scripts"
   },
   "dependencies": {
     "@headlessui/react": "2.2.0",

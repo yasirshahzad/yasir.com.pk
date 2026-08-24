@@ -3,7 +3,11 @@ import AuthorLayout from '@/layouts/AuthorLayout'
 import { genPageMetadata } from 'app/seo'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 
-export const metadata = genPageMetadata({ title: 'About' })
+export const metadata = genPageMetadata({
+  title: 'About',
+  description: 'Learn more about Muhammad Yasir, Full Stack Software Engineer specializing in web, mobile, and cloud software development.',
+  path: 'about',
+})
 
 export default function Page() {
   const author = getAuthorBySlug('default')
@@ -12,17 +16,13 @@ export default function Page() {
     return null
   }
 
-  // Assuming author back-matter/content might be in mdx if it was before
-  // But for now, we'll just render the layout with the meta data
-  // If there's extra content in the author .mdx, we'd need to extract it
-
   return (
-    <>
-      {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-      <AuthorLayout content={author as any}>
-        {/* If the author file has a body, we'd render it here. For now keeping it simple */}
-        <></>
-      </AuthorLayout>
-    </>
+    <AuthorLayout content={author as any}>
+      {author.content ? (
+        <p className="text-lg leading-8 text-gray-700 dark:text-gray-300">
+          {author.content}
+        </p>
+      ) : null}
+    </AuthorLayout>
   )
 }

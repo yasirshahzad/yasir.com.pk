@@ -12,6 +12,7 @@ import siteMetadata from '@/data/siteMetadata'
 import { ThemeProviders } from './theme-providers'
 import { Metadata } from 'next'
 import NextTopLoader from 'nextjs-toploader'
+import { WebSiteJsonLd, PersonJsonLd } from '@/components/JsonLd'
 
 const space_grotesk = Space_Grotesk({
   subsets: ['latin'],
@@ -29,14 +30,14 @@ export const metadata: Metadata = {
   openGraph: {
     title: siteMetadata.title,
     description: siteMetadata.description,
-    url: './',
+    url: siteMetadata.siteUrl,
     siteName: siteMetadata.title,
     images: [siteMetadata.socialBanner],
     locale: 'en_US',
     type: 'website',
   },
   alternates: {
-    canonical: './',
+    canonical: siteMetadata.siteUrl,
     types: {
       'application/rss+xml': `${siteMetadata.siteUrl}/feed.xml`,
     },
@@ -56,6 +57,14 @@ export const metadata: Metadata = {
     title: siteMetadata.title,
     card: 'summary_large_image',
     images: [siteMetadata.socialBanner],
+  },
+  verification: {
+    google: siteMetadata.googleSiteVerification || undefined,
+    other: {
+      ...(siteMetadata.bingSiteVerification
+        ? { 'msvalidate.01': siteMetadata.bingSiteVerification }
+        : {}),
+    },
   },
 }
 
@@ -96,6 +105,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000" />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
       <body className="bg-white pl-[calc(100vw-100%)] text-black antialiased dark:bg-gray-950 dark:text-white">
+        <WebSiteJsonLd />
+        <PersonJsonLd />
         <ThemeProviders>
           <NextTopLoader
             color="#E81CFF"

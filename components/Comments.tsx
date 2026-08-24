@@ -17,7 +17,8 @@ type Comment = {
 }
 
 interface CommentsProps {
-  postId: number
+  postId?: number
+  slug?: string
 }
 
 export default function Comments({ postId }: CommentsProps) {
@@ -29,6 +30,7 @@ export default function Comments({ postId }: CommentsProps) {
   const [replyContent, setReplyContent] = useState('')
 
   const fetchComments = async () => {
+    if (!postId) return
     const res = await getComments(postId)
     if (res.success && res.data) {
       setComments(res.data)
@@ -64,6 +66,7 @@ export default function Comments({ postId }: CommentsProps) {
   }, [postId])
 
   const handleSubmit = async (parentId?: number) => {
+    if (!postId) return
     const content = parentId ? replyContent : newComment
     if (!content.trim()) return
 

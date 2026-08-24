@@ -21,9 +21,10 @@ export function getAuthorBySlug(slug: string) {
   const filePath = path.join(authorsDir, `${slug}.mdx`)
   if (!fs.existsSync(filePath)) return null
   const fileContent = fs.readFileSync(filePath, 'utf8')
-  const { data } = matter(fileContent)
+  const { data, content } = matter(fileContent)
   return {
     ...data,
+    content,
     slug,
   }
 }

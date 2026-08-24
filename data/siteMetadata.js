@@ -23,6 +23,8 @@ const siteMetadata = {
   // medium: 'https://medium.com',
   // bluesky: 'https://bsky.app/',
   locale: 'en-US',
+  googleSiteVerification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
+  bingSiteVerification: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION || '',
   // set to true if you want a navbar fixed to the top
   stickyNav: false,
   analytics: {

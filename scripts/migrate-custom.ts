@@ -74,7 +74,7 @@ async function run() {
       if (e.code === '42701') console.log('Column focus_goal_minutes already exists');
       else throw e;
     }
-    
+
     // Add comments table
     try {
       await sql`
@@ -89,25 +89,25 @@ async function run() {
         );
       `;
       console.log('Created comments table');
-    } catch(e: any) {
+    } catch (e: any) {
       console.log('Error creating comments table:', e.message);
     }
 
     // Add constraints
     try {
-       await sql`ALTER TABLE "comments" ADD CONSTRAINT "comments_post_id_posts_id_fk" FOREIGN KEY ("post_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;`;
-       console.log('Added post_id constraint');
-    } catch(e: any) {
-        if (e.code === '42710') console.log('Constraint comments_post_id_posts_id_fk already exists');
-        else console.log('Error adding constraint:', e.message);
+      await sql`ALTER TABLE "comments" ADD CONSTRAINT "comments_post_id_posts_id_fk" FOREIGN KEY ("post_id") REFERENCES "public"."posts"("id") ON DELETE cascade ON UPDATE no action;`;
+      console.log('Added post_id constraint');
+    } catch (e: any) {
+      if (e.code === '42710') console.log('Constraint comments_post_id_posts_id_fk already exists');
+      else console.log('Error adding constraint:', e.message);
     }
-    
+
     try {
-       await sql`ALTER TABLE "comments" ADD CONSTRAINT "comments_user_id_reader_profiles_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."reader_profiles"("id") ON DELETE set null ON UPDATE no action;`;
-       console.log('Added user_id constraint');
-    } catch(e: any) {
-        if (e.code === '42710') console.log('Constraint comments_user_id_reader_profiles_id_fk already exists');
-        else console.log('Error adding constraint:', e.message);
+      await sql`ALTER TABLE "comments" ADD CONSTRAINT "comments_user_id_reader_profiles_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."reader_profiles"("id") ON DELETE set null ON UPDATE no action;`;
+      console.log('Added user_id constraint');
+    } catch (e: any) {
+      if (e.code === '42710') console.log('Constraint comments_user_id_reader_profiles_id_fk already exists');
+      else console.log('Error adding constraint:', e.message);
     }
 
     console.log('Migration completed successfully!');
